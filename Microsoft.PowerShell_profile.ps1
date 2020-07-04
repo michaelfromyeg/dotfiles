@@ -4,8 +4,8 @@ New-Alias -Name s -Value Get-GitStatus
 function Set-GitCommit { & git commit -am $args }
 New-Alias -Name c -Value Set-GitCommit
 
-function Set-GitCommit { & git push -u origin $args }
-New-Alias -Name p -Value Set-GitCommit
+function Set-GitPush { & git push -u origin $args }
+New-Alias -Name p -Value Set-GitPush
 
 function Go-To-Github { Set-Location ~/Documents/GitHub }
 New-Alias -Name mgh -Value Go-To-Github 
