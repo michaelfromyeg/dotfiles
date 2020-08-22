@@ -1,5 +1,9 @@
-# .files
+# dotfiles
 
-Dot files and general setup for a new PC.
+Includes the dotfiles I use for nvim and PowerShell.
 
-I highly recommend installing [Chocolatey](https://chocolatey.org/install) to handle software.
+For any required software installations, I highly recommend using Chocolatey.
+
+## vim
+
+I use [ThePrimeagen's dotfile](https://github.com/erkrnt/awesome-streamerrc/tree/master/ThePrimeagen) with Neovim.
