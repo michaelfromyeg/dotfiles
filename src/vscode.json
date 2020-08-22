@@ -1,0 +1,41 @@
+{
+    "terminal.integrated.shell.windows": "C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+    "workbench.iconTheme": "vscode-icons",
+    "vsicons.dontShowNewVersionMessage": true,
+    "editor.suggestSelection": "first",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "files.exclude": {
+        "**/.classpath": true,
+        "**/.project": true,
+        "**/.settings": true,
+        "**/.factorypath": true
+    },
+    "java.semanticHighlighting.enabled": true,
+    "java.project.importOnFirstTimeStartup": "automatic",
+    "[javascript]": {
+      "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "typescript.updateImportsOnFileMove.enabled": "always",
+    "python.languageServer": "Microsoft",
+    "python.dataScience.sendSelectionToInteractiveWindow": true,
+    "cSpell.userWords": [
+      "SUNIA's",
+      "appsscript",
+      "claspignore",
+      "clasprc",
+      "clrf",
+      "codelab",
+      "gitattributes",
+      "isupper",
+      "sunia"
+    ],
+    "python.dataScience.alwaysTrustNotebooks": true,
+    "javascript.updateImportsOnFileMove.enabled": "always",
+    "yaml.schemas": {
+      "file:///c%3A/Users/mdema/.vscode/extensions/atlassian.atlascode-2.7.0/resources/schemas/pipelines-schema.json": "bitbucket-pipelines.yml"
+    },
+    "workbench.colorTheme": "Gruvbox Dark (Soft)",
+    "editor.fontSize": 15,
+    "editor.fontFamily": "'Cascadia Code', Consolas, 'Courier New', monospace",
+    "editor.fontLigatures": true
+}
