@@ -7,7 +7,7 @@
     {
         "defaults":
         {
-            "fontFace": "Cascadia Code",
+            "fontFace": "Cascadia Code PL",
             "fontSize": 15,
             "padding": "6,6,6,6",
             "cursorShape": "vintage",
