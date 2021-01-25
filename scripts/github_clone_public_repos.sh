@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Original code from: https://stackoverflow.com/questions/19576742/how-to-clone-all-repos-at-once-from-github
 
 if [ $# -ne 1 ]

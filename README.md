@@ -1,6 +1,6 @@
 # dotfiles
 
-Includes the dotfiles I use for nvim and PowerShell.
+Includes the dotfiles I use for nvim, WSL 2, ZSH, and PowerShell.
 
 For any required software installations, I highly recommend using Chocolatey.
 
