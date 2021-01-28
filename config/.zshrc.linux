@@ -1,0 +1,28 @@
+# If you come from bash you might have to change your $PATH.
+# export PATH=$HOME/bin:/usr/local/bin:$PATH
+
+# Path to your oh-my-zsh installation.
+export ZSH="/home/mdema/.oh-my-zsh"
+
+ZSH_THEME="robbyrussell"
+HYPHEN_INSENSITIVE="true"
+DISABLE_UPDATE_PROMPT="true"
+ENABLE_CORRECTION="true"
+COMPLETION_WAITING_DOTS="true"
+DISABLE_UNTRACKED_FILES_DIRTY="true"
+HIST_STAMPS="yyyy/mm/dd"
+
+plugins=(
+	git
+	docker
+	iterm2	
+)
+
+source $ZSH/oh-my-zsh.sh
+
+alias zshconfig="mate ~/.zshrc"
+alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# Profiles
+[[ -e ~/.profile ]] && emulate sh -c "source ~/.profile"
+eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)

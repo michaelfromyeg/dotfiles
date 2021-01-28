@@ -1,17 +1,61 @@
 # dotfiles
 
-Includes the dotfiles I use for nvim, WSL 2, ZSH, and PowerShell.
+This repository includes the dotfiles I use for vim, WSL 2, zsh, iTerm2, and VS Code, and PowerShell. It's goal is to work well for me as a developer, use consistent theming, and make me more productive overall.
 
-For any required software installations, I highly recommend using Chocolatey.
+For any required software installations, I highly recommend using Homebrew and Chocolatey.
 
-## vim
+## Usage
 
-I use [ThePrimeagen's dotfile](https://github.com/erkrnt/awesome-streamerrc/tree/master/ThePrimeagen) with Neovim.
+These are the steps to using the dotfiles in this repository.
 
-To install YouCompleteMe, follow the README and then run this:
+## Guide
 
-`python install.py --clang-completer --all --msvc=15`
+Here is how to set-up the key software involved in my development workflow.
 
-## VS Code
+### vim
+
+Instructions for setting up my vim configuration; this will include:
+
+* ...
+* ...
+* ...
+
+## WSL 2
+
+Instructions for setting up my WSL 2 configuration; this will include:
+
+* ...
+* ...
+* ...
+
+## zsh
+
+Instructions for setting up my zsh configuration; this will include:
+
+* ...
+* ...
+* ...
+
+### iTerm2
+
+Instructions for setting up my iTerm2 configuration; this will include:
+
+* ...
+* ...
+* ...
+
+### PowerShell
+
+Instructions for setting up my PowerShell configuration; this will include:
+
+* ...
+* ...
+* ...
+
+### VS Code
 
 I use Settings Sync, a newly added VS Code feature, but I've included my settings as well.
+
+## Contributing
+
+Suggestions are always welcome. Don't hestitate to get in touch.
