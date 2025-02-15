@@ -15,7 +15,7 @@ HIST_STAMPS="yyyy/mm/dd"
 plugins=(
 	git
 	docker
-	iterm2	
+	iterm2
 )
 
 source $ZSH/oh-my-zsh.sh

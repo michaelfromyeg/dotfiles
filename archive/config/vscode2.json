@@ -1,0 +1,119 @@
+{
+  "[css]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[erlang]": {
+    "editor.defaultFormatter": "szTheory.erlang-formatter"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "cmake.configureOnOpen": false,
+  "cmake.showOptionsMovedNotification": false,
+  "editor.fontFamily": "CaskaydiaCove NFP, Cascadia Code PL, Consolas, 'Courier New', monospace",
+  "editor.fontLigatures": true,
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.replaceTagsWhenPull": true,
+  "github.copilot.editor.enableAutoCompletions": true,
+  "githubPullRequests.pullBranch": "never",
+  "go.toolsManagement.autoUpdate": true,
+  "indentRainbow.colors": [
+    "rgba(250, 189, 47, 0.05)",
+    "rgba(142, 192, 124, 0.05)",
+    "rgba(131, 165, 152, 0.05)",
+    "rgba(211, 134, 155, 0.05)",
+    "rgba(254, 128, 25, 0.05)"
+  ],
+  "indentRainbow.errorColor": "rgba(251, 73, 52, 0.2)",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "ltex.enabled": [
+    "bibtex",
+    "context",
+    "context.tex",
+    "html",
+    "javascript",
+    "latex",
+    "markdown",
+    "org",
+    "restructuredtext",
+    "rsweave"
+  ],
+  "notebook.output.fontFamily": "Cascadia Code PL, Consolas, 'Courier New', monospace",
+  "notebook.output.scrolling": true,
+  "notebook.output.wordWrap": true,
+  "remote.autoForwardPortsSource": "hybrid",
+  "telemetry.telemetryLevel": "off",
+  "terminal.integrated.defaultProfile.linux": "bash",
+  "terminal.integrated.defaultProfile.windows": "Git Bash",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "update.enableWindowsBackgroundUpdates": false,
+  "update.mode": "none",
+  "update.showReleaseNotes": false,
+  "vs-kubernetes": {
+    "vscode-kubernetes.kubectl-path.windows": "C:\\Users\\mdemarco\\.vs-kubernetes\\tools\\kubectl\\kubectl.exe",
+    "vscode-kubernetes.minikube-path.windows": "C:\\Users\\mdemarco\\.vs-kubernetes\\tools\\minikube\\windows-amd64\\minikube.exe"
+  },
+  "workbench.colorTheme": "Gruvbox Dark Medium",
+  "workbench.iconTheme": "vscode-icons",
+  "circleci.hostUrl": "",
+  "workbench.startupEditor": "none",
+  "security.workspace.trust.untrustedFiles": "open",
+  "puzzles.defaultLanguage": "python",
+  "security.allowedUNCHosts": ["wsl.localhost"],
+  "vim.useSystemClipboard": true,
+  "vim.handleKeys": {
+    "<C-d>": true,
+    "<C-s>": false,
+    "<C-z>": false,
+    "<C-w>": false,
+    "<C-c>": false,
+    "<C-v>": false,
+    "<C-x>": false,
+    "<C-p>": false,
+    "<C-a>": false
+  },
+  "vim.smartRelativeLine": true,
+  "vim.useCtrlKeys": false,
+  "workbench.colorCustomizations": {
+    "statusBar.background": "#282828",
+    "statusBar.noFolderBackground": "#282828",
+    "statusBar.debuggingBackground": "#282828",
+    "statusBar.foreground": "#a89984",
+    "statusBar.debuggingForeground": "#a89984"
+  },
+  "vim.statusBarColorControl": true,
+  "vim.statusBarColors.normal": ["#282828", "#a89984"],
+  "vim.statusBarColors.insert": ["#98971a", "#282828"],
+  "vim.statusBarColors.visual": ["#d65d0e", "#282828"],
+  "vim.statusBarColors.visualline": ["#d65d0e", "#282828"],
+  "vim.statusBarColors.visualblock": ["#d65d0e", "#282828"],
+  "vim.statusBarColors.replace": ["#cc241d", "#282828"],
+  "vim.statusBarColors.commandlineinprogress": ["#458588", "#282828"],
+  "vim.statusBarColors.searchinprogressmode": ["#b16286", "#282828"],
+  "vim.statusBarColors.easymotionmode": ["#d79921", "#282828"],
+  "vim.statusBarColors.surroundinputmode": ["#689d6a", "#282828"]
+}

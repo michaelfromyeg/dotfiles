@@ -5,10 +5,10 @@
   "editor.suggestSelection": "first",
   "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
   "files.exclude": {
-      "**/.classpath": true,
-      "**/.project": true,
-      "**/.settings": true,
-      "**/.factorypath": true
+    "**/.classpath": true,
+    "**/.project": true,
+    "**/.settings": true,
+    "**/.factorypath": true
   },
   "java.semanticHighlighting.enabled": true,
   "java.project.importOnFirstTimeStartup": "automatic",
@@ -35,9 +35,7 @@
   "java.help.firstView": "gettingStarted",
   "cmake.configureOnOpen": true,
   "jupyter.sendSelectionToInteractiveWindow": true,
-  "terminal.integrated.commandsToSkipShell": [
-    "language-julia.interrupt"
-  ],
+  "terminal.integrated.commandsToSkipShell": ["language-julia.interrupt"],
   "liveshare.authenticationProvider": "GitHub",
   "python.pythonPath": "/usr/bin/python3",
   "editor.tabSize": 2,

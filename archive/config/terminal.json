@@ -1,107 +1,110 @@
 {
-    "$schema": "https://aka.ms/terminal-profiles-schema",
-    "defaultProfile": "{2c4de342-38b7-51cf-b940-2309a097f518}",
-    "copyOnSelect": false,
-    "copyFormatting": false,
-    "profiles":
-    {
-        "defaults":
-        {
-            "fontFace": "Cascadia Code PL",
-            "fontSize": 12,
-            "padding": "6,6,6,6",
-            "cursorShape": "vintage",
-            "useAcrylic": false,
-            "suppressApplicationTitle": true,
-            "tabTitle": "Ubuntu",
-            "colorScheme" : "Gruvbox (Dark)",
-            "cursorColor" : "#FFFFFF"
-        },
-        "list":
-        [
-            {
-                "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
-                "name": "Ubuntu",
-                "source": "Windows.Terminal.Wsl",
-                "hidden": false,
-                "commandline" : "wsl -d Ubuntu",
-                "startingDirectory" : "//wsl$/Ubuntu/home/mdema"
-            },
-            {
-                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-                "name": "Windows PowerShell",
-                "commandline": "powershell.exe",
-                "hidden": false
-            },
-            {
-                "guid": "{00000000-0000-0000-ba54-000000000002}",
-                "name": "Git Bash",
-                "commandline" : "C:/Program Files/Git/bin/bash.exe --login",
-                "hidden": false
-            },
-            {
-                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
-                "name": "Command Prompt",
-                "commandline": "cmd.exe",
-                "hidden": false
-            },
-            {
-                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
-                "name": "Azure Cloud Shell",
-                "source": "Windows.Terminal.Azure",
-                "hidden": false
-            }
-        ]
+  "$schema": "https://aka.ms/terminal-profiles-schema",
+  "defaultProfile": "{2c4de342-38b7-51cf-b940-2309a097f518}",
+  "copyOnSelect": false,
+  "copyFormatting": false,
+  "profiles": {
+    "defaults": {
+      "fontFace": "Cascadia Code PL",
+      "fontSize": 12,
+      "padding": "6,6,6,6",
+      "cursorShape": "vintage",
+      "useAcrylic": false,
+      "suppressApplicationTitle": true,
+      "tabTitle": "Ubuntu",
+      "colorScheme": "Gruvbox (Dark)",
+      "cursorColor": "#FFFFFF"
     },
-    "schemes": [
-        {
-            "name": "Gruvbox (Dark)",
-            "background" : "#282828",
-            "black" : "#282828",
-            "blue" : "#458588",
-            "brightBlack" : "#928374",
-            "brightBlue" : "#83A598",
-            "brightCyan" : "#8EC07C",
-            "brightGreen" : "#B8BB26",
-            "brightPurple" : "#D3869B",
-            "brightRed" : "#FB4934",
-            "brightWhite" : "#EBDBB2",
-            "brightYellow" : "#FABD2F",
-            "cyan" : "#689D6A",
-            "foreground" : "#EBDBB2",
-            "green" : "#98971A",
-            "purple" : "#B16286",
-            "red" : "#CC241D",
-            "white" : "#A89984",
-            "yellow" : "#D79921"
-        },
-        {
-            "name" : "Raspberry",
-            "background" : "#3C0315",
-            "black" : "#282A2E",
-            "blue" : "#0170C5",
-            "brightBlack" : "#676E7A",
-            "brightBlue" : "#80c8ff",
-            "brightCyan" : "#8ABEB7",
-            "brightGreen" : "#B5D680",
-            "brightPurple" : "#AC79BB",
-            "brightRed" : "#BD6D85",
-            "brightWhite" : "#FFFFFD",
-            "brightYellow" : "#FFFD76",
-            "cyan" : "#3F8D83",
-            "foreground" : "#FFFFFD",
-            "green" : "#76AB23",
-            "purple" : "#7D498F",
-            "red" : "#BD0940",
-            "white" : "#FFFFFD",
-            "yellow" : "#E0DE48"
-            }
-    ],
-    "keybindings":
-    [
-        { "command": {"action": "copy", "singleLine": false }, "keys": "ctrl+c" },
-        { "command": "paste", "keys": "ctrl+v" },
-        { "command": "find", "keys": "ctrl+shift+f" },
-        { "command": { "action": "splitPane", "split": "auto", "splitMode": "duplicate" }, "keys": "alt+shift+d" }
+    "list": [
+      {
+        "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
+        "name": "Ubuntu",
+        "source": "Windows.Terminal.Wsl",
+        "hidden": false,
+        "commandline": "wsl -d Ubuntu",
+        "startingDirectory": "//wsl$/Ubuntu/home/mdema"
+      },
+      {
+        "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+        "name": "Windows PowerShell",
+        "commandline": "powershell.exe",
+        "hidden": false
+      },
+      {
+        "guid": "{00000000-0000-0000-ba54-000000000002}",
+        "name": "Git Bash",
+        "commandline": "C:/Program Files/Git/bin/bash.exe --login",
+        "hidden": false
+      },
+      {
+        "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+        "name": "Command Prompt",
+        "commandline": "cmd.exe",
+        "hidden": false
+      },
+      {
+        "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
+        "name": "Azure Cloud Shell",
+        "source": "Windows.Terminal.Azure",
+        "hidden": false
+      }
     ]
+  },
+  "schemes": [
+    {
+      "name": "Gruvbox (Dark)",
+      "background": "#282828",
+      "black": "#282828",
+      "blue": "#458588",
+      "brightBlack": "#928374",
+      "brightBlue": "#83A598",
+      "brightCyan": "#8EC07C",
+      "brightGreen": "#B8BB26",
+      "brightPurple": "#D3869B",
+      "brightRed": "#FB4934",
+      "brightWhite": "#EBDBB2",
+      "brightYellow": "#FABD2F",
+      "cyan": "#689D6A",
+      "foreground": "#EBDBB2",
+      "green": "#98971A",
+      "purple": "#B16286",
+      "red": "#CC241D",
+      "white": "#A89984",
+      "yellow": "#D79921"
+    },
+    {
+      "name": "Raspberry",
+      "background": "#3C0315",
+      "black": "#282A2E",
+      "blue": "#0170C5",
+      "brightBlack": "#676E7A",
+      "brightBlue": "#80c8ff",
+      "brightCyan": "#8ABEB7",
+      "brightGreen": "#B5D680",
+      "brightPurple": "#AC79BB",
+      "brightRed": "#BD6D85",
+      "brightWhite": "#FFFFFD",
+      "brightYellow": "#FFFD76",
+      "cyan": "#3F8D83",
+      "foreground": "#FFFFFD",
+      "green": "#76AB23",
+      "purple": "#7D498F",
+      "red": "#BD0940",
+      "white": "#FFFFFD",
+      "yellow": "#E0DE48"
+    }
+  ],
+  "keybindings": [
+    { "command": { "action": "copy", "singleLine": false }, "keys": "ctrl+c" },
+    { "command": "paste", "keys": "ctrl+v" },
+    { "command": "find", "keys": "ctrl+shift+f" },
+    {
+      "command": {
+        "action": "splitPane",
+        "split": "auto",
+        "splitMode": "duplicate"
+      },
+      "keys": "alt+shift+d"
+    }
+  ]
 }
