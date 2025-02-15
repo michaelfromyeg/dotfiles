@@ -3,7 +3,7 @@
 # This is the generic harness for running each of my setup scripts.
 # Usage: ./run.sh [filter] [--dry]
 
-script_dir=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 filter=""
 dry="0"
 
@@ -21,9 +21,9 @@ echo "[dotfiles] (Make sure you chmod +x the scripts you want to run!)"
 
 log() {
   if [[ $dry == "1" ]]; then
-    echo "[dotfiles] [DRY_RUN] $@"
+    echo "[dotfiles] [DRY_RUN] $*"
   else
-    echo "[dotfiles] $@"
+    echo "[dotfiles] $*"
   fi
 }
 
@@ -35,9 +35,9 @@ execute() {
   "$@"
 }
 
-log $script_dir -- $filter
+log "$script_dir" -- "$filter"
 
-cd $script_dir/scripts
+cd "$script_dir"/scripts || exit
 
 scripts=$(find . -maxdepth 1 -mindepth 1 -executable -type f)
 for script in $scripts; do
@@ -46,5 +46,5 @@ for script in $scripts; do
     continue
   fi
 
-  execute $script
+  execute "$script"
 done
