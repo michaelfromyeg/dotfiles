@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+echo "[update] Running system updates..."
+
 sudo apt update && sudo apt -y upgrade
 sudo apt -y dist-upgrade
 sudo apt -y autoremove

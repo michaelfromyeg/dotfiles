@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# Exit on error, undefined variables, and pipe failures
+# One-off script to download a gitignore template from GitHub.
+
 set -euo pipefail
 
 if [ $# -eq 0 ]; then
