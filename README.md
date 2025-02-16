@@ -8,8 +8,14 @@ Some of the scripts I have today...
 
 - `test`, for sanity
 - `neovim`, to build `neovim` from source
-- `env`, to setup my development environment
+- `env`, to set up my development environment
   - On Linux,
   - On macOS,
   - On Windows
 - The `vscode.json` is a read-only copy, since Visual Studio Code natively handles settings sync
+
+## Window Managers
+
+- Fancy Zones on Windows
+  - TODO(michaelfromyeg): go through [this guide](https://learn.microsoft.com/en-us/windows/powertoys/fancyzones)
+- Rectangles on macOS

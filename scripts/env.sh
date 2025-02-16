@@ -67,6 +67,39 @@ copy_file "$script_dir"/dotfiles/.bashrc "$HOME"
 copy_file "$script_dir/dotfiles/.vimrc" "$HOME"
 copy_file "$script_dir/dotfiles/.gitconfig" "$HOME"
 
+# setup vim and neovim
+execute mkdir -p "$HOME/.vim"
+execute mkdir -p "$HOME/.vim/undodir"
+execute mkdir -p "$HOME/.config/nvim"
+execute mkdir -p "$HOME/.local/share/nvim/site/autoload"
+
+execute mkdir -p "$HOME/.vim/backup"
+execute mkdir -p "$HOME/.vim/swap"
+execute mkdir -p "$HOME/.local/share/nvim/backup"
+execute mkdir -p "$HOME/.local/share/nvim/swap"
+
+execute chmod 700 "$HOME/.vim" "$HOME/.config/nvim"
+execute chmod 700 "$HOME/.vim/backup" "$HOME/.vim/swap" "$HOME/.vim/undodir"
+execute chmod 700 "$HOME/.local/share/nvim/backup" "$HOME/.local/share/nvim/swap"
+
+if [[ ! -f "$HOME/.vim/autoload/plug.vim" ]]; then
+  log "Installing vim-plug for Vim"
+  execute curl -fLo "$HOME/.vim/autoload/plug.vim" --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+fi
+
+if [[ ! -f "$HOME/.local/share/nvim/site/autoload/plug.vim" ]]; then
+  log "Installing vim-plug for Neovim"
+  execute curl -fLo "$HOME/.local/share/nvim/site/autoload/plug.vim" --create-dirs \
+    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+fi
+
+log "Installing Vim plugins"
+execute vim +PlugInstall +qall
+
+log "Installing Neovim plugins"
+execute nvim +PlugInstall +qall
+
 # make `run.sh` runnable from anywhere\
 mkdir -p ~/bin
 execute ln -sf "$script_dir/run.sh" "$HOME/bin/dotfiles"
