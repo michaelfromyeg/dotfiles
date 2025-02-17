@@ -70,7 +70,25 @@ log "$script_dir" -- "$filter"
 
 cd "$script_dir"/scripts || exit
 
-scripts=$(find . -maxdepth 1 -mindepth 1 -executable -type f)
+# Detect if running on Windows
+is_windows() {
+  case "$(uname -s)" in
+    CYGWIN*|MINGW*|MSYS*|Windows*)
+      return 0
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+# Find appropriate scripts based on platform
+if is_windows; then
+  scripts=$(find . -maxdepth 1 -mindepth 1 -name "*.ps1" -type f)
+else
+  scripts=$(find . -maxdepth 1 -mindepth 1 -executable -name "*.sh" -type f)
+fi
+
 for script in $scripts; do
   if echo "$script" | grep -qv "$filter"; then
     log "Skipped $script"
@@ -81,6 +99,13 @@ for script in $scripts; do
   color=$((31 + ($(echo "$script" | cksum | cut -d ' ' -f 1) % 6)))
 
   echo -e "\e[${color}m"
-  execute "$script"
+
+  # Execute PowerShell scripts differently on Windows
+  if is_windows && [[ "$script" == *.ps1 ]]; then
+    execute powershell.exe -ExecutionPolicy Bypass -File "$script"
+  else
+    execute "$script"
+  fi
+
   echo -e "\e[0m"
 done

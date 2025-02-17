@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Sets up my development environment. Should only be called via the run.sh script.
+# Sets up my development environment.
 
 echo "[env] Setting up your environment..."
 

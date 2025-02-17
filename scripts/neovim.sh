@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Sets up Neovim from source.
+
 echo "[neovim] Installing..."
 
 if [[ $dry == "1" ]] || [[ $dry == "2" ]]; then

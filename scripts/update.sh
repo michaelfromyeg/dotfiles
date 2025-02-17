@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Updates everything you can update on your system.
+
 echo "[update] Running system updates..."
 
 sudo apt update && sudo apt -y upgrade
