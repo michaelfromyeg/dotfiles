@@ -19,14 +19,20 @@ Some of the scripts I have today...
 - On Windows
   - Install WSL
   - Install Ubuntu (or another instance of choice)
+  - For Windows applications
+    - PowerShell, `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`, `cd ~`, `winget install --id=Git.Git -e`
+    - Clone thie repository to `~/code` on the Windows filesystem, and run `./dotfiles/scripts/ui.ps1`
+    - Let that run in the background
   - `sudo apt install git`
   - Clone this repository to `~/code` via `git clone https://github.com/michaelfromyeg/dotfiles`
 - On macOS
   - Run `xcode-select --install`
   - Clone this repository to `~/code`
+  - `chmod +x scripts/*.sh`
 - On Linux
   - `sudo apt install git`
   - Clone this repository to `~/code`
+  - `chmod +x scripts/*.sh`
 
 ## Usage
 
@@ -43,6 +49,7 @@ bash ~/code/dotfiles/run.sh test --drier
 bash ~/code/dotfiles/run.sh
 
 # on Windows
+# NOTE: on Windows it's okay to run `ui.ps1` in that environment
 wsl bash -c "~/code/dotfiles/run.sh --dry"
 wsl bash -c "~/code/dotfiles/run.sh test --drier"
 wsl bash -c "~/code/dotfiles/run.sh"

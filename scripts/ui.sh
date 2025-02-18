@@ -12,21 +12,30 @@ else
   HOMEBREW_NO_AUTO_UPDATE=1 brew update && yes | brew upgrade
 fi
 
-# Taps
-brew tap homebrew/cask
-brew tap homebrew/cask-versions
-brew tap homebrew/core
+
+# Check for OS
+OS_TYPE=$(uname -s)
+
+# If running on MacOS, tap homebrew/cask and homebrew/cask-versions
+if [ "$OS_TYPE" == "Darwin" ]; then
+  brew tap homebrew/cask
+  brew tap homebrew/cask-versions
+fi
 
 # Core Command Line Tools
 echo "[brew] Installing core command line tools..."
 CORE_TOOLS=(
+    gcc
     git
     gh
     node
     vim
+    # NOTE: this is built from source!
+    # neovim
     sqlite
     qpdf
     wget
+    jandedobbeleer/oh-my-posh/oh-my-posh
 )
 
 # Install core tools
@@ -35,73 +44,73 @@ for tool in "${CORE_TOOLS[@]}"; do
     brew install "$tool"
 done
 
-# Cask Applications
-echo "Installing applications..."
-APPS=(
-    # Core Utilities
-    ghostty
-    rectangle
-    alt-tab
+# Install Cask Applications only if on MacOS
+if [ "$OS_TYPE" == "Darwin" ]; then
+  # Cask Applications
+  echo "Installing applications..."
+  APPS=(
+      # Core Utilities
+      ghostty
+      rectangle
+      alt-tab
 
-    # Development
-    visual-studio-code
-    docker
+      # Development
+      visual-studio-code
+      docker
 
-    # Browsers and Communication
-    firefox
-    google-chrome
-    slack
-    zoom
-    thunderbird
+      # Browsers and Communication
+      firefox
+      google-chrome
+      slack
+      zoom
+      thunderbird
 
-    # Media and File Management
-    vlc
-    gimp
-    handbrake
-    obs
-    spotify
-    skim
+      # Media and File Management
+      vlc
+      gimp
+      handbrake
+      obs
+      spotify
+      skim
 
-    # Office and Productivity
-    libreoffice
-    notion
-    figma
-    beeper
-    cold-turkey-blocker
-    logitech-options
-    keepassxc
+      # Office and Productivity
+      libreoffice
+      notion
+      figma
+      beeper
+      cold-turkey-blocker
+      logitech-options
+      keepassxc
 
-    # Cloud Storage
-    dropbox
-    google-drive
+      # Cloud Storage
+      dropbox
+      google-drive
 
-    # Utilities
-    calibre
-    the-unarchiver
-    cursor
-    dupeguru
-    private-internet-access
-    qbittorrent
+      # Utilities
+      calibre
+      the-unarchiver
+      cursor
+      dupeguru
+      private-internet-access
+      qbittorrent
 
-    # Additional Mac-specific tools
-    alfred
-    bartender
-    monitorcontrol
-    app-cleaner
+      # Additional Mac-specific tools
+      alfred
+      bartender
+      monitorcontrol
+      app-cleaner
+  )
 
-    # NOTE: missing mp3 tag!
-)
-
-# Install applications
-for app in "${APPS[@]}"; do
-    echo "[brew] Installing $app..."
-    brew install --cask "$app"
-done
+  # Install applications
+  for app in "${APPS[@]}"; do
+      echo "[brew] Installing $app..."
+      brew install --cask "$app"
+  done
+fi
 
 # Cleanup
 echo "[brew] Cleaning up..."
 brew cleanup
-
 
 echo "[brew] Installation complete!"
 echo "[brew] NOTE: Some applications may require additional setup or login."
@@ -109,3 +118,4 @@ echo "[brew] NOTE: Some applications might require system restart to complete in
 echo "[brew] NOTE: Some applications might not be available in the Homebrew repository."
 
 brew doctor
+

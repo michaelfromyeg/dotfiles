@@ -27,7 +27,9 @@ $apps = @(
   "WinDirStat.WinDirStat"
   "CursorID.CursorID"
   "Microsoft.PowerToys"
-
+  "DominikReichl.KeePass"
+  "JanDeDobbeleer.OhMyPosh"
+    
   # Development
   "Git.Git"
   "GitHub.cli"
@@ -74,7 +76,6 @@ $apps = @(
   "PrivateInternetAccess.PrivateInternetAccess"
   "qBittorrent.qBittorrent"
 )
-
 
 foreach ($app in $apps) {
   Write-Host "Installing $app..." -ForegroundColor Green

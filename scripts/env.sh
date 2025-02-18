@@ -100,7 +100,7 @@ execute vim +PlugInstall +qall
 log "Installing Neovim plugins"
 execute nvim +PlugInstall +qall
 
-# make `run.sh` runnable from anywhere\
+# make `run.sh` runnable from anywhere
 mkdir -p ~/bin
 execute ln -sf "$script_dir/run.sh" "$HOME/bin/dotfiles"
 
