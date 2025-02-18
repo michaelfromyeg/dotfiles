@@ -41,6 +41,7 @@ $apps = @(
   "SQLite.SQLite"
   "QPDF.QPDF"
   "astral-sh.uv"
+  "Anthropic.Claude"
 
   # Browsers and Communication
   "Mozilla.Firefox"
