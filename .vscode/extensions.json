@@ -1,3 +1,39 @@
 {
-  "recommendations": ["hashicorp.terraform"]
+  // TODO(michaelfromyeg): update and prune this list; note down unwated recommendations
+  "recommendations": [
+    "biomejs.biome",
+    "ms-vscode.cpptools",
+    "CircleCI.circleci",
+    "naumovs.color-highlight",
+    "anysphere.pyright",
+    "ms-vscode-remote.remote-containers",
+    "ms-azuretools.vscode-docker",
+    "EditorConfig.EditorConfig",
+    "dbaeumer.vscode-eslint",
+    "donjayamanne.githistory",
+    "felipecaputo.git-project-manager",
+    "GitHub.vscode-pull-request-github",
+    "jdinhlife.gruvbox",
+    "hashicorp.terraform",
+    "oderwat.indent-rainbow",
+    "ms-toolsai.jupyter",
+    "ms-toolsai.vscode-jupyter-cell-tags",
+    "ms-toolsai.jupyter-renderers",
+    "ms-toolsai.vscode-jupyter-slideshow",
+    "James-Yu.latex-workshop",
+    "ms-vsliveshare.vsliveshare",
+    "ms-playwright.playwright",
+    "ms-vscode.powershell",
+    "esbenp.prettier-vscode",
+    "ms-python.vscode-pylance",
+    "ms-python.python",
+    "ms-python.debugpy",
+    "ms-vscode-remote.remote-ssh",
+    "ms-vscode-remote.remote-ssh-edit",
+    "charliermarsh.ruff",
+    "timonwong.shellcheck",
+    "vscodevim.vim",
+    "vscode-icons-team.vscode-icons",
+    "redhat.vscode-xml"
+  ]
 }

@@ -31,10 +31,10 @@ end
 
 -- Plugin setup
 vim.cmd([[
-call plug#begin()
-Plug 'tpope/vim-sensible'
-Plug 'morhetz/gruvbox'
-call plug#end()
+  call plug#begin()
+  Plug 'tpope/vim-sensible'
+  Plug 'morhetz/gruvbox'
+  call plug#end()
 ]])
 
 -- Gruvbox theme settings

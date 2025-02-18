@@ -61,6 +61,7 @@ if [ "$OS_TYPE" == "Darwin" ]; then
     # Development
     visual-studio-code
     docker
+    antidote
 
     # Browsers and Communication
     firefox

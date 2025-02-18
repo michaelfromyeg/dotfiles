@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+# Universal shell configuration for bash and zsh
+# Save as ~/.shellrc and source it from both ~/.bashrc and ~/.zshrc
+
+# History configuration
+HISTSIZE=5000
+HISTFILESIZE=5000
+HISTCONTROL=ignoredups
+HISTTIMEFORMAT="%F %T "
+
+# Environment variables
+export XDG_CONFIG_HOME="$HOME/.config"
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+# Common aliases
+alias ls='ls --color=auto'
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+
+# Git aliases
+alias g='git'
+alias ga='git add'
+alias gaa='git add --all'
+alias gc='git commit -v'
+alias gcm='git commit -m'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gd='git diff'
+alias gl='git pull'
+alias gp='git push'
+alias gst='git status'
+alias glg='git log --graph --oneline --decorate'
+alias grh='git reset HEAD'
+alias gsta='git stash'
+alias gstp='git stash pop'
+
+# Alert alias for long running commands
+# Usage: sleep 10; alert
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+# OS-specific configurations
+case "$(uname -s)" in
+    Darwin*)
+        # macOS-specific settings
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+        export ANDROID_HOME="$HOME/Library/Android/sdk"
+        export JAVA_HOME="/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home"
+        ;;
+    Linux*)
+        # Linux-specific settings
+        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+        ;;
+esac
+
+# Version managers
+# nvm (node version manager)
+export NVM_DIR="$HOME/.nvm"
+[ -s "$(brew --prefix nvm)/nvm.sh" ] && \. "$(brew --prefix nvm)/nvm.sh"
+[ -s "$(brew --prefix nvm)/etc/bash_completion.d/nvm" ] && \. "$(brew --prefix nvm)/etc/bash_completion.d/nvm"
+
+# rvm (ruby version manager)
+export PATH="$PATH:$HOME/.rvm/bin"
+
+# oh-my-posh (if installed)
+if command -v oh-my-posh >/dev/null 2>&1; then
+    eval "$(oh-my-posh init $(basename $SHELL) --config "$(brew --prefix oh-my-posh)"/themes/gruvbox.omp.json)"
+fi
+
+# Notion-specific configurations (if needed)
+if [ -d "$HOME/code/notion-next" ]; then
+    alias nn="cd ~/code/notion-next"
+    alias nr="notion run"
+    alias nd="notion desktop run"
+    alias ne="notion eslint"
+
+    # Notion Android paths
+    export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin"
+
+    # Notion shell completion
+    if command -v notion >/dev/null 2>&1; then
+        eval "$(notion completion --install)"
+    fi
+fi

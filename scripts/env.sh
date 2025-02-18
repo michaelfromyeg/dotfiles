@@ -64,6 +64,9 @@ copy_file() {
 copy_dirs "$script_dir"/config "$XDG_CONFIG_HOME"
 
 # the 'real' dotfiles
+copy_file "$script_dir"/dotfiles/.shellrc "$HOME"
+copy_file "$script_dir"/dotfiles/.zshrc "$HOME"
+copy_file "$script_dir"/dotfiles/.zsh_plugins.txt "$HOME"
 copy_file "$script_dir"/dotfiles/.bashrc "$HOME"
 copy_file "$script_dir/dotfiles/.vimrc" "$HOME"
 copy_file "$script_dir/dotfiles/.gitconfig" "$HOME"
