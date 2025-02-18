@@ -77,9 +77,11 @@ $apps = @(
   "Dropbox.Dropbox"
   "Google.GoogleDrive"
 
-
   "PrivateInternetAccess.PrivateInternetAccess"
   "qBittorrent.qBittorrent"
+
+  # Pocket Casts and ChatGPT are missing!
+  # https://apps.microsoft.com/detail/9PCDBQX582BZ
 )
 
 foreach ($app in $apps) {
