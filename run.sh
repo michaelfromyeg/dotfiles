@@ -82,11 +82,18 @@ is_windows() {
   esac
 }
 
+# Determine which find command to use
+if command -v gfind >/dev/null 2>&1; then
+  FIND="gfind"
+else
+  FIND="find"
+fi
+
 # Find appropriate scripts based on platform
 if is_windows; then
-  scripts=$(find . -maxdepth 1 -mindepth 1 -name "*.ps1" -type f)
+  scripts=$($FIND . -maxdepth 1 -mindepth 1 -name "*.ps1" -type f)
 else
-  scripts=$(find . -maxdepth 1 -mindepth 1 -executable -name "*.sh" -type f)
+  scripts=$($FIND . -maxdepth 1 -mindepth 1 -executable -name "*.sh" -type f)
 fi
 
 for script in $scripts; do

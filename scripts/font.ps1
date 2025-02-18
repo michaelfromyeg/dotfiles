@@ -3,4 +3,3 @@
 # Installs a font.
 
 oh-my-posh font install
-

@@ -1,6 +1,7 @@
 {
   "editor.formatOnSave": true,
   "files.associations": {
-    "scripts/*": "bash"
+    "scripts/*": "bash",
+    ".env.example": "dotenv"
   }
 }

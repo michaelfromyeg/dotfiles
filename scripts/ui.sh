@@ -25,23 +25,25 @@ fi
 # Core Command Line Tools
 echo "[brew] Installing core command line tools..."
 CORE_TOOLS=(
-    gcc
-    git
-    gh
-    node
-    vim
-    # NOTE: this is built from source!
-    # neovim
-    sqlite
-    qpdf
-    wget
-    jandedobbeleer/oh-my-posh/oh-my-posh
+  gcc
+  git
+  gh
+  node
+  vim
+  # NOTE: this is built from source!
+  # neovim
+  sqlite
+  qpdf
+  wget
+  # GNU-find, since the normal macOS find sucks
+  gfind
+  jandedobbeleer/oh-my-posh/oh-my-posh
 )
 
 # Install core tools
 for tool in "${CORE_TOOLS[@]}"; do
-    echo "[brew] Installing $tool..."
-    brew install "$tool"
+  echo "[brew] Installing $tool..."
+  brew install "$tool"
 done
 
 # Install Cask Applications only if on MacOS
@@ -49,56 +51,56 @@ if [ "$OS_TYPE" == "Darwin" ]; then
   # Cask Applications
   echo "Installing applications..."
   APPS=(
-      # Core Utilities
-      ghostty
-      rectangle
-      alt-tab
+    # Core Utilities
+    ghostty
+    rectangle
+    alt-tab
 
-      # Development
-      visual-studio-code
-      docker
+    # Development
+    visual-studio-code
+    docker
 
-      # Browsers and Communication
-      firefox
-      google-chrome
-      slack
-      zoom
-      thunderbird
+    # Browsers and Communication
+    firefox
+    google-chrome
+    slack
+    zoom
+    thunderbird
 
-      # Media and File Management
-      vlc
-      gimp
-      handbrake
-      obs
-      spotify
-      skim
+    # Media and File Management
+    vlc
+    gimp
+    handbrake
+    obs
+    spotify
+    skim
 
-      # Office and Productivity
-      libreoffice
-      notion
-      figma
-      beeper
-      cold-turkey-blocker
-      logitech-options
-      keepassxc
+    # Office and Productivity
+    libreoffice
+    notion
+    figma
+    beeper
+    cold-turkey-blocker
+    logitech-options
+    keepassxc
 
-      # Cloud Storage
-      dropbox
-      google-drive
+    # Cloud Storage
+    dropbox
+    google-drive
 
-      # Utilities
-      calibre
-      the-unarchiver
-      cursor
-      dupeguru
-      private-internet-access
-      qbittorrent
+    # Utilities
+    calibre
+    the-unarchiver
+    cursor
+    dupeguru
+    private-internet-access
+    qbittorrent
 
-      # Additional Mac-specific tools
-      alfred
-      bartender
-      monitorcontrol
-      app-cleaner
+    # Additional Mac-specific tools
+    alfred
+    bartender
+    monitorcontrol
+    app-cleaner
   )
 
   # Install applications

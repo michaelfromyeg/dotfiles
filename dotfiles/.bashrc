@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-### Default ~/.bashrc stuff
+### Default ~/.bashrc stuff with some tweaks from yours truly
 
 # If not running interactively, don't do anything
 case $- in
@@ -8,16 +8,21 @@ case $- in
       *) return;;
 esac
 
-# don't put duplicate lines or lines starting with space in the history.
+# Don't share history between sessions
 # See bash(1) for more options
-HISTCONTROL=ignoreboth
-
-# append to the history file, don't overwrite it
-shopt -s histappend
+shopt -u histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+HISTSIZE=5000
+HISTFILESIZE=5000
+# Shell history per window, rather than unique history file per terminal
+HISTFILE="/tmp/bash_history_$$"
+
+# Ignore duplicates
+HISTCONTROL=ignoredups
+
+# Save timestamps in history
+HISTTIMEFORMAT="%F %T "
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -87,6 +92,23 @@ alias ll='ls -alF'
 alias la='ls -A'
 alias l='ls -CF'
 
+# git aliases
+alias g='git'
+alias ga='git add'
+alias gaa='git add --all'
+alias gc='git commit -v'
+alias gcm='git commit -m'
+alias gco='git checkout'
+alias gcb='git checkout -b'
+alias gd='git diff'
+alias gl='git pull'
+alias gp='git push'
+alias gst='git status'
+alias glg='git log --graph --oneline --decorate'
+alias grh='git reset HEAD'
+alias gsta='git stash'
+alias gstp='git stash pop'
+
 # Add an "alert" alias for long running commands.
 # Usage: sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
@@ -106,8 +128,6 @@ fi
 
 export XDG_CONFIG_HOME="$HOME/.config"
 
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-
 # nvm (node version manager)
 export NVM_DIR="$HOME/.nvm"
 [ -s "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh" ] && \. "/home/linuxbrew/.linuxbrew/opt/nvm/nvm.sh"  # This loads nvm
@@ -118,3 +138,24 @@ export PATH="$PATH:$HOME/.rvm/bin"
 
 # oh-my-posh
 eval "$(oh-my-posh init bash --config "$(brew --prefix oh-my-posh)"/themes/gruvbox.omp.json)"
+
+# Homebrew
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+else
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+fi
+
+### Notion
+
+eval "$(notion completion --install)"
+
+alias nn="cd ~/code/notion-next"
+alias nr="notion run"
+alias nd="notion desktop run"
+alias ne="notion eslint"
+
+# Notion Android
+export ANDROID_HOME="$HOME/Library/Android/sdk"
+export JAVA_HOME="/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home"
+export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin"
