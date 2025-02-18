@@ -63,6 +63,7 @@ $apps = @(
 
   # Office and Productivity
   "Notion.Notion"
+  "Notion.NotionCalendar"
   "Figma.Figma"
   "Beeper.Beeper"
   "ColdTurkeySoftware.ColdTurkeyBlocker"
