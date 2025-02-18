@@ -14,6 +14,7 @@ try {
   exit 1
 }
 
+# See more at https://winstall.app
 $apps = @(
   # Core Windows Utilities
   "Microsoft.PowerShell"
@@ -25,25 +26,27 @@ $apps = @(
   "AutoHotkey.AutoHotkey"
   "Calibre.Calibre"
   "WinDirStat.WinDirStat"
-  "CursorID.CursorID"
+  "Anysphere.Cursor"
   "Microsoft.PowerToys"
   "DominikReichl.KeePass"
   "JanDeDobbeleer.OhMyPosh"
-    
+
   # Development
   "Git.Git"
   "GitHub.cli"
   "Microsoft.VisualStudioCode"
   "vim.vim"
-  "NodeJS.LTS"
+  "CoreyButler.NVMforWindows"
   "Docker.DockerDesktop"
   "SQLite.SQLite"
   "QPDF.QPDF"
+  "astral-sh.uv"
 
   # Browsers and Communication
   "Mozilla.Firefox"
   "Google.Chrome"
-  "Slack.Slack"
+  "SlackTechnologies.Slack"
+  "Discord.Discord"
   "Zoom.Zoom"
   "Mozilla.Thunderbird"
 
@@ -70,7 +73,7 @@ $apps = @(
 
   # Cloud Storage
   "Dropbox.Dropbox"
-  "Google.Drive"
+  "Google.GoogleDrive"
 
 
   "PrivateInternetAccess.PrivateInternetAccess"
