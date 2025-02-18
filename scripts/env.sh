@@ -59,7 +59,8 @@ copy_file() {
 
 }
 
-# covers neovim, ...
+# covers neovim, ghostty, etc.
+# TODO(michaelfromyeg): ghostty should only be copied on macOS
 copy_dirs "$script_dir"/config "$XDG_CONFIG_HOME"
 
 # the 'real' dotfiles

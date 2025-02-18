@@ -75,3 +75,4 @@ Running the `env.sh` script will make the run script accessible everywhere, unde
 - `tmux` setup
 - `vscode` settings and extensions
 - `terminal` and `ghostty` configs
+- Centralize the check for operating system and logic surrounding

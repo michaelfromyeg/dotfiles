@@ -46,7 +46,9 @@ for tool in "${CORE_TOOLS[@]}"; do
   brew install "$tool"
 done
 
-# Install Cask Applications only if on MacOS
+# Install Cask Applications only if on macOS
+# NOTE(michaelfromyeg): this seems mostly fine to run on my work computer;
+# ...most installations just fail due to pre-existing installations
 if [ "$OS_TYPE" == "Darwin" ]; then
   # Cask Applications
   echo "Installing applications..."
@@ -120,4 +122,3 @@ echo "[brew] NOTE: Some applications might require system restart to complete in
 echo "[brew] NOTE: Some applications might not be available in the Homebrew repository."
 
 brew doctor
-
