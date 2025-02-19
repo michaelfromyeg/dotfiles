@@ -36,7 +36,7 @@ CORE_TOOLS=(
   qpdf
   wget
   # GNU-find, since the normal macOS find sucks
-  gfind
+  findutils 
   jandedobbeleer/oh-my-posh/oh-my-posh
 )
 
