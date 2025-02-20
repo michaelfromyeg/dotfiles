@@ -1,3 +1,5 @@
+" A seemingly sane? Vim configuration written by Claude
+
 " Basic editor settings
 syntax on
 set number
