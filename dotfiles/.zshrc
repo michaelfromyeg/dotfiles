@@ -35,3 +35,7 @@ bindkey '^[[1;5D' backward-word
 # Load antidote plugin manager
 source $(brew --prefix)/opt/antidote/share/antidote/antidote.zsh
 antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
+
+# Added by `notion install`
+eval "$(pyenv init -)"
+eval "$(direnv hook zsh)"

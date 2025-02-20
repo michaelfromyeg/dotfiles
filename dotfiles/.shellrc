@@ -39,6 +39,15 @@ alias grh='git reset HEAD'
 alias gsta='git stash'
 alias gstp='git stash pop'
 
+# Combines fzf and git add
+ga_fzf() {
+    git status -s |
+    fzf --multi --preview 'git diff --color=always {2}' --preview-window=right:70% |
+    awk '{print $2}' |
+    xargs -r git add
+}
+alias gaf='ga_fzf'
+
 # Alert alias for long running commands
 # Usage: sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'

@@ -36,7 +36,7 @@ CORE_TOOLS=(
   qpdf
   wget
   # GNU-find, since the normal macOS find sucks
-  findutils 
+  findutils
   jandedobbeleer/oh-my-posh/oh-my-posh
 )
 
@@ -62,6 +62,7 @@ if [ "$OS_TYPE" == "Darwin" ]; then
     visual-studio-code
     docker
     antidote
+    fzf
 
     # Browsers and Communication
     firefox
