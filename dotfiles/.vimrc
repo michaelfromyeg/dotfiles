@@ -1,4 +1,7 @@
 " A seemingly sane? Vim configuration written by Claude
+" I keep this around because my Neovim setup uses LazyVim
+" which is a bit intense, and the minimal Vim setup is
+" often useful for quick edits.
 
 " Basic editor settings
 syntax on
