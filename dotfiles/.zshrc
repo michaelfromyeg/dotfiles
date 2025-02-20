@@ -1,5 +1,6 @@
 #!/usr/bin/env zsh
 
+# zsh-specific configuration
 # NOTE: I do not use oh-my-zsh! This uses antidote instead. Much faster.
 
 source ~/.shellrc

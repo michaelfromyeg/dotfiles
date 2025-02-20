@@ -28,7 +28,6 @@ CORE_TOOLS=(
   gcc
   git
   gh
-  node
   vim
   # NOTE: this is built from source!
   # neovim
@@ -42,6 +41,10 @@ CORE_TOOLS=(
   ripgrep
   fd
   git-delta
+  # Rendering stuff
+  imagemagick
+  ghostscript
+  tectonic
   jandedobbeleer/oh-my-posh/oh-my-posh
 )
 

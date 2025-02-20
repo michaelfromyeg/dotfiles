@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 # Universal shell configuration for bash and zsh
-# Save as ~/.shellrc and source it from both ~/.bashrc and ~/.zshrc
 
 # History configuration
 HISTSIZE=5000
@@ -13,7 +12,7 @@ HISTTIMEFORMAT="%F %T "
 export XDG_CONFIG_HOME="$HOME/.config"
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-# Common aliases
+# Some common aliases
 alias ls='ls --color=auto'
 alias ll='ls -alF'
 alias la='ls -A'
@@ -22,7 +21,7 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
-# (quick) git aliases
+# (quick) git aliases; more in gitconfig
 alias g='git'
 alias ga='git add'
 alias gaa='git add --all'
@@ -39,7 +38,7 @@ alias grh='git reset HEAD'
 alias gsta='git stash'
 alias gstp='git stash pop'
 
-# Combines fzf and git add
+# Combines fzf and git add into a handy workflow
 ga_fzf() {
     git status -s |
     fzf --multi --preview 'git diff --color=always {2}' --preview-window=right:70% |
@@ -66,11 +65,14 @@ case "$(uname -s)" in
         ;;
 esac
 
-# Version managers
+# Languages
 # nvm (node version manager)
 export NVM_DIR="$HOME/.nvm"
-[ -s "$(brew --prefix nvm)/nvm.sh" ] && \. "$(brew --prefix nvm)/nvm.sh"
-[ -s "$(brew --prefix nvm)/etc/bash_completion.d/nvm" ] && \. "$(brew --prefix nvm)/etc/bash_completion.d/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# uv
+export PATH="$HOME/.local/bin:$PATH"
 
 # rvm (ruby version manager)
 export PATH="$PATH:$HOME/.rvm/bin"
