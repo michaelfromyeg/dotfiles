@@ -15,7 +15,6 @@ export NVM_DIR="$HOME/.nvm"
 nvm install lts/jod
 nvm use lts/jod
 
-# Print versions
 npm -v
 node -v
 
@@ -24,14 +23,13 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 
 export PATH="$HOME/.local/bin:$PATH"
 
-# Print Python/pip versions
 python3 --version
 uv --version
 
 # rvm (Ruby)
 curl -sSL https://get.rvm.io | bash -s stable
 
-echo "[languages] Install Neovim stuff..."
+# Language dependencies
 npm install -g neovim
 uv pip install --system --break-system-packages pynvim
 gem install neovim
