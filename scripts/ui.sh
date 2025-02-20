@@ -41,6 +41,7 @@ CORE_TOOLS=(
   lazygit
   ripgrep
   fd
+  git-delta
   jandedobbeleer/oh-my-posh/oh-my-posh
 )
 

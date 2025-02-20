@@ -22,7 +22,7 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
-# Git aliases
+# (quick) git aliases
 alias g='git'
 alias ga='git add'
 alias gaa='git add --all'

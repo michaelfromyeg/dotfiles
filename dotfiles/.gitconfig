@@ -1,3 +1,52 @@
 [user]
 	email = michaelfromyeg@gmail.com
 	name = Michael DeMarco
+
+[color]
+  ui = auto
+
+[core]
+  pager = delta
+  editor = code --wait
+  precomposeunicode = true
+  untrackedCache = true
+
+[init]
+  defaultBranch = main
+
+[pull]
+  rebase = true
+
+[push]
+  default = current
+  followTags = true
+
+[fetch]
+  prune = true
+
+[diff]
+  renames = copies
+  algorithm = histogram
+
+[merge]
+  log = true
+  conflictstyle = diff3
+
+[rebase]
+  autoStash = true
+
+[alias]
+  # Pretty log
+  lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset'
+  # Show files ignored by git
+  ignored = ls-files -o -i --exclude-standard
+  # Undo last commit but keep changes
+  undo = reset --soft HEAD^
+  # List all aliases
+  aliases = config --get-regexp alias
+  # Show what you've done since yesterday
+  standup = log --since yesterday --author $(git config user.email) --pretty=short
+  # Show last tag
+  lasttag = describe --tags --abbrev=0
+  # Show modified files in last commit
+  files = show --pretty="" --name-only
