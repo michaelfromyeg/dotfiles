@@ -35,3 +35,5 @@ uv pip install --system --break-system-packages pynvim
 gem install neovim
 
 npm install -g @mermaid-js/mermaid-cli
+npm install -g @anthropic-ai/claude-code
+
