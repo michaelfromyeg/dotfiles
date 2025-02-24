@@ -20,6 +20,7 @@ alias l='ls -CF'
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
+alias c='clear'
 
 # (quick) git aliases; more in gitconfig
 alias g='git'
