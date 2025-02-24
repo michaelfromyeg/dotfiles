@@ -39,6 +39,10 @@ alias grh='git reset HEAD'
 alias gsta='git stash'
 alias gstp='git stash pop'
 
+alias gtcom='gt co main'
+alias gts='gt sync'
+alias gtr='gt restack'
+
 # Combines fzf and git add into a handy workflow
 ga_fzf() {
     git status -s |
