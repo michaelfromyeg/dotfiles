@@ -22,7 +22,7 @@ fi
 # Clone neovim repository
 git clone -b nightly https://github.com/neovim/neovim.git ~/apps/neovim
 
-cd ~/apps/neovim || exit
+cd ~/apps/neovim || exit 1
 
 make CMAKE_BUILD_TYPE=RelWithDebInfo
 sudo make install

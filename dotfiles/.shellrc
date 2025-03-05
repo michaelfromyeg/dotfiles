@@ -102,3 +102,6 @@ if [ -d "$HOME/code/notion-next" ]; then
         eval "$(notion completion --install)"
     fi
 fi
+
+# rust
+. "$HOME/.cargo/env"

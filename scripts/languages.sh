@@ -3,6 +3,9 @@
 # Installs programming language stuff.
 # NOTE: you should probably run `env.sh` before running this script.
 
+# rust
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
 # nvm (Node.js)
 rm -rf "$HOME/.nvm"
 mkdir -p "$HOME/.nvm"
@@ -36,4 +39,3 @@ gem install neovim
 
 npm install -g @mermaid-js/mermaid-cli
 npm install -g @anthropic-ai/claude-code
-
