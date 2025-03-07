@@ -92,17 +92,8 @@ if [[ ! -f "$HOME/.vim/autoload/plug.vim" ]]; then
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 fi
 
-if [[ ! -f "$HOME/.local/share/nvim/site/autoload/plug.vim" ]]; then
-  log "Installing vim-plug for Neovim"
-  execute curl -fLo "$HOME/.local/share/nvim/site/autoload/plug.vim" --create-dirs \
-    https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-fi
-
 log "Installing Vim plugins"
 execute vim +PlugInstall +qall
-
-log "Installing Neovim plugins"
-execute nvim +PlugInstall +qall
 
 # make `run.sh` runnable from anywhere
 mkdir -p ~/bin

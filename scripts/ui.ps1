@@ -76,6 +76,7 @@ $apps = @(
   "Notepad++.Notepad++"
   "KeePass.KeePass"
   "Microsoft.PowerToys"
+  "flux.flux"
 
   # Cloud Storage
   "Dropbox.Dropbox"

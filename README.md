@@ -1,6 +1,8 @@
 # Dotfiles
 
-This repository includes the dotfiles I use for (cross-platform) Neovim, Visual Studio Code, Cursor, (Windows) WSL 2, Windows Terminal, PowerShell, (macOS) Ghostty .
+This repository includes the dotfiles I use for (cross-platform) Neovim, Visual Studio Code, Cursor, (Windows) WSL 2, Windows Terminal, PowerShell, (macOS) Ghostty.
+
+> ⚠️ This is a work-in-progress!
 
 There's one entry point for all of my setup `run.sh`. It can, in turn, run scripts in `scripts/`.
 
@@ -53,7 +55,7 @@ bash ~/code/dotfiles/run.sh test --drier
 bash ~/code/dotfiles/run.sh
 
 # on Windows
-# NOTE: on Windows it's okay to run `ui.ps1` in that environment
+# NOTE: on Windows it's okay to run `ui.ps1` "directly" (i.e., via PowerShell)
 wsl bash -c "~/code/dotfiles/run.sh --dry"
 wsl bash -c "~/code/dotfiles/run.sh test --drier"
 wsl bash -c "~/code/dotfiles/run.sh"
@@ -68,11 +70,3 @@ Running the `env.sh` script will make the run script accessible everywhere, unde
 - Fancy Zones on Windows
   - TODO(michaelfromyeg): go through [this guide](https://learn.microsoft.com/en-us/windows/powertoys/fancyzones)
 - Rectangles on macOS
-
-## TODOs
-
-- Make the initial setup nicer; you shouldn't have to manually run the `ui` script
-- `tmux` setup
-- `vscode` settings and extensions
-- `terminal` and `ghostty` configs
-- Centralize the check for operating system and logic surrounding

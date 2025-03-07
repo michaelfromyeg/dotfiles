@@ -28,7 +28,6 @@ CORE_TOOLS=(
   gcc
   git
   gh
-  node
   vim
   # NOTE: this is built from source!
   # neovim
@@ -36,7 +35,16 @@ CORE_TOOLS=(
   qpdf
   wget
   # GNU-find, since the normal macOS find sucks
-  gfind
+  findutils
+  fzf
+  lazygit
+  ripgrep
+  fd
+  git-delta
+  # Rendering stuff
+  imagemagick
+  ghostscript
+  tectonic
   jandedobbeleer/oh-my-posh/oh-my-posh
 )
 
