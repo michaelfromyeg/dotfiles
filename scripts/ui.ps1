@@ -9,7 +9,8 @@ if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 
 try {
   $wingetVersion = winget --version
-} catch {
+}
+catch {
   Write-Error "Winget is not installed. Please install the App Installer from the Microsoft Store."
   exit 1
 }
@@ -42,6 +43,9 @@ $apps = @(
   "QPDF.QPDF"
   "astral-sh.uv"
   "Anthropic.Claude"
+  "Rustlang.Rustup"
+  "Microsoft.VisualStudio.2022.Community.Preview"
+  "Kitware.CMake"
 
   # Browsers and Communication
   "Mozilla.Firefox"
