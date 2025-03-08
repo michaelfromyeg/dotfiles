@@ -28,3 +28,5 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 elif [[ "$OSTYPE" == "linux"* ]]; then
   cargo run -p cli
 fi
+
+cargo install --path cli
