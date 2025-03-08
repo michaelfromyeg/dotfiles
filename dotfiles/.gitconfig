@@ -51,3 +51,6 @@
   # Show modified files in last commit
   files = show --pretty="" --name-only
   cleanup = !git reflog expire --expire=now --all && git gc --prune=now --aggressive && git fsck && git prune && git remote prune origin
+
+[advice]
+  skippedCherryPicks = false
