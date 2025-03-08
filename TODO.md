@@ -9,3 +9,4 @@ Things I should do. At some point.
 - Centralize the check for operating system and logic surrounding
 
 - Test commit #1
+- Test commit #2
