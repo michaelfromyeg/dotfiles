@@ -70,6 +70,7 @@ copy_file "$script_dir"/dotfiles/.zsh_plugins.txt "$HOME"
 copy_file "$script_dir"/dotfiles/.bashrc "$HOME"
 copy_file "$script_dir/dotfiles/.vimrc" "$HOME"
 copy_file "$script_dir/dotfiles/.gitconfig" "$HOME"
+copy_file "$script_dir/dotfiles/.ghstackrc" "$HOME"
 
 # setup vim and neovim
 execute mkdir -p "$HOME/.vim"
