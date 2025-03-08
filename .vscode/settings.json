@@ -4,6 +4,7 @@
     ".env.example": "dotenv",
     ".shellrc": "shellscript",
     "config": "plaintext",
-    "scripts/*": "shellscript"
+    "scripts/*": "shellscript",
+    ".ghstackrc": "plaintext"
   }
 }
