@@ -7,7 +7,7 @@
 
 [core]
   pager = delta
-  editor = code --wait
+  editor = nvim
   precomposeunicode = true
   untrackedCache = true
 
