@@ -5,6 +5,7 @@
     ".shellrc": "shellscript",
     "config": "plaintext",
     "scripts/*": "shellscript",
-    ".ghstackrc": "plaintext"
+    ".ghstackrc": "plaintext",
+    "*.ctbbl": "json"
   }
 }
