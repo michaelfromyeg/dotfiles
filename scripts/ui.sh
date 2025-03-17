@@ -29,6 +29,7 @@ CORE_TOOLS=(
   git
   gh
   vim
+  make
   # NOTE: this is built from source!
   # neovim
   sqlite
