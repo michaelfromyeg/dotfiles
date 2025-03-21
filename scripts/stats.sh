@@ -5,6 +5,10 @@
 
 # Fork of https://gist.githubusercontent.com/shitchell/783cc8a892ed1591eca2afeb65e8720a/raw/git-user-stats.
 
+#!/bin/bash
+# Show user stats (commits, files modified, insertions, deletions, and total
+# lines modified) for a repo
+
 # Process command line arguments
 git_log_opts=( "$@" )
 
@@ -14,7 +18,14 @@ printf "%-30s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\n" \
 printf "%-30s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\n" \
        "-----" "-------" "-----" "----------" "---------" "-----------"
 
+# Check if current directory is a git repository
+if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    echo "Error: Not a git repository"
+    exit 1
+fi
+
 # Use git log to get data, and process with simple awk script
+# The command will run in the current directory
 git log "${git_log_opts[@]}" --format='author: %ae' --numstat \
     | tr '[A-Z]' '[a-z]' \
     | grep -v '^$' \
