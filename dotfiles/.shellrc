@@ -42,6 +42,8 @@ alias gstp='git stash pop'
 alias gtcom='gt co main'
 alias gts='gt sync'
 alias gtr='gt restack'
+alias gtsub='gt submit --stack --update-only'
+alias 'gt s'='gt submit --stack --update-only'
 
 # Combines fzf and git add into a handy workflow
 ga_fzf() {
@@ -97,7 +99,7 @@ export PATH="$PATH:$HOME/.rvm/bin"
 
 # oh-my-posh (if installed)
 if command -v oh-my-posh >/dev/null 2>&1; then
-    eval "$(oh-my-posh init $(basename $SHELL) --config "$(brew --prefix oh-my-posh)"/themes/gruvbox.omp.json)"
+    eval "$(oh-my-posh init "$(basename "$SHELL")" --config "$(brew --prefix oh-my-posh)"/themes/gruvbox.omp.json)"
 fi
 
 # Notion-specific configurations (if needed)

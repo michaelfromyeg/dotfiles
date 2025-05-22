@@ -36,5 +36,6 @@
     "timonwong.shellcheck",
     "vscode-icons-team.vscode-icons",
     "vscodevim.vim"
-  ]
+  ],
+  "unwantedRecommendations": ["eamodio.gitlens"]
 }

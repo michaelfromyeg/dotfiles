@@ -42,6 +42,7 @@ CORE_TOOLS=(
   ripgrep
   fd
   git-delta
+  tree
   # Rendering stuff
   imagemagick
   ghostscript

@@ -1,5 +1,6 @@
 {
   "editor.formatOnSave": true,
+  "files.insertFinalNewline": true,
   "files.associations": {
     ".env.example": "dotenv",
     ".shellrc": "shellscript",
