@@ -1,40 +1,31 @@
 [user]
 	email = michaelfromyeg@gmail.com
 	name = Michael DeMarco
-
 [color]
   ui = auto
-
 [core]
   pager = delta
   editor = nvim
   precomposeunicode = true
   untrackedCache = true
-
+  ignorecase = true
 [init]
   defaultBranch = main
-
 [pull]
   rebase = true
-
 [push]
   default = current
   followTags = true
-
 [fetch]
   prune = true
-
 [diff]
   renames = copies
   algorithm = histogram
-
 [merge]
   log = true
   conflictstyle = diff3
-
 [rebase]
   autoStash = true
-
 [alias]
   # Push and set upstream
   pushup = push -u origin HEAD
@@ -53,6 +44,5 @@
   # Show modified files in last commit
   files = show --pretty="" --name-only
   cleanup = !git reflog expire --expire=now --all && git gc --prune=now --aggressive && git fsck && git prune && git remote prune origin
-
 [advice]
   skippedCherryPicks = false
