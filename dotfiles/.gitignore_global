@@ -1,0 +1,69 @@
+# Context directories, used for AI-driven programming
+.context/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.nfs*
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# Archive files
+*.zip
+*.tar.gz
+*.rar
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# SSH keys
+id_rsa
+id_dsa
+*.pem
+
+# API keys and secrets
+*secret*
+*key*
+*token*
