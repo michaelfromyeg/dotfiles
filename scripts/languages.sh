@@ -30,6 +30,13 @@ export PATH="/usr/local/go/bin:$PATH"
 
 log "Starting installation of programming languages and tools"
 
+# PowerShell (macOS only)
+if [[ $(uname) == "Darwin" ]]; then
+  brew install --cask powershell
+
+  check_cmd pwsh
+fi
+
 # Rust
 log "Installing Rust..."
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y

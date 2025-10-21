@@ -26,4 +26,3 @@ cd ~/apps/neovim || exit 1
 
 make CMAKE_BUILD_TYPE=RelWithDebInfo
 sudo make install
-

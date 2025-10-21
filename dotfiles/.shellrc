@@ -11,6 +11,8 @@ HISTTIMEFORMAT="%F %T "
 # Environment variables
 export XDG_CONFIG_HOME="$HOME/.config"
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
+export EDITOR=zed
 
 # Some common aliases
 alias ls='ls --color=auto'
@@ -62,8 +64,8 @@ gnb() {
     return 1
   fi
 
-  git checkout -b "michaelfromyeg/$1"
-  echo "Created and switched to branch: michaelfromyeg/$1"
+  git checkout -b "michaelfromyeg--$1"
+  echo "Created and switched to branch: michaelfromyeg--$1"
 }
 alias gnb='gnb'
 
@@ -94,6 +96,10 @@ export NVM_DIR="$HOME/.nvm"
 # uv
 export PATH="$HOME/.local/bin:$PATH"
 
+# pyenv
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+
 # rvm (ruby version manager)
 export PATH="$PATH:$HOME/.rvm/bin"
 
@@ -101,6 +107,9 @@ export PATH="$PATH:$HOME/.rvm/bin"
 if command -v oh-my-posh >/dev/null 2>&1; then
     eval "$(oh-my-posh init "$(basename "$SHELL")" --config "$(brew --prefix oh-my-posh)"/themes/gruvbox.omp.json)"
 fi
+
+# rust
+. "$HOME/.cargo/env"
 
 # Notion-specific configurations (if needed)
 if [ -d "$HOME/code/notion-next" ]; then
@@ -118,5 +127,10 @@ if [ -d "$HOME/code/notion-next" ]; then
     fi
 fi
 
-# rust
-. "$HOME/.cargo/env"
+# Gemini
+export GOOGLE_CLOUD_PROJECT=assistant-vertex
+export GOOGLE_CLOUD_LOCATION=us-central1
+export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gemini.json"
+
+# Claude
+alias claude="/Users/mdemarco/.claude/local/claude"

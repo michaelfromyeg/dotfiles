@@ -38,5 +38,6 @@ source $(brew --prefix)/opt/antidote/share/antidote/antidote.zsh
 antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
 
 # Added by `notion install`
-eval "$(pyenv init -)"
+eval "$(pyenv init - zsh)"
 eval "$(direnv hook zsh)"
+eval "$('/usr/local/bin/node' -r '/Users/mdemarco/code/notion-next/esbuild-runner.js' '/Users/mdemarco/code/notion-next/src/cli/main/notion.ts' completion --install)"
