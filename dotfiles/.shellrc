@@ -105,7 +105,8 @@ export PATH="$PATH:$HOME/.rvm/bin"
 
 # oh-my-posh (if installed)
 if command -v oh-my-posh >/dev/null 2>&1; then
-    eval "$(oh-my-posh init "$(basename "$SHELL")" --config "$(brew --prefix oh-my-posh)"/themes/gruvbox.omp.json)"
+  # eval "$(oh-my-posh init "$(basename "$SHELL")" --config "$(brew --prefix oh-my-posh)"/themes/gruvbox.omp.json)"
+  eval "$(oh-my-posh init "$(basename "$SHELL")" --config ~/.config/ohmyposh/gruvbox2.omp.json)"
 fi
 
 # rust
@@ -118,6 +119,9 @@ if [ -d "$HOME/code/notion-next" ]; then
     alias nd="notion desktop run"
     alias ne="notion eslint"
 
+    alias nfix="notion eslint --branch --fix --ratchet && notion format --branch && notion extract"
+    alias ncheck="nfix && notion test --branch && notion typecheck --go"
+
     # Notion Android paths
     export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin"
 
@@ -125,6 +129,31 @@ if [ -d "$HOME/code/notion-next" ]; then
     if command -v notion >/dev/null 2>&1; then
         eval "$(notion completion --install)"
     fi
+
+    # Run all modified test files on current branch vs main
+    test-branch() {
+        echo "Finding modified test files..."
+        local test_files=$(git diff --name-only main...HEAD | grep '\.test\.tsx\?$')
+
+        if [ -z "$test_files" ]; then
+            echo "No modified test files found"
+            return 0
+        fi
+
+        echo "Found test files:"
+        echo "$test_files"
+        echo ""
+
+        echo "$test_files" | while read -r file; do
+            if [ -f "$file" ]; then
+                echo "========================================"
+                echo "Testing: $file"
+                echo "========================================"
+                notion test "$file"
+                echo ""
+            fi
+        done
+    }
 fi
 
 # Gemini
