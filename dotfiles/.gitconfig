@@ -47,5 +47,7 @@
   cleanup = !git reflog expire --expire=now --all && git gc --prune=now --aggressive && git fsck && git prune && git remote prune origin
   # Force push with lease (safer than --force)
   pushf = push --force-with-lease
+  # Open all changed files (vs main) in $EDITOR
+  open-changed = !git diff --name-only main...HEAD | xargs $EDITOR
 [advice]
   skippedCherryPicks = false

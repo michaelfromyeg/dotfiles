@@ -40,6 +40,7 @@ alias glg='git log --graph --oneline --decorate'
 alias grh='git reset HEAD'
 alias gsta='git stash'
 alias gstp='git stash pop'
+alias goc='git diff --name-only main...HEAD | xargs $EDITOR'
 
 alias gtcom='gt co main'
 alias gts='gt sync'
@@ -67,7 +68,6 @@ gnb() {
   git checkout -b "michaelfromyeg--$1"
   echo "Created and switched to branch: michaelfromyeg--$1"
 }
-alias gnb='gnb'
 
 # Alert alias for long running commands
 # Usage: sleep 10; alert
