@@ -58,7 +58,7 @@ ga_fzf() {
 alias gaf='ga_fzf'
 
 # Creates a new branch with a prefix (thank you @yash)
-gnb() {
+gnb_f() {
   if [ -z "$1" ]; then
     echo "Usage: gnb <branch-description>"
     echo "Example: gnb fix-login-bug"
@@ -68,6 +68,7 @@ gnb() {
   git checkout -b "michaelfromyeg--$1"
   echo "Created and switched to branch: michaelfromyeg--$1"
 }
+alias gnb='gnb_f'
 
 # Alert alias for long running commands
 # Usage: sleep 10; alert

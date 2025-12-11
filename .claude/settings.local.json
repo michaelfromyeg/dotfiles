@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(chmod:*)",
+      "Bash(/Users/mdemarco/code/dotfiles/scripts/test-changed.sh:*)",
+      "Bash(./scripts/test-changed.sh:*)",
+      "Bash(./run.sh test-changed:*)"
+    ]
+  }
+}
