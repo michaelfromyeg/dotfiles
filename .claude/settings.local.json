@@ -32,7 +32,10 @@
       "Bash(sdk install:*)",
       "Bash(java:*)",
       "Bash(gradle:*)",
-      "Bash(kotlin:*)"
+      "Bash(kotlin:*)",
+      "Bash(gw_list_f)",
+      "Bash(git worktree:*)",
+      "Bash(gw_remove_f)"
     ]
   }
 }
