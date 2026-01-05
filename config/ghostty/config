@@ -1,2 +1,4 @@
 theme=GruvboxDark
 font-family=Cascadia Code NF
+keybind=shift+enter=text:\x1b\r
+
