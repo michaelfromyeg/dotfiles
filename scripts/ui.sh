@@ -43,6 +43,18 @@ CORE_TOOLS=(
   fd
   git-delta
   tree
+  tmux
+  xclip
+  jq
+  bat
+  eza
+  htop
+  tldr
+  zoxide
+  hyperfine
+  direnv
+  shellcheck
+  git-branchless
   # Rendering stuff
   imagemagick
   ghostscript

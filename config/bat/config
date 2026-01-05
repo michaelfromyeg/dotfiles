@@ -1,0 +1,6 @@
+--theme="gruvbox-dark"
+--style="numbers,changes"
+--italic-text=always
+--map-syntax "*.conf:INI"
+--map-syntax ".gitconfig:INI"
+--map-syntax ".env*:Dotenv"

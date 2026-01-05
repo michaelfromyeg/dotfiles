@@ -59,9 +59,13 @@ copy_file() {
 
 }
 
-# covers neovim, ghostty, etc.
-# TODO(michaelfromyeg): ghostty should only be copied on macOS
+# Copy config directories (nvim, bat, lazygit, ohmyposh, etc.)
 copy_dirs "$script_dir"/config "$XDG_CONFIG_HOME"
+
+# Remove ghostty config on non-macOS (it's macOS-only)
+if [[ "$(uname -s)" != "Darwin" ]]; then
+  execute rm -rf "$XDG_CONFIG_HOME/ghostty"
+fi
 
 # the 'real' dotfiles
 copy_file "$script_dir"/dotfiles/.shellrc "$HOME"
@@ -70,7 +74,9 @@ copy_file "$script_dir"/dotfiles/.zsh_plugins.txt "$HOME"
 copy_file "$script_dir"/dotfiles/.bashrc "$HOME"
 copy_file "$script_dir/dotfiles/.vimrc" "$HOME"
 copy_file "$script_dir/dotfiles/.gitconfig" "$HOME"
-copy_file "$script_dir/dotfiles/.ghstackrc" "$HOME"
+copy_file "$script_dir/dotfiles/.tmux.conf" "$HOME"
+copy_file "$script_dir/dotfiles/.ripgreprc" "$HOME"
+copy_file "$script_dir/dotfiles/.gitignore_global" "$HOME"
 
 # setup vim and neovim
 execute mkdir -p "$HOME/.vim"
@@ -97,12 +103,5 @@ log "Installing Vim plugins"
 execute vim +PlugInstall +qall
 
 # make `run.sh` runnable from anywhere
-mkdir -p ~/bin
+execute mkdir -p "$HOME/bin"
 execute ln -sf "$script_dir/run.sh" "$HOME/bin/dotfiles"
-
-if [[ ":$PATH:" != *":$HOME/bin:"* ]]; then
-    echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.bashrc"
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        echo 'export PATH="$HOME/bin:$PATH"' >> "$HOME/.zshrc"
-    fi
-fi
