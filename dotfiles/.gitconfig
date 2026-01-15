@@ -10,6 +10,7 @@
   untrackedCache = true
   ignorecase = true
   excludesfile = ~/.gitignore_global
+  hooksPath = ~/.config/git/hooks
 [init]
   defaultBranch = main
 [pull]

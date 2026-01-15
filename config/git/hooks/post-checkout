@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# post-checkout hook: Prevent base worktrees from leaving main/master
+
+# Args: previous_head new_head is_branch_checkout
+prev_head="$1"
+new_head="$2"
+is_branch_checkout="$3"
+
+# Only act on branch checkouts, not file checkouts
+[ "$is_branch_checkout" != "1" ] && exit 0
+
+# Get current branch
+current_branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+[ -z "$current_branch" ] && exit 0  # Detached HEAD, allow it
+
+# If we're on main/master, nothing to enforce
+[[ "$current_branch" == "main" || "$current_branch" == "master" ]] && exit 0
+
+# Determine if this is a base worktree (not a numbered worktree like repo-name-N)
+repo_root=$(git rev-parse --show-toplevel)
+repo_dir=$(basename "$repo_root")
+
+# Check if directory ends with -N (numbered worktree pattern)
+if [[ "$repo_dir" =~ -[0-9]+$ ]]; then
+  # This is a numbered worktree, allow any branch
+  exit 0
+fi
+
+# This is a base worktree and we're not on main/master - revert
+default_branch="main"
+if git show-ref --verify --quiet refs/heads/master && ! git show-ref --verify --quiet refs/heads/main; then
+  default_branch="master"
+fi
+
+echo ""
+echo "WARNING: Base worktree should stay on '$default_branch'."
+echo "Use 'gwc $current_branch' to create a worktree for this branch instead."
+echo "Switching back to '$default_branch'..."
+echo ""
+
+git checkout "$default_branch" --quiet
+exit 0

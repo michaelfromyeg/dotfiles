@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# pre-push hook: Run tests for changed files before pushing (notion-next only)
+
+repo_name=$(basename "$(git rev-parse --show-toplevel)")
+
+# Only run for notion-next repos (including worktrees like notion-next-1)
+if [[ ! "$repo_name" =~ ^notion-next(-[0-9]+)?$ ]]; then
+  exit 0
+fi
+
+echo ""
+echo "Running tests for changed files before push..."
+echo ""
+
+# Run test-changed script
+if command -v dotfiles &> /dev/null; then
+  dotfiles test-changed
+else
+  # Fallback to direct path
+  ~/code/dotfiles/scripts/test-changed.sh
+fi
+
+exit_code=$?
+
+if [ $exit_code -ne 0 ]; then
+  echo ""
+  echo "Tests failed. Push aborted."
+  echo "Use 'git push --no-verify' to skip this check."
+  echo ""
+  exit 1
+fi
+
+exit 0
