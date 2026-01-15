@@ -25,7 +25,11 @@ check_cmd() {
 
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
-export PATH="/usr/local/go/bin:$PATH"
+# Only add /usr/local/go/bin on Linux (manual install location)
+# On macOS, Homebrew manages Go in /opt/homebrew/bin or /usr/local/bin
+if [[ "$(uname -s)" != "Darwin" ]]; then
+  export PATH="/usr/local/go/bin:$PATH"
+fi
 
 log "Starting installation of programming languages and tools"
 

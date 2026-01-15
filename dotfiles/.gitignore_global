@@ -63,7 +63,6 @@ id_rsa
 id_dsa
 *.pem
 
-# API keys and secrets
-*secret*
-*key*
-*token*
+# Credentials
+credentials.json
+*.credentials

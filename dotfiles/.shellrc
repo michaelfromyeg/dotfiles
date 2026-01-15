@@ -64,7 +64,7 @@ alias gtsub='gt submit --stack --update-only'
 
 # Combines fzf and git add into a handy workflow
 ga_fzf() {
-    git status -s |
+  git status -s |
     fzf --multi --preview 'git diff --color=always {2}' --preview-window=right:70% |
     awk '{print $2}' |
     xargs -r git add
@@ -139,7 +139,7 @@ _gw_copy_configs() {
 
 # Create a worktree at ../repo-name-X with config copying
 gw_create_f() {
-  if ! git rev-parse --git-dir > /dev/null 2>&1; then
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
     echo "Error: Not in a git repository"
     return 1
   fi
@@ -166,9 +166,16 @@ gw_create_f() {
   local worktree_path="$parent_dir/${repo_name}-${counter}"
 
   echo "Creating worktree at: $worktree_path"
-  if git worktree add "$worktree_path" -b "$branch_name" 2>/dev/null || \
-     git worktree add "$worktree_path" "$branch_name"; then
+  if git worktree add "$worktree_path" -b "$branch_name" 2>/dev/null ||
+    git worktree add "$worktree_path" "$branch_name"; then
     _gw_copy_configs "$repo_root" "$worktree_path"
+
+    # Run notion install-node-modules for notion-next repos
+    if [ "$repo_name" = "notion-next" ]; then
+      echo "Installing node modules for notion-next..."
+      (cd "$worktree_path" && notion install-node-modules)
+    fi
+
     echo "Worktree created: $worktree_path (branch: $branch_name)"
   else
     echo "Error: Failed to create worktree"
@@ -181,7 +188,7 @@ alias gwc='gw_create_f'
 gw_list_f() {
   local code_dir="${HOME}/code"
 
-  if git rev-parse --git-dir > /dev/null 2>&1; then
+  if git rev-parse --git-dir >/dev/null 2>&1; then
     # In a repo - show worktrees for this repo
     local repo_name
     repo_name=$(basename "$(git rev-parse --show-toplevel)")
@@ -262,22 +269,42 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 
 # OS-specific configurations
 case "$(uname -s)" in
-    Darwin*)
-        # macOS-specific settings
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-        export ANDROID_HOME="$HOME/Library/Android/sdk"
-        ;;
-    Linux*)
-        # Linux-specific settings
-        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-        ;;
+Darwin*)
+  # macOS-specific settings
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+  export ANDROID_HOME="$HOME/Library/Android/sdk"
+  ;;
+Linux*)
+  # Linux-specific settings
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  ;;
 esac
 
 # Languages
 # nvm (node version manager)
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
+
+# Auto nvm use when entering directory with .nvmrc
+_nvm_auto_use() {
+  if [ -f ".nvmrc" ] && command -v nvm >/dev/null 2>&1; then
+    nvm use --silent
+  fi
+}
+
+# Use chpwd hook for zsh (works with zoxide's z command), cd wrapper for bash
+if [ -n "$ZSH_VERSION" ]; then
+  autoload -U add-zsh-hook
+  add-zsh-hook chpwd _nvm_auto_use
+else
+  cd() {
+    builtin cd "$@" && _nvm_auto_use
+  }
+fi
+
+# Check on shell startup
+_nvm_auto_use
 
 # uv
 export PATH="$HOME/.local/bin:$PATH"
@@ -321,46 +348,46 @@ fi
 
 # Notion-specific configurations (if needed)
 if [ -d "$HOME/code/notion-next" ]; then
-    alias nn="cd ~/code/notion-next"
-    alias nr="notion run"
-    alias nd="notion desktop run"
-    alias ne="notion eslint"
+  alias nn="cd ~/code/notion-next"
+  alias nr="notion run"
+  alias nd="notion desktop run"
+  alias ne="notion eslint"
 
-    alias nfix="notion eslint --branch --fix --ratchet && notion format --branch && notion extract"
-    alias ncheck="nfix && notion test --branch && notion typecheck --go"
+  alias nfix="notion eslint --branch --fix --ratchet && notion format --branch && notion extract"
+  alias ncheck="nfix && notion test --branch && notion typecheck --go"
 
-    # Notion Android paths
-    export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin"
+  # Notion Android paths
+  export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin"
 
-    # Notion shell completion
-    if command -v notion >/dev/null 2>&1; then
-        eval "$(notion completion --install)"
+  # Notion shell completion
+  if command -v notion >/dev/null 2>&1; then
+    eval "$(notion completion --install)"
+  fi
+
+  # Run all modified test files on current branch vs main
+  test-branch() {
+    echo "Finding modified test files..."
+    local test_files=$(git diff --name-only main...HEAD | grep '\.test\.tsx\?$')
+
+    if [ -z "$test_files" ]; then
+      echo "No modified test files found"
+      return 0
     fi
 
-    # Run all modified test files on current branch vs main
-    test-branch() {
-        echo "Finding modified test files..."
-        local test_files=$(git diff --name-only main...HEAD | grep '\.test\.tsx\?$')
+    echo "Found test files:"
+    echo "$test_files"
+    echo ""
 
-        if [ -z "$test_files" ]; then
-            echo "No modified test files found"
-            return 0
-        fi
-
-        echo "Found test files:"
-        echo "$test_files"
+    echo "$test_files" | while read -r file; do
+      if [ -f "$file" ]; then
+        echo "========================================"
+        echo "Testing: $file"
+        echo "========================================"
+        notion test "$file"
         echo ""
-
-        echo "$test_files" | while read -r file; do
-            if [ -f "$file" ]; then
-                echo "========================================"
-                echo "Testing: $file"
-                echo "========================================"
-                notion test "$file"
-                echo ""
-            fi
-        done
-    }
+      fi
+    done
+  }
 fi
 
 # Gemini
