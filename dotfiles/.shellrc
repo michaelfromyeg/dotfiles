@@ -91,7 +91,7 @@ _gw_copy_configs() {
   local dest="$2"
 
   # Essential files (always copy if they exist)
-  local essential_files=(".env" ".envrc" ".notion-cli.json" ".devex.config.yaml")
+  local essential_files=(".env" ".envrc" ".notion-cli.json" ".devex.config.yaml" "CLAUDE.local.md")
 
   for file in "${essential_files[@]}"; do
     if [ -f "$src/$file" ]; then
@@ -262,6 +262,42 @@ gw_remove_f() {
   fi
 }
 alias gwr='gw_remove_f'
+
+# Sync configs from current worktree to all others
+gw_sync_f() {
+  if ! git rev-parse --git-dir >/dev/null 2>&1; then
+    echo "Error: Not in a git repository"
+    return 1
+  fi
+
+  local current_worktree
+  current_worktree=$(git rev-parse --show-toplevel)
+
+  local worktrees=()
+  while IFS= read -r line; do
+    if [[ "$line" == worktree\ * ]]; then
+      local wt_path="${line#worktree }"
+      if [ "$wt_path" != "$current_worktree" ]; then
+        worktrees+=("$wt_path")
+      fi
+    fi
+  done < <(git worktree list --porcelain)
+
+  if [ ${#worktrees[@]} -eq 0 ]; then
+    echo "No other worktrees to sync to"
+    return 0
+  fi
+
+  echo "Syncing configs from: $current_worktree"
+  echo ""
+  for wt in "${worktrees[@]}"; do
+    echo "→ $(basename "$wt")"
+    _gw_copy_configs "$current_worktree" "$wt"
+    echo ""
+  done
+  echo "Sync complete"
+}
+alias gws='gw_sync_f'
 
 # Alert alias for long running commands
 # Usage: sleep 10; alert
