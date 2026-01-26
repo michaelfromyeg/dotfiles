@@ -316,6 +316,25 @@ Linux*)
   ;;
 esac
 
+# WSL-specific utilities
+if grep -qi microsoft /proc/version 2>/dev/null; then
+    # wslview replacement (wslu was discontinued)
+    wslview() {
+        if [ -z "$1" ]; then
+            echo "Usage: wslview <file or url>"
+            return 1
+        fi
+
+        if [ -e "$1" ]; then
+            # It's a file - convert to Windows path
+            cmd.exe /c start "" "$(wslpath -w "$1")" 2>/dev/null
+        else
+            # Assume it's a URL
+            cmd.exe /c start "" "$1" 2>/dev/null
+        fi
+    }
+fi
+
 # Languages
 # nvm (node version manager)
 export NVM_DIR="$HOME/.nvm"
