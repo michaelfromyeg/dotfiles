@@ -450,7 +450,7 @@ fi
 
 # Gemini
 export GOOGLE_CLOUD_PROJECT=assistant-vertex
-export GOOGLE_CLOUD_LOCATION=us-central1
+export GOOGLE_CLOUD_LOCATION=global
 export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gemini.json"
 
 # Claude
