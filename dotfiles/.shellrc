@@ -403,6 +403,8 @@ fi
 
 # Notion-specific configurations (if needed)
 if [ -d "$HOME/code/notion-next" ]; then
+  export NOTION_ENV=dev
+
   alias nn="cd ~/code/notion-next"
   alias nn1="cd ~/code/notion-next-1"
   alias nn2="cd ~/code/notion-next-2"
