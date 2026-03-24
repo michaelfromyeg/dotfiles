@@ -78,6 +78,26 @@ copy_file "$script_dir/dotfiles/.tmux.conf" "$HOME"
 copy_file "$script_dir/dotfiles/.ripgreprc" "$HOME"
 copy_file "$script_dir/dotfiles/.gitignore_global" "$HOME"
 
+# SSH config (managed portion — included by ~/.ssh/config)
+execute mkdir -p "$HOME/.ssh"
+execute chmod 700 "$HOME/.ssh"
+copy_file "$script_dir/dotfiles/.ssh/config.local" "$HOME/.ssh"
+if [ -f "$HOME/.ssh/config" ]; then
+  if ! grep -q "Include config.local" "$HOME/.ssh/config"; then
+    log "Adding Include config.local to ~/.ssh/config"
+    if [[ $dry != "1" ]] && [[ $dry != "2" ]]; then
+      sed -i.bak '1s/^/Include config.local\n\n/' "$HOME/.ssh/config"
+      rm -f "$HOME/.ssh/config.bak"
+    fi
+  fi
+else
+  log "Creating ~/.ssh/config with Include"
+  if [[ $dry != "1" ]] && [[ $dry != "2" ]]; then
+    echo "Include config.local" > "$HOME/.ssh/config"
+    chmod 600 "$HOME/.ssh/config"
+  fi
+fi
+
 # setup vim and neovim
 execute mkdir -p "$HOME/.vim"
 execute mkdir -p "$HOME/.vim/undodir"
@@ -105,3 +125,42 @@ execute vim +PlugInstall +qall
 # make `run.sh` runnable from anywhere
 execute mkdir -p "$HOME/bin"
 execute ln -sf "$script_dir/run.sh" "$HOME/bin/dotfiles"
+
+# Boxy remote dev profile (macOS only — synced to boxy containers from laptop)
+if [[ "$(uname -s)" == "Darwin" ]]; then
+  log "Setting up boxy profile..."
+
+  boxy_dotfiles="$HOME/.boxy/profile/dotfiles"
+  boxy_config="$boxy_dotfiles/.config"
+
+  execute mkdir -p "$boxy_dotfiles"
+  execute mkdir -p "$boxy_config"
+
+  # Shell configs
+  copy_file "$script_dir/dotfiles/.shellrc" "$boxy_dotfiles"
+  copy_file "$script_dir/dotfiles/.zshrc" "$boxy_dotfiles"
+  copy_file "$script_dir/dotfiles/.zsh_plugins.txt" "$boxy_dotfiles"
+  copy_file "$script_dir/dotfiles/.bashrc" "$boxy_dotfiles"
+  copy_file "$script_dir/dotfiles/.vimrc" "$boxy_dotfiles"
+  copy_file "$script_dir/dotfiles/.gitconfig" "$boxy_dotfiles"
+  copy_file "$script_dir/dotfiles/.ripgreprc" "$boxy_dotfiles"
+  copy_file "$script_dir/dotfiles/.gitignore_global" "$boxy_dotfiles"
+
+  # tmux.conf — append zsh as default shell for boxy sessions
+  copy_file "$script_dir/dotfiles/.tmux.conf" "$boxy_dotfiles"
+  if [[ $dry != "1" ]] && [[ $dry != "2" ]]; then
+    printf '\n# Boxy: use zsh as default shell\nset-option -g default-shell /usr/bin/zsh\n' >> "$boxy_dotfiles/.tmux.conf"
+  fi
+
+  # App configs (skip ghostty — macOS-only terminal)
+  for dir in bat git lazygit nvim ohmyposh; do
+    if [ -d "$script_dir/config/$dir" ]; then
+      execute rm -rf "$boxy_config/$dir"
+      execute cp -r "$script_dir/config/$dir" "$boxy_config"
+    fi
+  done
+
+  # Boxy init script
+  execute cp "$script_dir/boxy/init.sh" "$HOME/.boxy/profile/init.sh"
+  execute chmod +x "$HOME/.boxy/profile/init.sh"
+fi

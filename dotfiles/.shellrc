@@ -13,7 +13,13 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export PATH="$HOME/bin:$PATH"
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
-export EDITOR=zed
+if command -v zed >/dev/null 2>&1; then
+  export EDITOR=zed
+elif command -v nvim >/dev/null 2>&1; then
+  export EDITOR=nvim
+else
+  export EDITOR=vim
+fi
 
 # Some common aliases
 # Use eza if available, otherwise fall back to ls
@@ -311,8 +317,10 @@ Darwin*)
   export ANDROID_HOME="$HOME/Library/Android/sdk"
   ;;
 Linux*)
-  # Linux-specific settings
-  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  # Linux-specific settings (Linuxbrew, if installed)
+  if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+    eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  fi
   ;;
 esac
 
@@ -401,14 +409,21 @@ if command -v direnv >/dev/null 2>&1; then
   eval "$(direnv hook "$(basename "$SHELL")")"
 fi
 
-# Notion-specific configurations (if needed)
+# Notion-specific configurations (local or boxy)
+_notion_next=""
 if [ -d "$HOME/code/notion-next" ]; then
+  _notion_next="$HOME/code/notion-next"
+elif [ -d "/work/notion-next" ]; then
+  _notion_next="/work/notion-next"
+fi
+
+if [ -n "$_notion_next" ]; then
   export NOTION_ENV=dev
 
-  alias nn="cd ~/code/notion-next"
-  alias nn1="cd ~/code/notion-next-1"
-  alias nn2="cd ~/code/notion-next-2"
-  alias nn3="cd ~/code/notion-next-3"
+  alias nn="cd $_notion_next"
+  alias nn1="cd ${_notion_next}-1"
+  alias nn2="cd ${_notion_next}-2"
+  alias nn3="cd ${_notion_next}-3"
   alias nr="notion run"
   alias nd="notion desktop run"
   alias ne="notion eslint"
@@ -455,7 +470,22 @@ export GOOGLE_CLOUD_PROJECT=assistant-vertex
 export GOOGLE_CLOUD_LOCATION=global
 export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gemini.json"
 
-# Claude
-if [ -x "$HOME/.claude/local/claude" ]; then
+# Claude (boxy has it in PATH already; local installs to ~/.claude/local/)
+if ! command -v claude >/dev/null 2>&1 && [ -x "$HOME/.claude/local/claude" ]; then
   alias claude="$HOME/.claude/local/claude"
+fi
+
+# PR/CI status (requires gh CLI)
+if command -v gh >/dev/null 2>&1; then
+  alias prs='gh pr status'
+  alias prc='gh pr checks'
+  alias prv='gh pr view --web'
+fi
+
+# Boxy shortcuts
+if command -v notion >/dev/null 2>&1; then
+  alias nb='notion boxy'
+  alias nbc='notion boxy claude'
+  alias nbs='notion boxy ssh'
+  alias nbl='notion boxy ls'
 fi

@@ -34,11 +34,19 @@ bindkey '^[[1;5C' forward-word
 bindkey '^[[1;5D' backward-word
 
 # Load antidote plugin manager
-source $(brew --prefix)/opt/antidote/share/antidote/antidote.zsh
-antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
+_antidote_dir=""
+if type brew &>/dev/null; then
+  _antidote_dir="$(brew --prefix)/opt/antidote/share/antidote"
+elif [[ -d /usr/local/share/antidote ]]; then
+  _antidote_dir="/usr/local/share/antidote"
+fi
+if [[ -n "$_antidote_dir" ]] && [[ -f "$_antidote_dir/antidote.zsh" ]]; then
+  source "$_antidote_dir/antidote.zsh"
+  antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
+fi
+unset _antidote_dir
 
-# Added by `notion install`
-eval "$(pyenv init - zsh)"
-eval "$(direnv hook zsh)"
-eval "$('/usr/local/bin/node' -r '/Users/mdemarco/code/notion-next/esbuild-runner.js' '/Users/mdemarco/code/notion-next/src/cli/main/notion.ts' completion --install)"
+# Added by `notion install` (guarded for portability)
+command -v pyenv >/dev/null 2>&1 && eval "$(pyenv init - zsh)"
+command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
 
