@@ -122,6 +122,16 @@ fi
 log "Installing Vim plugins"
 execute vim +PlugInstall +qall
 
+# Claude Code user-level config (~/.claude/ is not XDG, so handled separately)
+execute mkdir -p "$HOME/.claude"
+execute mkdir -p "$HOME/.claude/skills"
+copy_file "$script_dir/claude/settings.json" "$HOME/.claude"
+copy_file "$script_dir/claude/statusline-command.sh" "$HOME/.claude"
+copy_file "$script_dir/claude/CLAUDE.md" "$HOME/.claude"
+if [ -d "$script_dir/claude/skills" ] && [ "$(ls -A "$script_dir/claude/skills" 2>/dev/null)" ]; then
+  copy_dirs "$script_dir/claude/skills" "$HOME/.claude/skills"
+fi
+
 # make `run.sh` runnable from anywhere
 execute mkdir -p "$HOME/bin"
 execute ln -sf "$script_dir/run.sh" "$HOME/bin/dotfiles"
