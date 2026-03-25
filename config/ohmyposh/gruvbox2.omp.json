@@ -5,27 +5,28 @@
       "alignment": "left",
       "segments": [
         {
-          "background": "#d3869b",
-          "foreground": "#282828",
+          "background": "#3A3A3A",
+          "foreground": "#ffffff",
           "style": "powerline",
           "powerline_symbol": "\ue0b0",
-          "template": "{{ if .Env.NOTION_BOXY_NAME }} \uf49e {{ .Env.NOTION_BOXY_NAME }} {{ end }}",
-          "type": "text"
+          "template": "{{ if .WSL }}WSL at{{ end }} {{.Icon}} ",
+          "type": "os"
         },
         {
           "background": "#689d6a",
           "foreground": "#282828",
           "style": "powerline",
           "powerline_symbol": "\ue0b0",
-          "template": "{{ if .SSHSession }} \uf817 {{ .UserName }}@{{ .HostName }} {{ end }}",
+          "template": "{{ if .SSHSession }} \uf817 {{ end }}",
           "type": "session"
         },
         {
-          "background": "#3A3A3A",
-          "foreground": "#ffffff",
+          "background": "#d3869b",
+          "foreground": "#282828",
           "style": "powerline",
-          "template": "{{ if .WSL }}WSL at{{ end }} {{.Icon}} ",
-          "type": "os"
+          "powerline_symbol": "\ue0b0",
+          "template": "{{ if .Env.NOTION_BOXY_NAME }} \uf49e {{ .Env.NOTION_BOXY_NAME }} {{ end }}",
+          "type": "text"
         },
         {
           "background": "#458588",
@@ -137,7 +138,8 @@
           }
         }
       ],
-      "type": "prompt"
+      "type": "prompt",
+      "newline": true
     }
   ],
   "console_title_template": "{{ .Folder }}",
