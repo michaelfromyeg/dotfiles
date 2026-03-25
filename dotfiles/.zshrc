@@ -24,15 +24,6 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' # Case insensitive
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}     # Colored completion
 
-# Key bindings
-bindkey '^[[A' history-substring-search-up
-bindkey '^[[B' history-substring-search-down
-bindkey '^[[H' beginning-of-line
-bindkey '^[[F' end-of-line
-bindkey '^[[3~' delete-char
-bindkey '^[[1;5C' forward-word
-bindkey '^[[1;5D' backward-word
-
 # Load antidote plugin manager
 _antidote_dir=""
 if type brew &>/dev/null; then
@@ -45,6 +36,20 @@ if [[ -n "$_antidote_dir" ]] && [[ -f "$_antidote_dir/antidote.zsh" ]]; then
   antidote load ${ZDOTDIR:-$HOME}/.zsh_plugins.txt
 fi
 unset _antidote_dir
+
+# Key bindings (after antidote so history-substring-search widgets exist)
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
+bindkey '^[[H' beginning-of-line
+bindkey '^[[F' end-of-line
+bindkey '^[[3~' delete-char
+bindkey '^[[1;5C' forward-word
+bindkey '^[[1;5D' backward-word
+
+# Auto-start tmux-dev on boxy SSH sessions
+if [[ -n "$NOTION_BOXY_NAME" && -z "$TMUX" && -n "$SSH_CONNECTION" ]]; then
+  ~/code/dotfiles/scripts/tmux-dev.sh && clear
+fi
 
 # Added by `notion install` (guarded for portability)
 command -v pyenv >/dev/null 2>&1 && eval "$(pyenv init - zsh)"
