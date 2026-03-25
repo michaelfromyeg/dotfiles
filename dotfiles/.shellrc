@@ -502,4 +502,30 @@ if command -v notion >/dev/null 2>&1; then
   alias nbc='notion boxy claude'
   alias nbs='notion boxy ssh'
   alias nbl='notion boxy ls'
+  alias nbcr='notion boxy create'
+  alias nbd='notion boxy destroy'
+
+  # SSH into all running boxies, each in a new Ghostty tab
+  nbsa() {
+    local names
+    names=$(notion boxy ls 2>&1 | awk 'NR>3 && /Running/ {print $1}')
+    if [ -z "$names" ]; then
+      echo "No running boxies found"
+      return 1
+    fi
+    echo "$names" | while IFS= read -r name; do
+      echo "Opening tab for $name..."
+      osascript -e "
+        tell application \"Ghostty\" to activate
+        tell application \"System Events\"
+          tell process \"ghostty\"
+            keystroke \"t\" using command down
+            delay 0.5
+            keystroke \"notion boxy ssh $name\"
+            keystroke return
+          end tell
+        end tell
+      "
+    done
+  }
 fi

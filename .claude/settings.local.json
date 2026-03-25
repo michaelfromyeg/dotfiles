@@ -39,7 +39,13 @@
       "WebFetch(domain:ghostty.org)",
       "Bash(gh api:*)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:ohmyposh.dev)"
+      "WebFetch(domain:ohmyposh.dev)",
+      "Bash(notion boxy:*)",
+      "Bash(ghostty --help)",
+      "Bash(ghostty +list-actions)",
+      "Bash(ghostty +new-tab --help)",
+      "Bash(ghostty +help)",
+      "Bash(nvm use:*)"
     ]
   }
 }
