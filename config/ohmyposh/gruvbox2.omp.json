@@ -131,7 +131,7 @@
             "{{ if gt .Code 0 }}#cc241d{{ end }}"
           ],
           "style": "plain",
-          "template": "\u276f ",
+          "template": "λ",
           "type": "status",
           "properties": {
             "always_enabled": true
