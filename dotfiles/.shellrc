@@ -481,14 +481,6 @@ export GOOGLE_CLOUD_PROJECT=assistant-vertex
 export GOOGLE_CLOUD_LOCATION=global
 export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gemini.json"
 
-# Claude
-if [ -n "$NOTION_BOXY_NAME" ]; then
-  # On a boxy, wrap claude to go through `notion boxy claude` which handles auth
-  claude() { notion boxy claude "$@"; }
-elif [ "$(uname -s)" = "Darwin" ] && ! command -v claude >/dev/null 2>&1 && [ -x "$HOME/.claude/local/claude" ]; then
-  alias claude="$HOME/.claude/local/claude"
-fi
-
 # PR/CI status (requires gh CLI)
 if command -v gh >/dev/null 2>&1; then
   alias prs='gh pr status'
