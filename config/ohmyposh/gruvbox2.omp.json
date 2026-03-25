@@ -5,6 +5,22 @@
       "alignment": "left",
       "segments": [
         {
+          "background": "#d3869b",
+          "foreground": "#282828",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "template": "{{ if .Env.NOTION_BOXY_NAME }} \uf49e {{ .Env.NOTION_BOXY_NAME }} {{ end }}",
+          "type": "text"
+        },
+        {
+          "background": "#689d6a",
+          "foreground": "#282828",
+          "style": "powerline",
+          "powerline_symbol": "\ue0b0",
+          "template": "{{ if .SSHSession }} \uf817 {{ .UserName }}@{{ .HostName }} {{ end }}",
+          "type": "session"
+        },
+        {
           "background": "#3A3A3A",
           "foreground": "#ffffff",
           "style": "powerline",
@@ -100,6 +116,25 @@
           "style": "powerline",
           "template": " \uf0ad ",
           "type": "root"
+        }
+      ],
+      "type": "prompt",
+      "newline": true
+    },
+    {
+      "alignment": "left",
+      "segments": [
+        {
+          "foreground": "#b8bb26",
+          "foreground_templates": [
+            "{{ if gt .Code 0 }}#cc241d{{ end }}"
+          ],
+          "style": "plain",
+          "template": "\u276f ",
+          "type": "status",
+          "properties": {
+            "always_enabled": true
+          }
         }
       ],
       "type": "prompt"

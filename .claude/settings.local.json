@@ -35,7 +35,11 @@
       "Bash(kotlin:*)",
       "Bash(gw_list_f)",
       "Bash(git worktree:*)",
-      "Bash(gw_remove_f)"
+      "Bash(gw_remove_f)",
+      "WebFetch(domain:ghostty.org)",
+      "Bash(gh api:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:ohmyposh.dev)"
     ]
   }
 }

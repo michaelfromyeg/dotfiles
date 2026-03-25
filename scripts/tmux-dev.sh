@@ -49,8 +49,8 @@ if [ "$WORK_DIR" != "$HOME" ] && command -v notion &>/dev/null; then
   tmux send-keys -t "$SESSION:1.3" "notion run" C-m
 fi
 
-# Start claude in the top pane
-tmux send-keys -t "$SESSION:1.1" "claude" C-m
+# Start claude in the top pane (use `command` to bypass any shell function wrappers)
+tmux send-keys -t "$SESSION:1.1" "command claude" C-m
 
 # Focus claude pane
 tmux select-pane -t "$SESSION:1.1"
