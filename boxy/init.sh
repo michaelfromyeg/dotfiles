@@ -90,6 +90,13 @@ if [ -f "$DOTFILES_DIR/run.sh" ]; then
   chown -R notion:notion /home/notion/bin
 fi
 
+# --- notion-next ---
+if [ -d /work/notion-next ]; then
+  echo "[boxy-init] Updating notion-next..."
+  git -C /work/notion-next fetch origin --prune
+  git -C /work/notion-next pull --ff-only || echo "[boxy-init] notion-next pull failed (dirty tree or diverged branch), skipping"
+fi
+
 # --- shell default ---
 if command -v zsh &>/dev/null; then
   chsh -s "$(command -v zsh)" 2>/dev/null || true
