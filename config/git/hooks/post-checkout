@@ -6,6 +6,9 @@ prev_head="$1"
 new_head="$2"
 is_branch_checkout="$3"
 
+# Skip on boxy
+[[ -n "${NOTION_BOXY_NAME:-}" ]] && exit 0
+
 # Only act on branch checkouts, not file checkouts
 [ "$is_branch_checkout" != "1" ] && exit 0
 
