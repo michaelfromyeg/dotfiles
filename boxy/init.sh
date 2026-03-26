@@ -67,17 +67,6 @@ if [ ! -d /usr/local/share/antidote ]; then
   git clone --depth=1 https://github.com/mattmc3/antidote.git /usr/local/share/antidote
 fi
 
-# ghostty terminfo (so TERM=xterm-ghostty works over SSH)
-# Ghostty handles this automatically via shell-integration-features = ssh-terminfo
-# but we install it here as a fallback
-if ! infocmp xterm-ghostty &>/dev/null; then
-  echo "[boxy-init] Installing ghostty terminfo..."
-  curl -sSfL https://github.com/ghostty-org/ghostty/raw/main/src/terminfo/ghostty.terminfo -o /tmp/ghostty.terminfo \
-    && tic -x /tmp/ghostty.terminfo \
-    && rm -f /tmp/ghostty.terminfo \
-    || echo "[boxy-init] ghostty terminfo install failed (non-fatal), enable ssh-terminfo in Ghostty config instead"
-fi
-
 # --- dotfiles ---
 DOTFILES_DIR="/home/notion/code/dotfiles"
 if [ ! -d "$DOTFILES_DIR" ]; then
@@ -90,6 +79,13 @@ if [ -f "$DOTFILES_DIR/run.sh" ]; then
   chown -R notion:notion /home/notion/bin
   echo "[boxy-init] Running dotfiles env..."
   sudo -u notion bash "$DOTFILES_DIR/run.sh" env
+fi
+
+# ghostty terminfo (so TERM=xterm-ghostty works over SSH)
+if ! infocmp xterm-ghostty &>/dev/null; then
+  echo "[boxy-init] Installing ghostty terminfo..."
+  tic -x "$DOTFILES_DIR/config/ghostty/xterm-ghostty.terminfo" \
+    || echo "[boxy-init] ghostty terminfo install failed (non-fatal)"
 fi
 
 # --- notion-next ---

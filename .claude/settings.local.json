@@ -47,7 +47,8 @@
       "Bash(ghostty +help)",
       "Bash(nvm use:*)",
       "Bash(scp ~/.config/graphite/user_config \"notion-boxy:michaelfromyeg--rebase-main-into-branch:~/.config/graphite/user_config\")",
-      "Bash(ssh \"notion-boxy:michaelfromyeg--rebase-main-into-branch\" \"cd ~/code/dotfiles && git pull --ff-only && bash run.sh env\")"
+      "Bash(ssh \"notion-boxy:michaelfromyeg--rebase-main-into-branch\" \"cd ~/code/dotfiles && git pull --ff-only && bash run.sh env\")",
+      "Bash(infocmp:*)"
     ]
   }
 }
