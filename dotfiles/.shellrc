@@ -45,6 +45,9 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias c='clear'
 
+# Reset terminal after SSH to clear any terminfo weirdness
+ssh() { command ssh "$@"; reset; }
+
 # (quick) git aliases; more in gitconfig
 alias g='git'
 alias ga='git add'
