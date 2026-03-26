@@ -88,6 +88,8 @@ if [ -f "$DOTFILES_DIR/run.sh" ]; then
   mkdir -p /home/notion/bin
   ln -sf "$DOTFILES_DIR/run.sh" /home/notion/bin/dotfiles
   chown -R notion:notion /home/notion/bin
+  echo "[boxy-init] Running dotfiles env..."
+  sudo -u notion bash "$DOTFILES_DIR/run.sh" env
 fi
 
 # --- notion-next ---
