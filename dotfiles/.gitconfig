@@ -17,7 +17,7 @@
   rebase = true
 [push]
   default = current
-  followTags = true
+  followTags = false
 [fetch]
   prune = true
 [diff]
