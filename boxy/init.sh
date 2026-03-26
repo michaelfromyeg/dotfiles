@@ -91,10 +91,17 @@ if [ -f "$DOTFILES_DIR/run.sh" ]; then
 fi
 
 # --- notion-next ---
+# GH_TOKEN was written to ~notion/.ssh/environment before this script runs,
+# but sudo doesn't inherit it. Source it explicitly so git can authenticate.
 if [ -d /work/notion-next ]; then
   echo "[boxy-init] Updating notion-next..."
-  git -C /work/notion-next fetch origin --prune
-  git -C /work/notion-next pull --ff-only || echo "[boxy-init] notion-next pull failed (dirty tree or diverged branch), skipping"
+  NOTION_SSH_ENV="/home/notion/.ssh/environment"
+  GH_ENV=""
+  if [ -f "$NOTION_SSH_ENV" ]; then
+    GH_ENV=$(grep '^GH_TOKEN=' "$NOTION_SSH_ENV" | tail -1) || true
+  fi
+  sudo -u notion env $GH_ENV git -C /work/notion-next fetch origin --prune
+  sudo -u notion env $GH_ENV git -C /work/notion-next pull --ff-only || echo "[boxy-init] notion-next pull failed (dirty tree or diverged branch), skipping"
 fi
 
 # --- shell default ---
