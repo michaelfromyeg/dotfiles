@@ -497,6 +497,15 @@ if command -v notion >/dev/null 2>&1; then
   alias nbcr='notion boxy create'
   alias nbd='notion boxy destroy'
 
+  # Copy local secrets/configs that can't be committed to a boxy
+  nbsync() {
+    local name="${1:?Usage: nbsync <boxy-name>}"
+    local host="notion-boxy:${name}"
+    echo "Syncing secrets to $name..."
+    scp ~/.config/graphite/user_config "${host}:~/.config/graphite/user_config"
+    echo "Done."
+  }
+
   # SSH into all running boxies, each in a new Ghostty tab
   nbsa() {
     local names

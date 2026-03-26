@@ -60,11 +60,13 @@ copy_file() {
 }
 
 # Copy config directories (nvim, bat, lazygit, ohmyposh, etc.)
-copy_dirs "$script_dir"/config "$XDG_CONFIG_HOME"
+config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
+execute mkdir -p "$config_home"
+copy_dirs "$script_dir"/config "$config_home"
 
 # Remove ghostty config on non-macOS (it's macOS-only)
 if [[ "$(uname -s)" != "Darwin" ]]; then
-  execute rm -rf "$XDG_CONFIG_HOME/ghostty"
+  execute rm -rf "$config_home/ghostty"
 fi
 
 # the 'real' dotfiles
