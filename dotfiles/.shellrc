@@ -509,6 +509,20 @@ if command -v notion >/dev/null 2>&1; then
     echo "Done."
   }
 
+  # SSH into a boxy in a new named Ghostty tab
+  nbopen() {
+    local name="${1:?Usage: nbopen <boxy-name>}"
+    osascript <<EOF
+tell application "Ghostty"
+  activate
+  set cfg to new surface configuration
+  set command of cfg to "bash -c 'printf \"\\\\033]0;boxy: $name\\\\007\"; exec notion boxy ssh $name'"
+  set wait after command of cfg to true
+  tell front window to new tab with configuration cfg
+end tell
+EOF
+  }
+
   # SSH into all running boxies, each in a new Ghostty tab
   nbsa() {
     local names
@@ -519,17 +533,7 @@ if command -v notion >/dev/null 2>&1; then
     fi
     echo "$names" | while IFS= read -r name; do
       echo "Opening tab for $name..."
-      osascript -e "
-        tell application \"Ghostty\" to activate
-        tell application \"System Events\"
-          tell process \"ghostty\"
-            keystroke \"t\" using command down
-            delay 0.5
-            keystroke \"notion boxy ssh $name\"
-            keystroke return
-          end tell
-        end tell
-      "
+      nbopen "$name"
     done
   }
 fi
