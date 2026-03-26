@@ -47,7 +47,8 @@
       "Bash(ghostty +help)",
       "Bash(nvm use:*)",
       "Bash(scp ~/.config/graphite/user_config \"REDACTED-HOST:michaelfromyeg--rebase-main-into-branch:~/.config/graphite/user_config\")",
-      "Bash(ssh \"REDACTED-HOST:michaelfromyeg--rebase-main-into-branch\" \"cd ~/code/dotfiles && git pull --ff-only && bash run.sh env\")"
+      "Bash(ssh \"REDACTED-HOST:michaelfromyeg--rebase-main-into-branch\" \"cd ~/code/dotfiles && git pull --ff-only && bash run.sh env\")",
+      "Bash(infocmp:*)"
     ]
   }
 }
