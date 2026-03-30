@@ -396,7 +396,7 @@ export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"
 # oh-my-posh (if installed)
 if command -v oh-my-posh >/dev/null 2>&1; then
   # eval "$(oh-my-posh init "$(basename "$SHELL")" --config "$(brew --prefix oh-my-posh)"/themes/gruvbox.omp.json)"
-  eval "$(oh-my-posh init "$(basename "$SHELL")" --config ~/.config/ohmyposh/gruvbox2.omp.json)"
+  eval "$(oh-my-posh init "${ZSH_VERSION:+zsh}${BASH_VERSION:+bash}" --config ~/.config/ohmyposh/gruvbox2.omp.json)"
 fi
 
 # rust
