@@ -48,7 +48,7 @@ bindkey '^[[1;5D' backward-word
 
 # Auto-start tmux-dev on boxy SSH sessions
 if [[ -n "$NOTION_BOXY_NAME" && -z "$TMUX" && -n "$SSH_CONNECTION" ]]; then
-  ~/code/dotfiles/scripts/tmux-dev.sh && clear
+  ~/code/dotfiles/scripts/tmux-dev.sh && reset
 fi
 
 # Added by `notion install` (guarded for portability)
