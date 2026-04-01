@@ -54,7 +54,7 @@ copy_file() {
 
   log "Copying the file $from to $to"
 
-  execute rm "$to/$name"
+  execute rm -f "$to/$name"
   execute cp "$from" "$to"
 
 }
