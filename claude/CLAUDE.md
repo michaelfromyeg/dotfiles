@@ -19,6 +19,7 @@
 ## Workflow
 
 - Prefix branches with `michaelfromyeg--`
+- When creating GitHub PRs, always assign to me (`--assignee @me`).
 - When editing dotfiles: edit in the repo, remind me to run `dotfiles env` to sync.
 - Use conventional commits (feat:, fix:, chore:, etc.).
 

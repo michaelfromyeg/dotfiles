@@ -172,6 +172,12 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
     fi
   done
 
+  # Claude Code config
+  boxy_claude="$boxy_dotfiles/.claude"
+  execute mkdir -p "$boxy_claude"
+  copy_file "$script_dir/claude/CLAUDE.md" "$boxy_claude"
+  copy_file "$script_dir/claude/settings.json" "$boxy_claude"
+
   # Boxy init script
   execute cp "$script_dir/boxy/init.sh" "$HOME/.boxy/profile/init.sh"
   execute chmod +x "$HOME/.boxy/profile/init.sh"
