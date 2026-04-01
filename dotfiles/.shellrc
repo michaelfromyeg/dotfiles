@@ -504,10 +504,10 @@ fi
 # Boxy shortcuts
 if command -v notion >/dev/null 2>&1; then
   alias nb='notion boxy'
-  alias nbc='notion boxy claude'
-  alias nbs='notion boxy ssh'
+  nbc() { notion boxy claude "$@"; reset; }
+  nbs() { notion boxy ssh "$@"; reset; }
   alias nbl='notion boxy ls'
-  alias nbcr='notion boxy create'
+  nbcr() { notion boxy create "$@"; reset; }
   alias nbd='notion boxy destroy'
 
   # Copy local secrets/configs that can't be committed to a boxy
