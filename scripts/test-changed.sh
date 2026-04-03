@@ -162,6 +162,16 @@ fi
 
 # === Test File Discovery ===
 
+ensure_fresh_base() {
+  # Extract remote and branch from BASE_BRANCH (e.g., "origin/main" -> remote=origin, branch=main)
+  local remote branch
+  if [[ "$BASE_BRANCH" == */* ]]; then
+    remote="${BASE_BRANCH%%/*}"
+    branch="${BASE_BRANCH#*/}"
+    git fetch "$remote" "$branch" --quiet 2>/dev/null || true
+  fi
+}
+
 find_changed_tests() {
   local pattern="$1"
   local exclude_pattern="$2"
@@ -251,6 +261,9 @@ else
   EXCLUDE_PATTERN='\.integration\.test\.'
   log "Mode: Unit tests only (excluding integration)"
 fi
+
+# Ensure base branch ref is up to date
+ensure_fresh_base
 
 # Find test files
 log_info "Finding changed test files..."
