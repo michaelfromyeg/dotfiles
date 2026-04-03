@@ -47,7 +47,7 @@ bindkey '^[[1;5C' forward-word
 bindkey '^[[1;5D' backward-word
 
 # Auto-start tmux-dev on boxy SSH sessions
-if [[ -n "$NOTION_BOXY_NAME" && -z "$TMUX" && -n "$SSH_CONNECTION" ]]; then
+if [[ -n "$NOTION_BOXY_NAME" && -z "$TMUX" && -n "$SSH_CONNECTION" && -t 0 ]]; then
   ~/code/dotfiles/scripts/tmux-dev.sh && reset
 fi
 
