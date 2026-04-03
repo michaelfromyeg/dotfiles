@@ -10,7 +10,7 @@ set -o pipefail
 
 # === Configuration & Defaults ===
 SCRIPT_NAME="test-changed"
-BASE_BRANCH="main"
+BASE_BRANCH="origin/main"
 TEST_CMD="notion test"
 OUTPUT_FILE="test-results.txt"
 INCLUDE_INTEGRATION=false
@@ -239,11 +239,11 @@ log "Test command: $TEST_CMD"
 log "Output file: $OUTPUT_FILE"
 
 # Determine test file pattern based on mode
-TEST_PATTERN='\.test\.'
+TEST_PATTERN='\.test\.(ts|tsx|js|jsx)$'
 EXCLUDE_PATTERN=""
 
 if [[ "$INTEGRATION_ONLY" == true ]]; then
-  TEST_PATTERN='\.integration\.test\.'
+  TEST_PATTERN='\.integration\.test\.(ts|tsx|js|jsx)$'
   log "Mode: Integration tests only"
 elif [[ "$INCLUDE_INTEGRATION" == true ]]; then
   log "Mode: All tests (including integration)"
