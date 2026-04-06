@@ -41,19 +41,37 @@ done
 export script_dir="$script_dir"
 export dry="$dry"
 
-echo "[dotfiles] Hello!"
-echo "[dotfiles] (Make sure you chmod +x the scripts you want to run!)"
+# Colors
+BOLD='\033[1m'
+DIM='\033[2m'
+CYAN='\033[0;36m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+NC='\033[0m'
+
+header() {
+  echo ""
+  if [[ -n "$filter" ]]; then
+    echo -e "${BOLD}${CYAN}dotfiles${NC} ${DIM}>${NC} ${BOLD}$filter${NC}"
+  else
+    echo -e "${BOLD}${CYAN}dotfiles${NC} ${DIM}> all${NC}"
+  fi
+  if [[ $dry == "1" ]] || [[ $dry == "2" ]]; then
+    echo -e "  ${YELLOW}(dry run)${NC}"
+  fi
+  echo ""
+}
 
 log() {
   if [[ $dry == "1" ]] || [[ $dry == "2" ]]; then
-    echo "[dotfiles] [DRY_RUN] $*"
+    echo -e "${DIM}[dotfiles]${NC} ${YELLOW}[DRY_RUN]${NC} $*"
   else
-    echo "[dotfiles] $*"
+    echo -e "${DIM}[dotfiles]${NC} $*"
   fi
 }
 
 execute() {
-  log "Executing... $*"
+  echo -e "${DIM}[dotfiles]${NC} ${GREEN}Running${NC} $*"
 
   if [[ $dry == "1" ]]; then
     return
@@ -66,7 +84,7 @@ execute() {
   fi
 }
 
-log "$script_dir" -- "$filter"
+header
 
 cd "$script_dir"/scripts || exit
 
@@ -98,14 +116,10 @@ fi
 
 for script in $scripts; do
   if echo "$script" | grep -qv "$filter"; then
-    log "Skipped $script"
+    # Only show skipped scripts when running all (no filter)
+    [[ -z "$filter" ]] && log "${DIM}Skipped $script${NC}"
     continue
   fi
-
-  # choose a unique color based on the script name
-  color=$((31 + ($(echo "$script" | cksum | cut -d ' ' -f 1) % 6)))
-
-  echo -e "\e[${color}m"
 
   # Execute PowerShell scripts differently on Windows
   if is_windows && [[ "$script" == *.ps1 ]]; then
@@ -113,6 +127,4 @@ for script in $scripts; do
   else
     execute "$script"
   fi
-
-  echo -e "\e[0m"
 done
