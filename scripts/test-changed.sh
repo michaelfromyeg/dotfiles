@@ -176,9 +176,11 @@ find_changed_tests() {
   local pattern="$1"
   local exclude_pattern="$2"
 
-  # Get files changed in this branch (committed changes compared to base)
+  # Get files changed in this branch only (commits unique to this branch)
+  local merge_base
+  merge_base=$(git merge-base "${BASE_BRANCH}" HEAD 2>/dev/null)
   local committed_files
-  committed_files=$(git diff --name-only "${BASE_BRANCH}...HEAD" 2>/dev/null | grep -E "$pattern" || true)
+  committed_files=$(git diff --name-only "${merge_base}..HEAD" 2>/dev/null | grep -E "$pattern" || true)
 
   # Get dirty/uncommitted files (staged and unstaged)
   local dirty_files

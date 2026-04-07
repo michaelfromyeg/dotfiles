@@ -56,7 +56,8 @@
       "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'archived: {d.get\\(\\\\\"archived\\\\\"\\)}, license: {d.get\\(\\\\\"license\\\\\"\\)}, stars: {d.get\\(\\\\\"stargazers_count\\\\\"\\)}'\\)\")",
       "Bash(gh extension:*)",
       "Bash(gh help:*)",
-      "Bash(gh issue:*)"
+      "Bash(gh issue:*)",
+      "Bash(./src/cli/notion boxy:*)"
     ]
   }
 }
