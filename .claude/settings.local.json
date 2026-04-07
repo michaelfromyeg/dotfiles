@@ -50,7 +50,13 @@
       "Bash(ssh \"notion-boxy:michaelfromyeg--rebase-main-into-branch\" \"cd ~/code/dotfiles && git pull --ff-only && bash run.sh env\")",
       "Bash(infocmp:*)",
       "Bash(ssh -v michaelfromyeg--asdasdasd.boxy.makenotion.com)",
-      "Bash(session-manager-plugin --version)"
+      "Bash(session-manager-plugin --version)",
+      "Bash(gh repo:*)",
+      "Bash(gh search:*)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'archived: {d.get\\(\\\\\"archived\\\\\"\\)}, license: {d.get\\(\\\\\"license\\\\\"\\)}, stars: {d.get\\(\\\\\"stargazers_count\\\\\"\\)}'\\)\")",
+      "Bash(gh extension:*)",
+      "Bash(gh help:*)",
+      "Bash(gh issue:*)"
     ]
   }
 }
