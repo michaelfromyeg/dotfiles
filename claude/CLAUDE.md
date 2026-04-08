@@ -20,6 +20,8 @@
 
 - Prefix branches with `michaelfromyeg--`
 - When creating GitHub PRs, always assign to me (`--assignee @me`).
+- PR titles must be formatted as `[TASK-XXXXX] Description` where XXXXX is the task ID. If unknown, ask.
+- PR descriptions should be concise with minimal Markdown formatting.
 - When editing dotfiles: edit in the repo, remind me to run `dotfiles env` to sync.
 - Use conventional commits (feat:, fix:, chore:, etc.).
 
