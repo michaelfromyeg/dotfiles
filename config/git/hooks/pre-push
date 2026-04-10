@@ -17,13 +17,9 @@ echo ""
 echo "Running tests for changed files before push..."
 echo ""
 
-# Run test-changed script
-if command -v dotfiles &> /dev/null; then
-  dotfiles test-changed
-else
-  # Fallback to direct path
-  ~/code/dotfiles/scripts/test-changed.sh
-fi
+# Run test-changed script directly (not via `dotfiles` wrapper, which cd's
+# to the scripts dir and would break git context for worktrees)
+~/code/dotfiles/scripts/test-changed.sh
 
 exit_code=$?
 
