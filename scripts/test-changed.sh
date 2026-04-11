@@ -12,7 +12,7 @@ set -o pipefail
 SCRIPT_NAME="test-changed"
 BASE_BRANCH="origin/main"
 TEST_CMD="notion test"
-OUTPUT_FILE="test-results.txt"
+OUTPUT_FILE="${TMPDIR:-/tmp}/test-results.txt"
 INCLUDE_INTEGRATION=false
 INTEGRATION_ONLY=false
 INCLUDE_UNTRACKED=false
@@ -199,12 +199,52 @@ find_changed_tests() {
   local all_files
   all_files=$(echo -e "${committed_files}\n${dirty_files}\n${staged_files}\n${untracked_files}" | sort -u | grep -v '^$' || true)
 
+  # Filter out deleted/renamed files that no longer exist on disk
+  if [[ -n "$all_files" ]]; then
+    all_files=$(echo "$all_files" | while IFS= read -r f; do [[ -f "$f" ]] && echo "$f"; done || true)
+  fi
+
   # Apply exclusion pattern if provided
   if [[ -n "$exclude_pattern" && -n "$all_files" ]]; then
     all_files=$(echo "$all_files" | grep -vE "$exclude_pattern" || true)
   fi
 
   echo "$all_files"
+}
+
+find_associated_tests() {
+  local test_pattern="$1"
+  local exclude_pattern="$2"
+
+  local merge_base
+  merge_base=$(git merge-base "${BASE_BRANCH}" HEAD 2>/dev/null)
+
+  # Gather changed source files (non-test) from commits, dirty, and staged
+  local committed dirty staged
+  committed=$(git diff --name-only "${merge_base}..HEAD" 2>/dev/null | grep -E '\.(ts|tsx|js|jsx)$' | grep -vE '\.(test|spec)\.' || true)
+  dirty=$(git diff --name-only HEAD 2>/dev/null | grep -E '\.(ts|tsx|js|jsx)$' | grep -vE '\.(test|spec)\.' || true)
+  staged=$(git diff --name-only --cached 2>/dev/null | grep -E '\.(ts|tsx|js|jsx)$' | grep -vE '\.(test|spec)\.' || true)
+
+  local all_sources
+  all_sources=$(echo -e "${committed}\n${dirty}\n${staged}" | sort -u | grep -v '^$' || true)
+
+  # For each source file, check if an associated test file exists
+  local results=""
+  while IFS= read -r src; do
+    [[ -z "$src" || ! -f "$src" ]] && continue
+    local base="${src%.*}"
+    local ext="${src##*.}"
+    for variant in test spec; do
+      local candidate="${base}.${variant}.${ext}"
+      if [[ -f "$candidate" ]] && echo "$candidate" | grep -qE "$test_pattern"; then
+        if [[ -z "$exclude_pattern" ]] || ! echo "$candidate" | grep -qE "$exclude_pattern"; then
+          results+="${candidate}"$'\n'
+        fi
+      fi
+    done
+  done <<< "$all_sources"
+
+  echo "$results" | sort -u | grep -v '^$' || true
 }
 
 # === Docker Handling ===
@@ -267,9 +307,12 @@ fi
 # Ensure base branch ref is up to date
 ensure_fresh_base
 
-# Find test files
+# Find changed test files and tests associated with changed source files
 log_info "Finding changed test files..."
-ALL_TESTS=$(find_changed_tests "$TEST_PATTERN" "$EXCLUDE_PATTERN")
+CHANGED_TESTS=$(find_changed_tests "$TEST_PATTERN" "$EXCLUDE_PATTERN")
+log_info "Finding tests associated with changed source files..."
+ASSOCIATED_TESTS=$(find_associated_tests "$TEST_PATTERN" "$EXCLUDE_PATTERN")
+ALL_TESTS=$(echo -e "${CHANGED_TESTS}\n${ASSOCIATED_TESTS}" | sort -u | grep -v '^$' || true)
 
 if [[ -z "$ALL_TESTS" ]]; then
   log_success "No changed test files found."
