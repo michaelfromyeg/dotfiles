@@ -37,6 +37,8 @@ dotfiles neovim        # Build Neovim from source
 ./scripts/test-changed.sh [options]
 # Options: -a (all tests), -i (integration only), -n (dry-run), -v (verbose)
 # Default: runs unit tests for files changed vs main branch
+# Discovers .test.{ts,tsx,js,jsx} and .spec.{ts,tsx,js,jsx} files
+# Uses "notion test" as default runner (-c to override)
 ```
 
 ## Architecture
@@ -44,8 +46,10 @@ dotfiles neovim        # Build Neovim from source
 ```
 run.sh                 # Main entry point harness
 scripts/               # Modular setup scripts (.sh for POSIX, .ps1 for Windows)
-config/                # XDG-compliant app configs (nvim, ghostty, lazygit)
-dotfiles/              # Shell configs (.shellrc, .zshrc, .bashrc, .gitconfig)
+config/                # XDG-compliant app configs (nvim, ghostty, lazygit, bat, ohmyposh)
+dotfiles/              # Shell configs (.shellrc, .zshrc, .bashrc, .gitconfig, .tmux.conf)
+claude/                # Claude Code user-level config (settings.json, CLAUDE.md, skills/)
+boxy/                  # Remote dev profile init script (macOS only)
 ```
 
 ### Key Design Patterns
@@ -59,16 +63,21 @@ dotfiles/              # Shell configs (.shellrc, .zshrc, .bashrc, .gitconfig)
       └─ aliases and functions
 ```
 
-**Script Pattern:** Scripts expect `$dry` and `$script_dir` from `run.sh`:
+**Script Pattern:** Scripts expect `$dry` and `$script_dir` exported from `run.sh`:
 ```bash
 #!/usr/bin/env bash
 echo "[script-name] Starting..."
-# Check $dry == "1" or "2" before executing commands
+# $dry == "0" → normal, "1" → harness dry run, "2" → script-level dry run
+# $script_dir → absolute path to the repo root
+# Scripts typically define local log() and execute() wrappers that check $dry
 ```
 
 **Config Deployment:** `env.sh` copies (not symlinks) configs from this repo to:
 - `config/*` → `~/.config/`
 - `dotfiles/*` → `~/`
+- `dotfiles/.ssh/config.local` → `~/.ssh/` (auto-included via `~/.ssh/config`)
+- `claude/*` → `~/.claude/`
+- On macOS: also syncs a boxy remote dev profile to `~/.boxy/profile/`
 
 ## Key Files
 

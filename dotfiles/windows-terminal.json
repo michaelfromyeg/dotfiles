@@ -1,22 +1,99 @@
 {
   "$help": "https://aka.ms/terminal-documentation",
   "$schema": "https://aka.ms/terminal-profiles-schema",
-  "actions": [],
+  "actions": [
+    {
+      "command": { "action": "sendInput", "input": "\u001b[13;2u" },
+      "id": "User.ShiftEnter"
+    }
+  ],
   "copyFormatting": "none",
   "copyOnSelect": false,
   "defaultProfile": "{2c4de342-38b7-51cf-b940-2309a097f518}",
   "keybindings": [
     {
       "id": "Terminal.CopyToClipboard",
-      "keys": "ctrl+c"
+      "keys": "ctrl+shift+c"
     },
     {
       "id": "Terminal.PasteFromClipboard",
-      "keys": "ctrl+v"
+      "keys": "ctrl+shift+v"
     },
     {
-      "id": "Terminal.DuplicatePaneAuto",
+      "command": { "action": "splitPane", "split": "vertical" },
+      "keys": "alt+d"
+    },
+    {
+      "command": { "action": "splitPane", "split": "horizontal" },
       "keys": "alt+shift+d"
+    },
+    {
+      "command": "closePane",
+      "keys": "alt+w"
+    },
+    {
+      "command": { "action": "moveFocus", "direction": "previous" },
+      "keys": "ctrl+["
+    },
+    {
+      "command": { "action": "moveFocus", "direction": "next" },
+      "keys": "ctrl+]"
+    },
+    {
+      "command": { "action": "moveFocus", "direction": "up" },
+      "keys": "ctrl+alt+up"
+    },
+    {
+      "command": { "action": "moveFocus", "direction": "down" },
+      "keys": "ctrl+alt+down"
+    },
+    {
+      "command": { "action": "moveFocus", "direction": "left" },
+      "keys": "ctrl+alt+left"
+    },
+    {
+      "command": { "action": "moveFocus", "direction": "right" },
+      "keys": "ctrl+alt+right"
+    },
+    {
+      "command": { "action": "resizePane", "direction": "up" },
+      "keys": "ctrl+shift+up"
+    },
+    {
+      "command": { "action": "resizePane", "direction": "down" },
+      "keys": "ctrl+shift+down"
+    },
+    {
+      "command": { "action": "resizePane", "direction": "left" },
+      "keys": "ctrl+shift+left"
+    },
+    {
+      "command": { "action": "resizePane", "direction": "right" },
+      "keys": "ctrl+shift+right"
+    },
+    {
+      "command": "togglePaneZoom",
+      "keys": "ctrl+shift+enter"
+    },
+    {
+      "command": "toggleFullscreen",
+      "keys": "ctrl+enter"
+    },
+    {
+      "command": { "action": "adjustFontSize", "delta": 1 },
+      "keys": "ctrl+="
+    },
+    {
+      "command": { "action": "adjustFontSize", "delta": -1 },
+      "keys": "ctrl+-"
+    },
+    {
+      "command": "resetFontSize",
+      "keys": "ctrl+0"
+    },
+    {
+      "id": "User.ShiftEnter",
+      "keys": "shift+enter"
     }
   ],
   "newTabMenu": [
