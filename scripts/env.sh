@@ -47,10 +47,15 @@ copy_dirs() {
   popd > /dev/null || exit
 }
 
+SYNCED_FILES=()
+
 copy_file() {
   from=$1
   to=$2
   name=$(basename "$from")
+
+  # Track relative path from script_dir for sync check
+  SYNCED_FILES+=("${from#"$script_dir"/}")
 
   log "Copying the file $from to $to"
 
@@ -134,6 +139,20 @@ if [ -d "$script_dir/claude/skills" ] && [ "$(ls -A "$script_dir/claude/skills" 
   copy_dirs "$script_dir/claude/skills" "$HOME/.claude/skills"
 fi
 
+# Windows Terminal settings (WSL only — push config to Windows filesystem)
+if grep -qi microsoft /proc/version 2>/dev/null; then
+  win_user=$(cmd.exe /C "echo %USERNAME%" 2>/dev/null | tr -d '\r')
+  wt_settings="/mnt/c/Users/$win_user/AppData/Local/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/settings.json"
+  if [[ -d "$(dirname "$wt_settings")" ]]; then
+    log "Syncing Windows Terminal settings..."
+    copy_file "$script_dir/dotfiles/windows-terminal.json" "$(dirname "$wt_settings")"
+    # Windows Terminal expects settings.json, not windows-terminal.json
+    execute mv "$(dirname "$wt_settings")/windows-terminal.json" "$wt_settings"
+  else
+    log "Windows Terminal settings directory not found, skipping"
+  fi
+fi
+
 # make `run.sh` runnable from anywhere
 execute mkdir -p "$HOME/bin"
 execute ln -sf "$script_dir/run.sh" "$HOME/bin/dotfiles"
@@ -181,4 +200,33 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
   # Boxy init script
   execute cp "$script_dir/boxy/init.sh" "$HOME/.boxy/profile/init.sh"
   execute chmod +x "$HOME/.boxy/profile/init.sh"
+fi
+
+# === Sync check: warn about files not handled by this script ===
+
+WARN_YELLOW='\033[0;33m'
+WARN_NC='\033[0m'
+unsynced=0
+
+for dir in dotfiles claude; do
+  [[ ! -d "$script_dir/$dir" ]] && continue
+  while IFS= read -r file; do
+    rel="$dir/$file"
+    skip=false
+    for synced in "${SYNCED_FILES[@]}"; do
+      [[ "$synced" == "$rel" ]] && skip=true && break
+    done
+    if ! $skip; then
+      if [[ $unsynced -eq 0 ]]; then
+        echo ""
+        echo -e "${WARN_YELLOW}[env] Warning: the following files are not synced by env.sh:${WARN_NC}"
+      fi
+      echo -e "${WARN_YELLOW}  - $rel${WARN_NC}"
+      unsynced=$((unsynced + 1))
+    fi
+  done < <(cd "$script_dir/$dir" && find . -type f | sed 's|^\./||' | sort)
+done
+
+if [[ $unsynced -gt 0 ]]; then
+  echo -e "${WARN_YELLOW}[env] Add a copy_file call to env.sh for each, or remove them.${WARN_NC}"
 fi
