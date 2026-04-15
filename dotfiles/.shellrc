@@ -450,10 +450,10 @@ if [ -n "$_notion_next" ]; then
   alias nn3="cd ${_notion_next}-3"
   alias nr="notion run"
   alias nd="notion desktop run"
-  alias ne="notion eslint"
+  alias ne="notion lint"
 
-  alias nfix="notion eslint --branch --fix --ratchet && notion format --branch && notion extract"
-  alias ncheck="nfix && notion test --branch && notion typecheck --go"
+  alias nfix="notion lint --branch --fix --ratchet && notion format --branch && notion extract"
+  alias ncheck="nfix && notion test --branch && notion typecheck"
 
   # Notion Android paths
   export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin"
