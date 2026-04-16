@@ -13,6 +13,35 @@ if [[ -n "${NOTION_BOXY_NAME:-}" ]]; then
   exit 0
 fi
 
+# Catch codegen/lint/format drift that rebases miss: pre-commit doesn't fire
+# during `git rebase`, so commits can land on top of a new main without the
+# lint-staged tasks re-running. Replay lint-staged against the diff range,
+# then compare the tree before/after — any delta means something needed
+# regenerating and didn't.
+default_ref=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/@@')
+default_ref=${default_ref:-origin/master}
+merge_base=$(git merge-base HEAD "$default_ref" 2>/dev/null)
+
+ls_exit=0
+if [ -n "$merge_base" ] && [ -x ./node_modules/.bin/lint-staged ]; then
+  echo ""
+  echo "Replaying lint-staged against $default_ref...HEAD..."
+  echo ""
+  pre_diff=$(git diff HEAD)
+  ./node_modules/.bin/lint-staged --diff="$merge_base..HEAD"
+  ls_exit=$?
+  post_diff=$(git diff HEAD)
+  if [ "$pre_diff" != "$post_diff" ]; then
+    echo ""
+    echo "lint-staged produced changes — commit them and re-push."
+    git status --short
+    echo ""
+    echo "Push aborted. Use 'git push --no-verify' to skip."
+    echo ""
+    exit 1
+  fi
+fi
+
 echo ""
 echo "Running tests for changed files before push..."
 echo ""
@@ -28,8 +57,9 @@ echo ""
 notion typecheck
 tc_exit=$?
 
-if [ $test_exit -ne 0 ] || [ $tc_exit -ne 0 ]; then
+if [ $ls_exit -ne 0 ] || [ $test_exit -ne 0 ] || [ $tc_exit -ne 0 ]; then
   echo ""
+  [ $ls_exit -ne 0 ] && echo "lint-staged failed."
   [ $test_exit -ne 0 ] && echo "Tests failed."
   [ $tc_exit -ne 0 ] && echo "Typecheck failed."
   echo "Push aborted. Use 'git push --no-verify' to skip."
