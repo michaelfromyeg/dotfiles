@@ -27,6 +27,6 @@
   "fastMode": true,
   "skipDangerousModePermissionPrompt": true,
   "permissions": {
-    "defaultMode": "plan"
+    "defaultMode": "auto"
   }
 }
