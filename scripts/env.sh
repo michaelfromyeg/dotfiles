@@ -133,7 +133,6 @@ execute vim +PlugInstall +qall
 execute mkdir -p "$HOME/.claude"
 execute mkdir -p "$HOME/.claude/skills"
 copy_file "$script_dir/claude/settings.json" "$HOME/.claude"
-SYNCED_FILES+=("claude/settings.boxy.json")  # consumed by the boxy profile sync below (macOS only)
 copy_file "$script_dir/claude/statusline-command.sh" "$HOME/.claude"
 copy_file "$script_dir/claude/CLAUDE.md" "$HOME/.claude"
 if [ -d "$script_dir/claude/skills" ] && [ "$(ls -A "$script_dir/claude/skills" 2>/dev/null)" ]; then
@@ -192,13 +191,11 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
     fi
   done
 
-  # Claude Code config (boxy uses the auto-mode variant)
+  # Claude Code config
   boxy_claude="$boxy_dotfiles/.claude"
   execute mkdir -p "$boxy_claude"
   copy_file "$script_dir/claude/CLAUDE.md" "$boxy_claude"
-  log "Copying the file $script_dir/claude/settings.boxy.json to $boxy_claude/settings.json"
-  execute rm -f "$boxy_claude/settings.json"
-  execute cp "$script_dir/claude/settings.boxy.json" "$boxy_claude/settings.json"
+  copy_file "$script_dir/claude/settings.json" "$boxy_claude"
 
   # Boxy init script
   execute cp "$script_dir/boxy/init.sh" "$HOME/.boxy/profile/init.sh"
