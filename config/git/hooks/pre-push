@@ -8,11 +8,6 @@ if [[ ! "$repo_name" =~ ^notion-next(-[0-9]+)?$ ]]; then
   exit 0
 fi
 
-# Skip on boxy (blobless clone makes this painfully slow)
-if [[ -n "${NOTION_BOXY_NAME:-}" ]]; then
-  exit 0
-fi
-
 # Catch codegen/lint/format drift that rebases miss: pre-commit doesn't fire
 # during `git rebase`, so commits can land on top of a new main without the
 # lint-staged tasks re-running. Replay lint-staged against the diff range,
@@ -51,11 +46,15 @@ echo ""
 ~/code/dotfiles/scripts/test-changed.sh
 test_exit=$?
 
-echo ""
-echo "Running typecheck..."
-echo ""
-notion typecheck
-tc_exit=$?
+# Full typecheck only runs on boxy — it's too slow to block pushes locally.
+tc_exit=0
+if [[ -n "${NOTION_BOXY_NAME:-}" ]]; then
+  echo ""
+  echo "Running typecheck..."
+  echo ""
+  notion typecheck
+  tc_exit=$?
+fi
 
 if [ $ls_exit -ne 0 ] || [ $test_exit -ne 0 ] || [ $tc_exit -ne 0 ]; then
   echo ""
