@@ -48,6 +48,17 @@ ln -sf /usr/bin/fdfind /usr/local/bin/fd 2>/dev/null || true
 
 # --- tools not in bullseye repos ---
 
+# yq (YAML processor — needed by notion CLI for .devex.config.yaml)
+if ! command -v yq &>/dev/null; then
+  step "yq" bash -c '
+    curl -sSLo /usr/local/bin/yq \
+      "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64" &&
+    chmod +x /usr/local/bin/yq
+  '
+else
+  skip "yq"
+fi
+
 # eza (ls replacement)
 if ! command -v eza &>/dev/null; then
   step "eza" bash -c '
