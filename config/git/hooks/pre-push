@@ -19,6 +19,11 @@ merge_base=$(git merge-base HEAD "$default_ref" 2>/dev/null)
 
 ls_exit=0
 if [ -n "$merge_base" ] && [ -x ./node_modules/.bin/lint-staged ]; then
+  # Ensure deps are current before lint-staged runs notion commands —
+  # otherwise `notion codegen extract` discovers the mismatch mid-hook
+  # and fails on the interactive install fallback prompt.
+  ./src/cli/notion install-node-modules
+
   echo ""
   echo "Replaying lint-staged against $default_ref...HEAD..."
   echo ""
