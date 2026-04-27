@@ -91,7 +91,16 @@ echo "[script-name] Starting..."
 
 ## Workflow
 
-**Modifying configs:**
+### Git and Branch Management
+
+I use both vanilla git and Graphite (`gt`) for branch/PR management. Detect which is in use before running commands:
+
+- **Graphite stack:** Look for `.graphite_id` in recent commits or check `gt ls`. Use `gt` commands (`gt create`, `gt submit`, `gt sync`, etc.) instead of raw git for branch creation, rebasing, and PR submission.
+- **Vanilla git:** Use standard git commands and `gh` for PRs.
+
+When in doubt, run `gt ls` — if it recognizes the current branch as part of a stack, use Graphite. Don't mix: e.g., don't `git rebase` a Graphite-managed stack or `gt submit` a vanilla branch.
+
+### Modifying configs:
 1. Edit files in `dotfiles/` or `config/`
 2. Run `dotfiles env` to sync to home
 3. Reload shell: `exec zsh`
