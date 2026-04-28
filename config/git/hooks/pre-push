@@ -8,14 +8,21 @@ if [[ ! "$repo_name" =~ ^notion-next(-[0-9]+)?$ ]]; then
   exit 0
 fi
 
+default_ref=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/@@')
+default_ref=${default_ref:-origin/master}
+merge_base=$(git merge-base HEAD "$default_ref" 2>/dev/null)
+
+# Nothing to check if HEAD is identical to the default branch (e.g. boxy
+# creating a new branch off main and pushing it for the first time).
+if [ -n "$merge_base" ] && [ "$(git rev-parse HEAD)" = "$(git rev-parse "$merge_base")" ]; then
+  exit 0
+fi
+
 # Catch codegen/lint/format drift that rebases miss: pre-commit doesn't fire
 # during `git rebase`, so commits can land on top of a new main without the
 # lint-staged tasks re-running. Replay lint-staged against the diff range,
 # then compare the tree before/after — any delta means something needed
 # regenerating and didn't.
-default_ref=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/@@')
-default_ref=${default_ref:-origin/master}
-merge_base=$(git merge-base HEAD "$default_ref" 2>/dev/null)
 
 ls_exit=0
 if [ -n "$merge_base" ] && [ -x ./node_modules/.bin/lint-staged ]; then
