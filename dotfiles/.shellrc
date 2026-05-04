@@ -70,6 +70,7 @@ alias gtcom='gt co main'
 alias gts='gt sync'
 alias gtr='gt restack'
 alias gtsub='gt submit --stack --update-only'
+alias gtsubnv='gt submit --stack --update-only --no-verify'
 
 # Combines fzf and git add into a handy workflow
 ga_fzf() {
