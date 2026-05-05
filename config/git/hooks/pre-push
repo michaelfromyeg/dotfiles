@@ -8,9 +8,12 @@ if [[ ! "$repo_name" =~ ^notion-next(-[0-9]+)?$ ]]; then
   exit 0
 fi
 
-default_ref=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/@@')
-default_ref=${default_ref:-origin/master}
-merge_base=$(git merge-base HEAD "$default_ref" 2>/dev/null)
+base_ref=$(gt parent 2>/dev/null)
+if [ -z "$base_ref" ]; then
+  base_ref=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/@@')
+  base_ref=${base_ref:-origin/main}
+fi
+merge_base=$(git merge-base HEAD "$base_ref" 2>/dev/null)
 
 # Nothing to check if HEAD is identical to the default branch (e.g. boxy
 # creating a new branch off main and pushing it for the first time).
@@ -32,7 +35,7 @@ if [ -n "$merge_base" ] && [ -x ./node_modules/.bin/lint-staged ]; then
   ./src/cli/notion install-node-modules
 
   echo ""
-  echo "Replaying lint-staged against $default_ref...HEAD..."
+  echo "Replaying lint-staged against $base_ref...HEAD..."
   echo ""
   pre_diff=$(git diff HEAD)
   ./node_modules/.bin/lint-staged --diff="$merge_base..HEAD"
@@ -55,7 +58,7 @@ echo ""
 
 # Run test-changed script directly (not via `dotfiles` wrapper, which cd's
 # to the scripts dir and would break git context for worktrees)
-~/code/dotfiles/scripts/test-changed.sh
+~/code/dotfiles/scripts/test-changed.sh --base "$base_ref"
 test_exit=$?
 
 # Full typecheck only runs on boxy — it's too slow to block pushes locally.
