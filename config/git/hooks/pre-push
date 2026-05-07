@@ -15,9 +15,10 @@ if [ -z "$base_ref" ]; then
 fi
 merge_base=$(git merge-base HEAD "$base_ref" 2>/dev/null)
 
-# Nothing to check if HEAD is identical to the default branch (e.g. boxy
+# Nothing to check if we can't resolve a merge base (e.g. gt parent returned
+# garbage during initialization) or HEAD is identical to the base (e.g. boxy
 # creating a new branch off main and pushing it for the first time).
-if [ -n "$merge_base" ] && [ "$(git rev-parse HEAD)" = "$(git rev-parse "$merge_base")" ]; then
+if [ -z "$merge_base" ] || [ "$(git rev-parse HEAD)" = "$(git rev-parse "$merge_base")" ]; then
   exit 0
 fi
 
