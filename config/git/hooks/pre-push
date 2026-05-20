@@ -59,7 +59,7 @@ echo ""
 
 # Run test-changed script directly (not via `dotfiles` wrapper, which cd's
 # to the scripts dir and would break git context for worktrees)
-~/code/dotfiles/scripts/test-changed.sh --base "$base_ref"
+~/code/dotfiles/scripts/test-changed.sh
 test_exit=$?
 
 # Full typecheck only runs on boxy — it's too slow to block pushes locally.
