@@ -46,6 +46,7 @@ while [[ $# -gt 0 ]]; do
     -o|--output)    OUTPUT_FILE="$2"; shift 2 ;;
     -t|--timestamp) ADD_TIMESTAMP=true; shift ;;
     -u|--untracked) INCLUDE_UNTRACKED=true; shift ;;
+    -b|--base)      shift 2 ;;  # ignored: `notion test --branch` does its own graphite-aware base detection
     -h|--help)      show_help; exit 0 ;;
     --)             shift; PASSTHROUGH+=("$@"); break ;;
     *)              PASSTHROUGH+=("$1"); shift ;;
