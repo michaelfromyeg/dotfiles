@@ -1,24 +1,24 @@
 #!/usr/bin/env bash
 
-# Thin wrapper around `notion test --branch`.
+# Thin wrapper around `notion test`.
 #
-# `notion test --branch` already:
-#   - discovers tests for files changed on this branch (graphite-aware merge-base)
-#   - includes uncommitted working-tree changes
-#   - batches into a single jest invocation with streaming per-file results
-#   - handles unit/integration/docker setup
+# Default: `notion test --branch` (lets notion test handle discovery itself —
+# graphite-aware base, jest reporters, batched into one invocation).
 #
-# This wrapper just adds:
-#   - tee'd output to a file with a header (useful for PR descriptions)
-#   - optional inclusion of untracked test files (notion test --branch skips them)
+# With --base BRANCH (or when called from a stacked-PR pre-push hook):
+# discover changed test files between BRANCH..HEAD + working tree ourselves,
+# then pass them as positional args. This keeps the test set scoped to the
+# *current* stack branch instead of the whole diff back to origin/main.
 #
 # Anything not consumed below is forwarded to `notion test`.
 
 set -o pipefail
 
+BASE=""
 OUTPUT_FILE=""
 ADD_TIMESTAMP=false
 INCLUDE_UNTRACKED=false
+INTEGRATION_MODE="exclude"  # exclude | include | only
 PASSTHROUGH=()
 
 show_help() {
@@ -26,27 +26,36 @@ show_help() {
 Usage: $0 [options] [-- notion-test-args...]
 
 Options:
+  -b, --base BRANCH    Compare against BRANCH (e.g. \`gt parent\`).
+                       When set, we discover tests ourselves over BRANCH..HEAD
+                       and pass them as positional args (scoped per stack branch).
+                       When unset, falls back to \`notion test --branch\`.
   -o, --output FILE    Tee combined output to FILE
   -t, --timestamp      Append _YYYYMMDD_HHMMSS to the output filename
   -u, --untracked      Also include untracked *.test.{ts,tsx,js,jsx} files
+  -a, --all            Include integration tests (default: exclude them)
+  -i, --integration    Run ONLY integration tests
   -h, --help           Show this help
 
 All other args (e.g. --coverage, --watch, --bail, --maxWorkers=N) are
-forwarded to \`notion test\`. \`--branch\` is always added.
+forwarded to \`notion test\`.
 
 Examples:
-  $0                              # notion test --branch
-  $0 -o results.txt -t            # tee to timestamped file
-  $0 -- --coverage --bail         # forward jest flags through
+  $0                                # notion test --branch
+  $0 -b "\$(gt parent)"              # only tests changed on this stack branch
+  $0 -o results.txt -t              # tee to timestamped file
+  $0 -- --coverage --bail           # forward jest flags through
 EOF
 }
 
 while [[ $# -gt 0 ]]; do
   case $1 in
+    -b|--base)      BASE="$2"; shift 2 ;;
     -o|--output)    OUTPUT_FILE="$2"; shift 2 ;;
     -t|--timestamp) ADD_TIMESTAMP=true; shift ;;
     -u|--untracked) INCLUDE_UNTRACKED=true; shift ;;
-    -b|--base)      shift 2 ;;  # ignored: `notion test --branch` does its own graphite-aware base detection
+    -a|--all)         INTEGRATION_MODE="include"; shift ;;
+    -i|--integration) INTEGRATION_MODE="only"; shift ;;
     -h|--help)      show_help; exit 0 ;;
     --)             shift; PASSTHROUGH+=("$@"); break ;;
     *)              PASSTHROUGH+=("$1"); shift ;;
@@ -55,25 +64,65 @@ done
 
 if [[ -n "$OUTPUT_FILE" && "$ADD_TIMESTAMP" == true ]]; then
   ext="${OUTPUT_FILE##*.}"
-  base="${OUTPUT_FILE%.*}"
+  base_name="${OUTPUT_FILE%.*}"
   if [[ "$ext" == "$OUTPUT_FILE" ]]; then
     OUTPUT_FILE="${OUTPUT_FILE}_$(date +%Y%m%d_%H%M%S)"
   else
-    OUTPUT_FILE="${base}_$(date +%Y%m%d_%H%M%S).${ext}"
+    OUTPUT_FILE="${base_name}_$(date +%Y%m%d_%H%M%S).${ext}"
   fi
 fi
 
-UNTRACKED_TESTS=()
-if [[ "$INCLUDE_UNTRACKED" == true ]]; then
-  while IFS= read -r f; do
-    [[ -n "$f" ]] && UNTRACKED_TESTS+=("$f")
-  done < <(git ls-files --others --exclude-standard 2>/dev/null \
-           | grep -E '\.(test|spec)\.(ts|tsx|js|jsx)$' || true)
-fi
+TEST_RE='\.(test|spec)\.(ts|tsx|js|jsx)$'
+SRC_RE='\.(ts|tsx|js|jsx)$'
 
-CMD=(notion test --branch "${PASSTHROUGH[@]}")
-if [[ ${#UNTRACKED_TESTS[@]} -gt 0 ]]; then
-  CMD+=("${UNTRACKED_TESTS[@]}")
+# Discover changed test files over $BASE..HEAD plus uncommitted changes.
+# For changed source files (non-test), include the sibling .test/.spec file
+# if one exists. Optionally include untracked test files.
+discover_tests() {
+  local base="$1"
+  local merge_base
+  merge_base=$(git merge-base "$base" HEAD 2>/dev/null) || return 1
+
+  {
+    git diff --name-only "${merge_base}..HEAD" 2>/dev/null
+    git diff --name-only HEAD 2>/dev/null
+    git diff --name-only --cached 2>/dev/null
+    if [[ "$INCLUDE_UNTRACKED" == true ]]; then
+      git ls-files --others --exclude-standard 2>/dev/null
+    fi
+  } | sort -u | while IFS= read -r f; do
+    [[ -z "$f" || ! -f "$f" ]] && continue
+    if [[ "$f" =~ $TEST_RE ]]; then
+      echo "$f"
+    elif [[ "$f" =~ $SRC_RE ]]; then
+      local stem="${f%.*}" ext="${f##*.}"
+      for variant in test spec; do
+        local candidate="${stem}.${variant}.${ext}"
+        [[ -f "$candidate" ]] && echo "$candidate"
+      done
+    fi
+  done | sort -u | filter_integration
+}
+
+filter_integration() {
+  case "$INTEGRATION_MODE" in
+    exclude) grep -vE '\.integration\.(test|spec)\.' || true ;;
+    only)    grep -E  '\.integration\.(test|spec)\.' || true ;;
+    include) cat ;;
+  esac
+}
+
+CMD=(notion test)
+if [[ -n "$BASE" ]]; then
+  mapfile -t TESTS < <(discover_tests "$BASE")
+  if [[ ${#TESTS[@]} -eq 0 ]]; then
+    echo "[test-changed] No changed tests vs $BASE."
+    exit 0
+  fi
+  echo "[test-changed] Base: $BASE (found ${#TESTS[@]} test file(s))"
+  CMD+=("${PASSTHROUGH[@]}" "${TESTS[@]}")
+else
+  CMD+=(--branch "${PASSTHROUGH[@]}")
 fi
 
 run() {
@@ -83,6 +132,7 @@ run() {
       echo "  Test Results"
       echo "  Generated: $(date)"
       echo "  Branch:    $(git branch --show-current 2>/dev/null || echo unknown)"
+      [[ -n "$BASE" ]] && echo "  Base:      $BASE"
       echo "  Command:   ${CMD[*]}"
       echo "=============================================="
       echo ""
