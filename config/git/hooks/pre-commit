@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# pre-commit hook: delegate to the pre-commit framework when the repo
+# has a .pre-commit-config.yaml. No-op otherwise so this hook is safe
+# to ship globally via core.hooksPath.
+
+repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+[ -f "$repo_root/.pre-commit-config.yaml" ] || exit 0
+command -v pre-commit >/dev/null 2>&1 || exit 0
+
+exec pre-commit run --config "$repo_root/.pre-commit-config.yaml"
