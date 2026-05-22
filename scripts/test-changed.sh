@@ -19,6 +19,7 @@ OUTPUT_FILE=""
 ADD_TIMESTAMP=false
 INCLUDE_UNTRACKED=false
 INTEGRATION_MODE="exclude"  # exclude | include | only
+CAP=40
 PASSTHROUGH=()
 
 show_help() {
@@ -35,6 +36,9 @@ Options:
   -u, --untracked      Also include untracked *.test.{ts,tsx,js,jsx} files
   -a, --all            Include integration tests (default: exclude them)
   -i, --integration    Run ONLY integration tests
+  -c, --cap N          Cap the discovered test set at N files; if more are
+                       found, randomly sample N (default: 40, --cap 0 disables).
+                       Only applies in --base mode; ignored by --branch mode.
   -h, --help           Show this help
 
 All other args (e.g. --coverage, --watch, --bail, --maxWorkers=N) are
@@ -56,6 +60,7 @@ while [[ $# -gt 0 ]]; do
     -u|--untracked) INCLUDE_UNTRACKED=true; shift ;;
     -a|--all)         INTEGRATION_MODE="include"; shift ;;
     -i|--integration) INTEGRATION_MODE="only"; shift ;;
+    -c|--cap)       CAP="$2"; shift 2 ;;
     -h|--help)      show_help; exit 0 ;;
     --)             shift; PASSTHROUGH+=("$@"); break ;;
     *)              PASSTHROUGH+=("$1"); shift ;;
@@ -119,7 +124,13 @@ if [[ -n "$BASE" ]]; then
     echo "[test-changed] No changed tests vs $BASE."
     exit 0
   fi
-  echo "[test-changed] Base: $BASE (found ${#TESTS[@]} test file(s))"
+  orig_count=${#TESTS[@]}
+  if [[ "$CAP" -gt 0 && "$orig_count" -gt "$CAP" ]]; then
+    mapfile -t TESTS < <(printf '%s\n' "${TESTS[@]}" | sort -R | head -n "$CAP")
+    echo "[test-changed] Capped at $CAP of $orig_count discovered test file(s) (random sample)." >&2
+  fi
+  echo "[test-changed] Base: $BASE (running ${#TESTS[@]} test file(s))" >&2
+  printf '  %s\n' "${TESTS[@]}" >&2
   CMD+=("${PASSTHROUGH[@]}" "${TESTS[@]}")
 else
   CMD+=(--branch "${PASSTHROUGH[@]}")

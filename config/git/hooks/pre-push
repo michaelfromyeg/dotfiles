@@ -12,6 +12,7 @@ base_ref=$(gt parent 2>/dev/null)
 if [ -z "$base_ref" ]; then
   base_ref=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/@@')
   base_ref=${base_ref:-origin/main}
+  echo "[pre-push] gt parent returned nothing; using fallback base $base_ref" >&2
 fi
 merge_base=$(git merge-base HEAD "$base_ref" 2>/dev/null)
 
@@ -58,8 +59,18 @@ echo "Running tests for changed files before push..."
 echo ""
 
 # Run test-changed script directly (not via `dotfiles` wrapper, which cd's
-# to the scripts dir and would break git context for worktrees)
-~/code/dotfiles/scripts/test-changed.sh --base "$base_ref"
+# to the scripts dir and would break git context for worktrees).
+#
+# Per-push knobs (set on the `git push` invocation):
+#   RUN_INTEGRATION=1 git push   -> only integration tests for changed files
+#   RUN_ALL_TESTS=1   git push   -> unit + integration
+#   TEST_CAP=0        git push   -> disable cap (run everything discovered)
+#   TEST_CAP=100      git push   -> raise cap to 100
+extra_args=()
+[ -n "${RUN_INTEGRATION:-}" ] && extra_args+=(--integration)
+[ -n "${RUN_ALL_TESTS:-}" ]   && extra_args+=(--all)
+[ -n "${TEST_CAP:-}" ]        && extra_args+=(--cap "$TEST_CAP")
+~/code/dotfiles/scripts/test-changed.sh --base "$base_ref" "${extra_args[@]}"
 test_exit=$?
 
 # Full typecheck only runs on boxy — it's too slow to block pushes locally.
