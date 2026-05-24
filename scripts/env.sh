@@ -151,11 +151,16 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
   else
     log "Windows Terminal settings directory not found, skipping"
   fi
+
 fi
 
 # make `run.sh` runnable from anywhere
 execute mkdir -p "$HOME/bin"
 execute ln -sf "$script_dir/run.sh" "$HOME/bin/dotfiles"
+
+# Claude Desktop MCP servers (WSL and macOS)
+SYNCED_FILES+=("claude/desktop-mcp-servers.json")
+python3 "$script_dir/scripts/sync-claude-desktop.py"
 
 # Boxy remote dev profile (macOS only — synced to boxy containers from laptop)
 if [[ "$(uname -s)" == "Darwin" ]]; then

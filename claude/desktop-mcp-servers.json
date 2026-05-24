@@ -1,0 +1,10 @@
+{
+  "beeminder": {
+    "command": "uv",
+    "args": ["run", "__BEEMINDER_MCP_SERVER__"],
+    "env": {
+      "BEEMINDER_USERNAME": "__BEEMINDER_USERNAME__",
+      "BEEMINDER_AUTH_TOKEN": "__BEEMINDER_AUTH_TOKEN__"
+    }
+  }
+}
