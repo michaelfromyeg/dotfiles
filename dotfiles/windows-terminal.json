@@ -36,7 +36,7 @@
       "keys": "ctrl+["
     },
     {
-      "command": { "action": "moveFocus", "direction": "next" },
+      "command": { "action": "moveFocus", "direction": "nextInOrder" },
       "keys": "ctrl+]"
     },
     {
