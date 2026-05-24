@@ -29,11 +29,22 @@ if [[ "$repo_dir" =~ -[0-9]+$ ]]; then
   exit 0
 fi
 
-# This is a base worktree and we're not on main/master - revert
-default_branch="main"
-if git show-ref --verify --quiet refs/heads/master && ! git show-ref --verify --quiet refs/heads/main; then
-  default_branch="master"
+# This is a base worktree and we're not on main/master - revert.
+# Resolve the repo's real default branch from the remote HEAD, since the
+# local set of branches isn't reliable (e.g. clones that carry both a
+# local main and master, like Homebrew). Fall back to a local heuristic.
+default_branch=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null)
+default_branch="${default_branch#origin/}"
+if [ -z "$default_branch" ]; then
+  default_branch="main"
+  if git show-ref --verify --quiet refs/heads/master && ! git show-ref --verify --quiet refs/heads/main; then
+    default_branch="master"
+  fi
 fi
+
+# Only enforce a switch when that default branch actually exists locally,
+# otherwise leave the checkout alone rather than failing.
+git show-ref --verify --quiet "refs/heads/$default_branch" || exit 0
 
 echo ""
 echo "WARNING: Base worktree should stay on '$default_branch'."
