@@ -20,10 +20,20 @@
 - Don't add docstrings, type annotations, or error handling beyond what's asked.
 - Avoid special unicode symbols (e.g., `→`) in favor of things I can type (e.g., `->`).
 
+## Running Commands
+
+- For commands that are slow (more than a few seconds) or produce large output (tests, builds, installs, long scripts), redirect to a temp file instead of piping through `head`/`tail`: `cmd > /tmp/claude-<desc>.log 2>&1; echo exit=$?`. Then grep or Read the file for the slices you need.
+  - This preserves the real exit code (a pipeline's exit status is the last command, so `| tail` masks failures), keeps the full output available to inspect multiple ways without re-running, and keeps my context small.
+  - Never blind-truncate test or build output. The real error is often at the top, not the tail.
+- For cheap, small, one-look commands (`git status`, `ls`, reading a short file), just run them inline. Don't redirect.
+- Use the temp file under system `/tmp`, never a scratch dir in the repo. Keep the working tree clean.
+- Prefer purpose-built tools over truncation: `rg -m`/`-C`, `Read` with offsets, `git log -n`, `pytest -q`.
+- The Bash tool runs in the login shell (zsh on macOS, not bash). Write portable POSIX-compatible syntax, quote variables, and avoid bash-only or zsh-only constructs unless the shell is confirmed. Watch zsh differences: no word-splitting of unquoted `$(...)`, 1-based arrays, errors on no-match globs.
+
 ## Testing
 
 - For features and bugs, add tests. Ensure tests hit a reasonable level of coverage.
-  - No fake tests. A test must actually exercise the behavior it claims to test: real assertions on real outputs, not just "function ran without throwing" or "the mock I set up was called." If the only way to test something is to mock the thing under test, don't write the test — say so.
+  - No fake tests. A test must actually exercise the behavior it claims to test: real assertions on real outputs, not just "function ran without throwing" or "the mock I set up was called." If the only way to test something is to mock the thing under test, don't write the test -- say so.
   - Automated tests are preferred. If not possible or too much effort, manual tests are fine, e.g., a temporary bash script to show the before and after. Include manual steps in PR descriptions to aid reviewers.
 - Run relevant existing tests before declaring a code change done.
 - If you can't run tests (no command, no env), say so explicitly rather than claiming success.
@@ -36,61 +46,29 @@
 - PR descriptions should be concise with minimal Markdown formatting.
 - When editing dotfiles: edit in the repo, remind me to run `dotfiles env` to sync.
 - Use conventional commits (feat:, fix:, chore:, etc.).
-- If it's a PR stack, use Graphite (`gt`). Otherwise, vanilla git is fine. Don't mix the two — e.g., don't `git rebase` a Graphite-managed stack or `gt submit` a vanilla branch. When in doubt, run `gt ls`.
+- If it's a PR stack, use Graphite (`gt`). Otherwise, vanilla git is fine. Don't mix the two -- e.g., don't `git rebase` a Graphite-managed stack or `gt submit` a vanilla branch. When in doubt, run `gt ls`.
 
 # Software Design Principles
 
-Derived from John Ousterhout's _A Philosophy of Software Design_.
+Derived from Ousterhout's _A Philosophy of Software Design_. Central goal: manage
+complexity, which shows up as change amplification, cognitive load, and unknown unknowns.
 
-## Core Goal
+- Make modules deep: simple interface, rich functionality hidden. If an interface is as
+  complex as its implementation, the module isn't pulling its weight.
+- Hide design decisions behind interfaces; expose as little as possible. The same knowledge
+  living in two places (information leakage) is a red flag -- merge or extract it.
+- Define errors out of existence: design so the error can't arise, rather than surfacing
+  exceptions for every caller to handle.
+- Prefer fewer, more powerful methods over many narrow ones. Keep related logic together;
+  don't split for length alone -- only when it yields an independently useful abstraction.
+- Comment the why, not the what: intent, invariants, edge cases. Don't restate the code.
+- Names should create a precise mental image. Avoid vague names (`data`, `handle`,
+  `process`); use one name per concept everywhere.
+- Invest ~10-20% in improving code you touch. Leave it better than you found it.
 
-- The central problem of software design is managing complexity. Every decision should be evaluated by whether it increases or decreases the complexity of the system.
-- Complexity manifests as: (1) change amplification — one change requires many edits, (2) cognitive load — you need to hold a lot of context to make a change, (3) unknown unknowns — you don't know what you need to know. Minimize all three.
-
-## Module Design
-
-- Make modules deep: simple interface, rich functionality hidden behind it. A good module does a lot for its callers without exposing how.
-- Avoid shallow modules: if a class or function's interface is as complex as its implementation, it's not pulling its weight.
-- When creating an abstraction, ask: does this actually simplify things for the caller, or just move complexity around?
-
-## Information Hiding
-
-- Each module should encapsulate design decisions (data structures, algorithms, low-level details) and expose as little as possible through its interface.
-- Information leakage — the same knowledge duplicated or assumed across multiple modules — is a red flag. If two modules both need to know about a format, protocol, or invariant, consider merging them or extracting the shared knowledge into one place.
-
-## Interface Design
-
-- Design interfaces that are somewhat general-purpose: broad enough to serve multiple use cases, but don't build speculative features. The interface should be general; the implementation can be specific to current needs.
-- Define errors out of existence. Instead of surfacing exceptions for callers to handle, design the interface so the error condition can't arise or is handled internally. Every exception in an interface adds complexity for every caller.
-- Fewer, more powerful methods are better than many narrow ones. Combine related operations when they share context.
-
-## Decomposition
-
-- Don't split methods or classes purely for length. Split only when it produces independently useful, deep abstractions.
-- Aggressive decomposition into tiny units often increases complexity by scattering related logic. Keep related logic together.
-- Each method should do one thing cleanly — but "one thing" can be a substantial, coherent operation, not just a few lines.
-
-## Comments and Documentation
-
-- Write comments that explain what is not obvious from the code: the intent behind a decision, the meaning of an abstraction, invariants, edge cases, and the "why."
-- Do not write comments that restate what the code mechanically does.
-- Write interface comments (what a module/function does and its contract) before or alongside writing the implementation — treat documentation as part of design.
-
-## Naming
-
-- Names should create a precise mental image of what the entity represents. Avoid vague names (`data`, `info`, `handle`, `process`) and unnecessarily verbose names.
-- Consistency in naming conventions across the codebase matters more than cleverness in any single name. Use the same name for the same concept everywhere.
-
-## Strategic Mindset
-
-- Invest roughly 10–20% of effort in improving the design of code you're touching, even when the immediate task doesn't require it.
-- Tactical "just make it work" programming creates complexity debt that compounds. A small upfront investment in cleaner design pays off quickly.
-- When modifying existing code, leave it better than you found it.
-
-## Red Flags
-
-- A change requires edits in many places -> likely a design problem (change amplification).
-- You need to read a lot of code to understand a small change -> high cognitive load.
-- An interface has many parameters, many methods, or exposes internal data structures -> shallow or leaky abstraction.
+Red flags:
+- A change needs edits in many places -> change amplification.
+- You must read a lot of code to make a small change -> high cognitive load.
+- Many params/methods, or exposed internal data -> shallow or leaky abstraction.
 - The same information appears in multiple places -> information leakage.
-- A general-purpose utility has special-case logic for one caller -> abstraction boundary is wrong.
+- A general utility has special-case logic for one caller -> wrong abstraction boundary.
