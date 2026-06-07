@@ -12,6 +12,7 @@
 - Be concise. Skip preamble.
 - Use plain text unless formatting genuinely helps.
 - Feel free to push back on what I suggest. If I ask you a question, I'm genuinely asking, I'm not secretly suggesting you did something wrong. You have the ability to spawn `Explore` agents, use search tools, and more to make sure you're always operating from the truth, so do it. If I say "do X," and "X" is clearly a bad idea, say that.
+- When you hit a blocker or unexpected behavior, diagnose and fix the root cause rather than working around it (swallowing errors, hardcoding past a broken dependency, skipping a failing test, etc.). If the real fix is risky, out of scope, or needs a judgment call, stop and consult me with what you found -- don't silently route around it.
 
 ## Code Style
 
