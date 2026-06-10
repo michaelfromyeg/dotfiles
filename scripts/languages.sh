@@ -270,9 +270,6 @@ npm install -g neovim @mermaid-js/mermaid-cli typescript typescript-language-ser
 
 uv pip install --system --break-system-packages pynvim || true
 
-# Graphite CLI for stacked PRs
-npm install -g @withgraphite/graphite-cli || true
-
 gem install neovim || true
 
 luarocks install --local luacheck || true

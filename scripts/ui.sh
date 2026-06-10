@@ -55,6 +55,8 @@ CORE_TOOLS=(
   direnv
   shellcheck
   git-branchless
+  # av (Aviator CLI) for stacked PRs
+  aviator-co/tap/av
   # Rendering stuff
   imagemagick
   ghostscript
