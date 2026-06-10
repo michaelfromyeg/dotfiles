@@ -139,6 +139,10 @@ if [ -d "$script_dir/claude/skills" ] && [ "$(ls -A "$script_dir/claude/skills" 
   copy_dirs "$script_dir/claude/skills" "$HOME/.claude/skills"
 fi
 
+# Install the Claude Code plugins declared in settings.json (no-op if the
+# claude CLI isn't present yet, e.g. early in a fresh Boxy provision).
+execute bash "$script_dir/scripts/claude-plugins.sh"
+
 # Windows Terminal settings (WSL only — push config to Windows filesystem)
 if grep -qi microsoft /proc/version 2>/dev/null; then
   win_user=$(cmd.exe /C "echo %USERNAME%" 2>/dev/null | tr -d '\r')
