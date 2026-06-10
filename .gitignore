@@ -1,2 +1,7 @@
+# General
 scripts/test-results.txt
 .env
+
+# Python
+scripts/__pycache__/
+
