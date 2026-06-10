@@ -377,7 +377,7 @@ if [ -n "$ZSH_VERSION" ]; then
   add-zsh-hook chpwd _nvm_auto_use
 else
   cd() {
-    builtin cd "$@" && _nvm_auto_use
+    builtin cd "$@" && { declare -F _nvm_auto_use >/dev/null 2>&1 && _nvm_auto_use; }
   }
 fi
 
