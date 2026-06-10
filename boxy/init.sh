@@ -96,6 +96,21 @@ else
   skip "zoxide"
 fi
 
+# av (Aviator CLI — stacked PRs; no Homebrew on boxy, so use the release tarball)
+if ! command -v av &>/dev/null; then
+  step "av" bash -c '
+    tag=$(curl -sS https://api.github.com/repos/aviator-co/av/releases/latest | jq -r .tag_name) &&
+    curl -sSLo /tmp/av.tar.gz \
+      "https://github.com/aviator-co/av/releases/download/${tag}/av_${tag#v}_linux_x86_64.tar.gz" &&
+    tar xzf /tmp/av.tar.gz -C /tmp av &&
+    mv /tmp/av /usr/local/bin/av &&
+    chmod +x /usr/local/bin/av &&
+    rm -f /tmp/av.tar.gz
+  '
+else
+  skip "av"
+fi
+
 # oh-my-posh (prompt theme)
 if ! command -v oh-my-posh &>/dev/null; then
   step "oh-my-posh" bash -c '

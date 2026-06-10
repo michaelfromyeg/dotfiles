@@ -66,11 +66,12 @@ alias gsta='git stash'
 alias gstp='git stash pop'
 alias goc='git diff --name-only main...HEAD | xargs $EDITOR'
 
-alias gtcom='gt co main'
-alias gts='gt sync'
-alias gtr='gt restack'
-alias gtsub='gt submit --stack --update-only'
-alias gtsubnv='gt submit --stack --update-only --no-verify'
+# av (Aviator CLI) shortcuts for stacked PRs
+alias avs='av sync'
+alias avr='av restack'
+alias avsub='av pr --all'
+alias avt='av tree'
+alias gcm='git checkout main'
 
 # Combines fzf and git add into a handy workflow
 ga_fzf() {
@@ -516,7 +517,10 @@ if command -v notion >/dev/null 2>&1; then
     local name="${1:?Usage: nbsync <boxy-name>}"
     local host="notion-boxy:${name}"
     echo "Syncing secrets to $name..."
-    scp ~/.config/graphite/user_config "${host}:~/.config/graphite/user_config"
+    if [ -f ~/.config/av/config.yaml ]; then
+      ssh "$host" 'mkdir -p ~/.config/av'
+      scp ~/.config/av/config.yaml "${host}:~/.config/av/config.yaml"
+    fi
     echo "Done."
   }
 

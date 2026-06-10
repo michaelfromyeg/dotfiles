@@ -3,7 +3,7 @@
 # Thin wrapper around `notion test`.
 #
 # Default: `notion test --branch` (lets notion test handle discovery itself —
-# graphite-aware base, jest reporters, batched into one invocation).
+# stack-aware base, jest reporters, batched into one invocation).
 #
 # With --base BRANCH (or when called from a stacked-PR pre-push hook):
 # discover changed test files between BRANCH..HEAD + working tree ourselves,
@@ -27,7 +27,7 @@ show_help() {
 Usage: $0 [options] [-- notion-test-args...]
 
 Options:
-  -b, --base BRANCH    Compare against BRANCH (e.g. \`gt parent\`).
+  -b, --base BRANCH    Compare against BRANCH (e.g. the parent branch in your av stack).
                        When set, we discover tests ourselves over BRANCH..HEAD
                        and pass them as positional args (scoped per stack branch).
                        When unset, falls back to \`notion test --branch\`.
@@ -46,7 +46,7 @@ forwarded to \`notion test\`.
 
 Examples:
   $0                                # notion test --branch
-  $0 -b "\$(gt parent)"              # only tests changed on this stack branch
+  $0 -b main                        # only tests changed vs main
   $0 -o results.txt -t              # tee to timestamped file
   $0 -- --coverage --bail           # forward jest flags through
 EOF

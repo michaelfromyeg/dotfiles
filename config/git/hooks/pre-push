@@ -8,16 +8,22 @@ if [[ ! "$repo_name" =~ ^notion-next(-[0-9]+)?$ ]]; then
   exit 0
 fi
 
-base_ref=$(gt parent 2>/dev/null)
+# Scope tests to the diff against this branch's av stack parent. av has no
+# command that prints the parent, so read it from av's metadata db (kept in
+# the git common dir so worktrees share one). Fall back to origin's default
+# branch when the branch isn't part of an av stack.
+cur_branch=$(git symbolic-ref --short HEAD 2>/dev/null)
+av_db="$(git rev-parse --git-common-dir 2>/dev/null)/av/av.db"
+base_ref=$(jq -r --arg b "$cur_branch" '.branches[$b].parent.name // empty' "$av_db" 2>/dev/null)
 if [ -z "$base_ref" ]; then
   base_ref=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/@@')
   base_ref=${base_ref:-origin/main}
-  echo "[pre-push] gt parent returned nothing; using fallback base $base_ref" >&2
+  echo "[pre-push] no av stack parent found; using fallback base $base_ref" >&2
 fi
 merge_base=$(git merge-base HEAD "$base_ref" 2>/dev/null)
 
-# Nothing to check if we can't resolve a merge base (e.g. gt parent returned
-# garbage during initialization) or HEAD is identical to the base (e.g. boxy
+# Nothing to check if we can't resolve a merge base (e.g. the av parent points
+# at a branch not present locally) or HEAD is identical to the base (e.g. boxy
 # creating a new branch off main and pushing it for the first time).
 if [ -z "$merge_base" ] || [ "$(git rev-parse HEAD)" = "$(git rev-parse "$merge_base")" ]; then
   exit 0

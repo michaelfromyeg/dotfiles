@@ -24,6 +24,7 @@ dotfiles test          # Sanity check
 dotfiles homebrew      # Install tools/apps via Homebrew
 dotfiles languages     # Install programming languages
 dotfiles neovim        # Build Neovim from source
+dotfiles claude-plugins # Install Claude Code plugins from claude/settings.json
 ```
 
 ### Dry-Run Modes
@@ -93,12 +94,12 @@ echo "[script-name] Starting..."
 
 ### Git and Branch Management
 
-I use both vanilla git and Graphite (`gt`) for branch/PR management. Detect which is in use before running commands:
+I use both vanilla git and av (Aviator CLI, `av`) for branch/PR management. Detect which is in use before running commands:
 
-- **Graphite stack:** Look for `.graphite_id` in recent commits or check `gt ls`. Use `gt` commands (`gt create`, `gt submit`, `gt sync`, etc.) instead of raw git for branch creation, rebasing, and PR submission.
+- **av stack:** Run `av tree` — if it recognizes the current branch as part of a stack, use av. Use `av` commands (`av branch`, `av pr`, `av sync`, `av restack`, etc.) instead of raw git for branch creation, rebasing, and PR submission.
 - **Vanilla git:** Use standard git commands and `gh` for PRs.
 
-When in doubt, run `gt ls` — if it recognizes the current branch as part of a stack, use Graphite. Don't mix: e.g., don't `git rebase` a Graphite-managed stack or `gt submit` a vanilla branch.
+Don't mix: e.g., don't `git rebase` an av-managed stack or `av pr` a vanilla branch.
 
 ### Modifying configs:
 1. Edit files in `dotfiles/` or `config/`

@@ -47,7 +47,7 @@
 - PR descriptions should be concise with minimal Markdown formatting.
 - When editing dotfiles: edit in the repo, remind me to run `dotfiles env` to sync.
 - Use conventional commits (feat:, fix:, chore:, etc.).
-- If it's a PR stack, use Graphite (`gt`). Otherwise, vanilla git is fine. Don't mix the two -- e.g., don't `git rebase` a Graphite-managed stack or `gt submit` a vanilla branch. When in doubt, run `gt ls`.
+- If it's a PR stack, use av (Aviator CLI, `av`). Otherwise, vanilla git is fine. Don't mix the two -- e.g., don't `git rebase` an av-managed stack or `av pr` a vanilla branch. When in doubt, run `av tree`.
 
 # Software Design Principles
 
