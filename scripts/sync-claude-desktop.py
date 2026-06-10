@@ -8,6 +8,8 @@ Claude Desktop's claude_desktop_config.json.
 Works on both macOS and WSL (writing to the Windows filesystem).
 """
 
+from __future__ import annotations
+
 import json
 import os
 import platform
