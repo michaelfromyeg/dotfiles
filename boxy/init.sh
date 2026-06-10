@@ -142,7 +142,11 @@ if [ -d /work/notion-next ]; then
   fi
   step "notion-next" bash -c "
     sudo -u notion env $GH_ENV git -C /work/notion-next fetch origin --prune -q &&
-    sudo -u notion env $GH_ENV git -C /work/notion-next pull --ff-only -q
+    if sudo -u notion git -C /work/notion-next symbolic-ref -q HEAD >/dev/null; then
+      sudo -u notion env $GH_ENV git -C /work/notion-next pull --ff-only -q
+    else
+      echo 'notion-next is in detached HEAD; skipping pull'
+    fi
   " || true
 fi
 
