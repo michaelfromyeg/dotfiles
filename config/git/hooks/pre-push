@@ -8,6 +8,15 @@ if [[ ! "$repo_name" =~ ^notion-next(-[0-9]+)?$ ]]; then
   exit 0
 fi
 
+# Escape hatch for av, which has no --no-verify passthrough:
+#   SKIP_PUSH_TESTS=1 av sync --push=yes --prune=yes
+# Skips lint-staged replay + tests here; the repo's .githooks/pre-push
+# (replayed-commit + main guards) still runs.
+if [ -n "${SKIP_PUSH_TESTS:-}" ]; then
+  echo "[pre-push] SKIP_PUSH_TESTS set; skipping lint-staged replay and tests" >&2
+  exit 0
+fi
+
 # Scope tests to the diff against this branch's av stack parent. av has no
 # command that prints the parent, so read it from av's metadata db (kept in
 # the git common dir so worktrees share one). Fall back to origin's default
