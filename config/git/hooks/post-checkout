@@ -9,6 +9,14 @@ is_branch_checkout="$3"
 # Skip on boxy
 [[ -n "${NOTION_BOXY_NAME:-}" ]] && exit 0
 
+# Only enforce for notion-next repos (including worktrees like notion-next-1).
+# Otherwise this fires on every repo and can interrupt operations that check
+# out branches mid-flight (e.g. Homebrew rebasing during `brew update`).
+repo_name=$(basename "$(git rev-parse --show-toplevel 2>/dev/null)")
+if [[ ! "$repo_name" =~ ^notion-next(-[0-9]+)?$ ]]; then
+  exit 0
+fi
+
 # Only act on branch checkouts, not file checkouts
 [ "$is_branch_checkout" != "1" ] && exit 0
 
