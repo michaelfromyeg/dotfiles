@@ -34,7 +34,8 @@
       "Bash(source:*)",
       "Bash(bash:*)",
       "WebSearch",
-      "WebFetch"
+      "WebFetch",
+      "Bash(rg -l \"terminal\" --iglob \"*.sh\" --iglob \"*.ps1\" -i)"
     ]
   }
 }
