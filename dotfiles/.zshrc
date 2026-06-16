@@ -46,7 +46,7 @@ bindkey '^[[3~' delete-char
 bindkey '^[[1;5C' forward-word
 bindkey '^[[1;5D' backward-word
 
-export NOTION_BOXY_TYPECHECK_SLOTS=2
+export NOTION_BOXY_TYPECHECK_SLOTS=3
 
 # Auto-start tmux-dev on boxy SSH sessions
 if [[ -n "$NOTION_BOXY_NAME" && -z "$TMUX" && -n "$SSH_CONNECTION" && -t 0 ]]; then
