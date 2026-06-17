@@ -538,6 +538,13 @@ end tell
 EOF
   }
 
+  # Request my standard AWS JIT permissions for 12 hours
+  nperms() {
+    notion jit create-request --appName "AWS" --resourceName "REDACTED-AWS-ROLE" --duration "12 hours" --justification "Load testing" --notifyMe=false
+    notion jit create-request --appName "AWS" --resourceName "REDACTED-AWS-ROLE" --duration "12 hours" --justification "Load testing" --notifyMe=false
+    notion jit create-request --appName "AWS" --resourceName "REDACTED-AWS-ROLE" --duration "12 hours" --justification "Load testing" --notifyMe=false
+  }
+
   # SSH into all running boxies, each in a new Ghostty tab
   nbsa() {
     local names
