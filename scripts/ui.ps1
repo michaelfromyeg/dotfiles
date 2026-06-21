@@ -85,6 +85,11 @@ $apps = @(
   "PrivateInternetAccess.PrivateInternetAccess"
   "qBittorrent.qBittorrent"
 
+  # Gaming
+  "Valve.Steam"
+  "EpicGames.EpicGamesLauncher"
+  "GOG.Galaxy"
+
   # Pocket Casts and ChatGPT are missing!
   # https://apps.microsoft.com/detail/9PCDBQX582BZ
 )
