@@ -377,12 +377,14 @@ if [ -n "$ZSH_VERSION" ]; then
   add-zsh-hook chpwd _nvm_auto_use
 else
   cd() {
+    # Guarded: Claude Code's shell-snapshot replays this without capturing the
+    # function definition, which otherwise spams "_nvm_auto_use: command not found".
     builtin cd "$@" && { declare -F _nvm_auto_use >/dev/null 2>&1 && _nvm_auto_use; }
   }
 fi
 
-# Check on shell startup
-_nvm_auto_use
+# Check on shell startup (guarded for the same snapshot-replay reason)
+command -v _nvm_auto_use >/dev/null 2>&1 && _nvm_auto_use
 
 # uv
 export PATH="$HOME/.local/bin:$PATH"
