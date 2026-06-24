@@ -38,7 +38,8 @@
       "Bash(rg -l \"terminal\" --iglob \"*.sh\" --iglob \"*.ps1\" -i)",
       "Read(//Users/mdemarco/.claude/**)",
       "Read(//Users/mdemarco/code/notion-next/**)",
-      "Read(//Users/mdemarco/code/notion-next/src/cli/commands/**)"
+      "Read(//Users/mdemarco/code/notion-next/src/cli/commands/**)",
+      "Bash(rg *)"
     ]
   }
 }
