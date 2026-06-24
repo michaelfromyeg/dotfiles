@@ -163,6 +163,24 @@ if [ -d /work/notion-next ]; then
       echo 'notion-next is in detached HEAD; skipping pull'
     fi
   " || true
+
+  # Default Claude Code to plan mode in notion-next. Its checked-in
+  # .claude/settings.json forces acceptEdits; settings.local.json (gitignored,
+  # higher precedence) overrides it. Deep-merge a dotfiles-owned override
+  # fragment on top of any existing local settings so the accumulated
+  # permissions.allow list survives.
+  step "notion-next plan mode" sudo -u notion bash -c '
+    cd /work/notion-next || exit 0
+    frag="$1/claude/notion-next.settings.local.json"
+    [ -f "$frag" ] || exit 0
+    mkdir -p .claude
+    f=.claude/settings.local.json
+    base="{}"
+    [ -f "$f" ] && base="$(jq . "$f" 2>/dev/null || echo "{}")"
+    printf "%s" "$base" > "$f.base"
+    jq -s ".[0] * .[1]" "$f.base" "$frag" > "$f.tmp" && mv "$f.tmp" "$f"
+    rm -f "$f.base"
+  ' _ "$DOTFILES_DIR" || true
 fi
 
 # --- shell default ---

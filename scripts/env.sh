@@ -166,6 +166,10 @@ execute ln -sf "$script_dir/run.sh" "$HOME/bin/dotfiles"
 SYNCED_FILES+=("claude/desktop-mcp-servers.json")
 python3 "$script_dir/scripts/sync-claude-desktop.py"
 
+# notion-next plan-mode override fragment: not deployed to $HOME — boxy/init.sh
+# deep-merges it into /work/notion-next/.claude/settings.local.json on boxies.
+SYNCED_FILES+=("claude/notion-next.settings.local.json")
+
 # Boxy remote dev profile (macOS only — synced to boxy containers from laptop)
 if [[ "$(uname -s)" == "Darwin" ]]; then
   log "Setting up boxy profile..."
