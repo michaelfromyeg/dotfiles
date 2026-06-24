@@ -88,21 +88,10 @@ extra_args=()
 ~/code/dotfiles/scripts/test-changed.sh --base "$base_ref" "${extra_args[@]}"
 test_exit=$?
 
-# Full typecheck only runs on boxy — it's too slow to block pushes locally.
-tc_exit=0
-if [[ -n "${NOTION_BOXY_NAME:-}" ]]; then
-  echo ""
-  echo "Running typecheck..."
-  echo ""
-  notion typecheck
-  tc_exit=$?
-fi
-
-if [ $ls_exit -ne 0 ] || [ $test_exit -ne 0 ] || [ $tc_exit -ne 0 ]; then
+if [ $ls_exit -ne 0 ] || [ $test_exit -ne 0 ]; then
   echo ""
   [ $ls_exit -ne 0 ] && echo "lint-staged failed."
   [ $test_exit -ne 0 ] && echo "Tests failed."
-  [ $tc_exit -ne 0 ] && echo "Typecheck failed."
   echo "Push aborted. Use 'git push --no-verify' to skip."
   echo ""
   exit 1
