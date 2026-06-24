@@ -48,8 +48,11 @@ bindkey '^[[1;5D' backward-word
 
 export NOTION_BOXY_TYPECHECK_SLOTS=3
 
-# Auto-start tmux-dev on boxy SSH sessions
-if [[ -n "$NOTION_BOXY_NAME" && -z "$TMUX" && -n "$SSH_CONNECTION" && -t 0 ]]; then
+# Auto-start tmux-dev on boxy remote sessions. Don't gate on $SSH_CONNECTION:
+# `notion boxy sshv2` connects via `kubectl exec` and `notion boxy mosh` runs
+# under mosh-server, neither of which sets it. $NOTION_BOXY_NAME (on a boxy),
+# -z $TMUX (not already in tmux), and -t 0 (interactive tty) are enough.
+if [[ -n "$NOTION_BOXY_NAME" && -z "$TMUX" && -t 0 ]]; then
   ~/code/dotfiles/scripts/tmux-dev.sh && reset
 fi
 
