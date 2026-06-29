@@ -51,7 +51,9 @@
   pushf = push --force-with-lease
   # Open all changed files (vs main) in $EDITOR
   open-changed = !git diff --name-only main...HEAD | xargs $EDITOR
+# Use gh's credential helper locally; fall back to $GH_TOKEN where gh isn't
+# installed (e.g. boxies, which inject GH_TOKEN but have no gh on PATH).
 [credential "https://github.com"]
-  helper = !gh auth git-credential
+  helper = "!f() { if command -v gh >/dev/null 2>&1; then gh auth git-credential \"$@\"; elif [ \"$1\" = get ] && [ -n \"$GH_TOKEN\" ]; then echo username=x-access-token; echo \"password=$GH_TOKEN\"; fi; }; f"
 [advice]
   skippedCherryPicks = false
