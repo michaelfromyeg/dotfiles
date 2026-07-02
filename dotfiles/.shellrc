@@ -24,6 +24,14 @@ export COLORTERM=truecolor
 : "${TERM:=xterm-256color}"
 export TERM
 
+# A UTF-8 locale keeps multibyte glyphs (powerline separators, Nerd Font icons)
+# rendering correctly. mosh's launch-time locale is handled in .bash_profile; this
+# covers interactive zsh and `notion boxy sshv2`. Only set when unset/non-UTF-8.
+case "${LC_ALL:-${LC_CTYPE:-$LANG}}" in
+  *[Uu][Tt][Ff]-8 | *[Uu][Tt][Ff]8) ;;
+  *) export LANG=C.UTF-8 ;;
+esac
+
 if command -v zed >/dev/null 2>&1; then
   export EDITOR=zed
 elif command -v nvim >/dev/null 2>&1; then
