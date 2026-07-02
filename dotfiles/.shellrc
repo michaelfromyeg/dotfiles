@@ -13,6 +13,17 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export PATH="$HOME/bin:$PATH"
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
+
+# Ghostty and every terminal we connect from is truecolor, but `notion boxy mosh`
+# (forces TERM=xterm-256color) and `notion boxy sshv2` (kubectl exec) both drop
+# COLORTERM, so 24-bit apps downgrade to 256 colors. Re-assert it on the remote.
+export COLORTERM=truecolor
+
+# Safety net: kubectl exec can leave TERM unset. Only fills in when missing, so a
+# forwarded xterm-ghostty / mosh's xterm-256color is left untouched.
+: "${TERM:=xterm-256color}"
+export TERM
+
 if command -v zed >/dev/null 2>&1; then
   export EDITOR=zed
 elif command -v nvim >/dev/null 2>&1; then
