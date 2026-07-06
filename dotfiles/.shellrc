@@ -478,6 +478,25 @@ if [ -n "$_notion_next" ]; then
   alias nfix="notion lint --branch --fix --ratchet && notion format --branch && notion extract"
   alias ncheck="nfix && notion test --branch && notion typecheck"
 
+  # On boxy, disable the git-hook autofixes (typecheck, lint, relevant tests)
+  # that otherwise run on commit/push -- too slow to want blocking a remote box.
+  # NOTION_AUTOFIX_TRIGGERS is Notion's sanctioned per-env override; empty turns
+  # autofixes off entirely. The cheap safety checks (no pushing main, no replayed
+  # commits) still run. Run the disabled checks on demand with the helpers below.
+  if [ -n "$NOTION_BOXY_NAME" ]; then
+    export NOTION_AUTOFIX_TRIGGERS=""
+  fi
+
+  # The push-hook checks, exposed as manual helpers:
+  alias ntc="notion typecheck"          # typecheck
+  alias ntb="notion test --branch"      # relevant tests for the current branch
+  # nhook: exactly what the pre-push hook runs -- lint-staged over the branch diff
+  nhook() {
+    ( cd "$(git rev-parse --show-toplevel)" &&
+      CI=true NOTION_LINT_STAGED=1 NOTION_LINT_STAGED_HOOK=pre-push \
+        ./ntx lint-staged --diff="origin/main...HEAD" --config .lintstagedrc.mjs )
+  }
+
   # Notion Android paths
   export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin"
 
