@@ -60,3 +60,8 @@ fi
 command -v pyenv >/dev/null 2>&1 && eval "$(pyenv init - zsh)"
 command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
 
+export PNPM_HOME="$HOME/Library/pnpm"
+export PATH="$PNPM_HOME/bin:$PNPM_HOME:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
+
