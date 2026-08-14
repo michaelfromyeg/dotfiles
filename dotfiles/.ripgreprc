@@ -1,1 +1,8 @@
+# Case-insensitive unless the pattern has an uppercase letter
+--smart-case
+
+# Search hidden files (dotfiles, .github, ...) but never .git itself
+--hidden
+--glob=!.git/
+
 --type-add=tsx:*.tsx

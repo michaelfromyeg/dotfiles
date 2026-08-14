@@ -32,7 +32,7 @@
           "background": "#458588",
           "foreground": "#282828",
           "powerline_symbol": "\ue0b0",
-          "properties": {
+          "options": {
             "style": "full"
           },
           "style": "powerline",
@@ -50,7 +50,7 @@
           "foreground": "#282828",
           "leading_diamond": "\ue0b6",
           "powerline_symbol": "\ue0b0",
-          "properties": {
+          "options": {
             "branch_template": "{{ trunc 25 .Branch }}",
             "fetch_status": true,
             "branch_icon": "\uE0A0 ",
@@ -65,7 +65,7 @@
           "background": "#d65d0e",
           "foreground": "#282828",
           "powerline_symbol": "\ue0b0",
-          "properties": {
+          "options": {
             "threshold": 500,
             "style": "austin"
           },
@@ -78,7 +78,7 @@
           "background_templates": ["{{ if gt .Code 0 }}#cc241d{{ end }}"],
           "foreground": "#ebdbb2",
           "powerline_symbol": "\ue0b0",
-          "properties": {
+          "options": {
             "always_enabled": false
           },
           "style": "powerline",
@@ -94,7 +94,7 @@
           ],
           "foreground": "#282828",
           "powerline_symbol": "\ue0b0",
-          "properties": {
+          "options": {
             "discharging_icon": "\uf244 ",
             "charging_icon": "\uf1e6 "
           },
@@ -127,13 +127,11 @@
       "segments": [
         {
           "foreground": "#b8bb26",
-          "foreground_templates": [
-            "{{ if gt .Code 0 }}#cc241d{{ end }}"
-          ],
+          "foreground_templates": ["{{ if gt .Code 0 }}#cc241d{{ end }}"],
           "style": "plain",
           "template": "$",
           "type": "status",
-          "properties": {
+          "options": {
             "always_enabled": true
           }
         }

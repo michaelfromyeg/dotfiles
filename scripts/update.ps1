@@ -2,7 +2,8 @@
 
 # Updates everything you can update, on a Windows computer.
 
-if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
+{
   Write-Warning "Please run as administrator"
   break
 }
@@ -10,9 +11,10 @@ if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdenti
 Write-Host "[update] Running system updates..." -ForegroundColor Green
 
 # Install Windows Update module if not present
-if (!(Get-Module -ListAvailable -Name PSWindowsUpdate)) {
-    Write-Host "Installing Windows Update PowerShell module..." -ForegroundColor Yellow
-    Install-Module PSWindowsUpdate -Force
+if (!(Get-Module -ListAvailable -Name PSWindowsUpdate))
+{
+  Write-Host "Installing Windows Update PowerShell module..." -ForegroundColor Yellow
+  Install-Module PSWindowsUpdate -Force
 }
 
 # Import Windows Update module
@@ -24,9 +26,10 @@ Get-WindowsUpdate
 Install-WindowsUpdate -AcceptAll -AutoReboot:$false
 
 # Update winget packages if winget is available
-if (Get-Command winget -ErrorAction SilentlyContinue) {
-    Write-Host "Updating winget packages..." -ForegroundColor Green
-    winget upgrade --all --include-unknown --accept-source-agreements
+if (Get-Command winget -ErrorAction SilentlyContinue)
+{
+  Write-Host "Updating winget packages..." -ForegroundColor Green
+  winget upgrade --all --include-unknown --accept-source-agreements
 }
 
 # Clean up Windows update files

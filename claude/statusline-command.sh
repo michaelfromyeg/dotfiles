@@ -3,6 +3,8 @@
 # Claude Code statusline — gruvbox theme (foreground colors)
 # Mirrors gruvbox2.omp.json color palette
 
+# shellcheck disable=SC2034  # full palette kept to mirror the omp theme, even colors currently unused
+
 input=$(cat)
 
 current_dir=$(echo "$input" | jq -r '.workspace.current_dir')
@@ -51,10 +53,10 @@ if [[ -n "$current_dir" && "$current_dir" != "null" ]]; then
 fi
 
 # --- Git ---
-if git -C "$current_dir" rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-  branch=$(git -C "$current_dir" symbolic-ref --short HEAD 2>/dev/null \
-    || git -C "$current_dir" describe --tags --exact-match 2>/dev/null \
-    || git -C "$current_dir" rev-parse --short HEAD 2>/dev/null)
+if git -C "$current_dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  branch=$(git -C "$current_dir" symbolic-ref --short HEAD 2>/dev/null ||
+    git -C "$current_dir" describe --tags --exact-match 2>/dev/null ||
+    git -C "$current_dir" rev-parse --short HEAD 2>/dev/null)
 
   if [[ -n "$branch" ]]; then
     # Truncate to 25 chars
@@ -65,7 +67,7 @@ if git -C "$current_dir" rev-parse --is-inside-work-tree > /dev/null 2>&1; then
     # Ahead/behind
     ahead=0
     behind=0
-    if git -C "$current_dir" rev-parse --abbrev-ref '@{upstream}' > /dev/null 2>&1; then
+    if git -C "$current_dir" rev-parse --abbrev-ref '@{upstream}' >/dev/null 2>&1; then
       ahead=$(git -C "$current_dir" rev-list --count '@{upstream}..HEAD' 2>/dev/null || echo 0)
       behind=$(git -C "$current_dir" rev-list --count 'HEAD..@{upstream}' 2>/dev/null || echo 0)
     fi

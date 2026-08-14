@@ -2,9 +2,9 @@
 
 # Universal shell configuration for bash and zsh
 
-# History configuration
-HISTSIZE=5000
-HISTFILESIZE=5000
+# History configuration (bash; these vars are no-ops in zsh -- see .zshrc)
+HISTSIZE=50000
+HISTFILESIZE=50000
 HISTCONTROL=ignoredups
 HISTTIMEFORMAT="%F %T "
 
@@ -28,17 +28,25 @@ export TERM
 # rendering correctly. mosh's launch-time locale is handled in .bash_profile; this
 # covers interactive zsh and `notion boxy sshv2`. Only set when unset/non-UTF-8.
 case "${LC_ALL:-${LC_CTYPE:-$LANG}}" in
-  *[Uu][Tt][Ff]-8 | *[Uu][Tt][Ff]8) ;;
-  *) export LANG=C.UTF-8 ;;
+*[Uu][Tt][Ff]-8 | *[Uu][Tt][Ff]8) ;;
+*) export LANG=C.UTF-8 ;;
 esac
 
+# Zed needs --wait so editor-blocking tools (git, crontab -e, kubectl edit)
+# get a real editing session; nvim covers remote boxes where zed isn't installed.
 if command -v zed >/dev/null 2>&1; then
-  export EDITOR=zed
+  export EDITOR="zed --wait"
 elif command -v nvim >/dev/null 2>&1; then
   export EDITOR=nvim
 else
   export EDITOR=vim
 fi
+export VISUAL="$EDITOR"
+
+# -F: quit if one screen, -R: pass through colors (delta/bat), -X: keep output
+# on screen after quit
+export LESS="-FRX"
+export PAGER=less
 
 # Some common aliases
 # Use eza if available, otherwise fall back to ls
@@ -49,7 +57,10 @@ if command -v eza >/dev/null 2>&1; then
   alias l='eza -F'
   alias tree='eza --tree'
 else
-  alias ls='ls --color=auto'
+  case "$(uname -s)" in
+  Darwin*) alias ls='ls -G' ;;
+  *) alias ls='ls --color=auto' ;;
+  esac
   alias ll='ls -alF'
   alias la='ls -A'
   alias l='ls -CF'
@@ -64,8 +75,15 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias c='clear'
 
-# Reset terminal after SSH to clear any terminfo weirdness
-ssh() { command ssh "$@"; reset; }
+# Reset terminal after SSH to clear any terminfo weirdness. Only for
+# interactive sessions -- `reset` on a non-tty emits escape junk, and scripted
+# ssh calls (see nbsync) shouldn't clear scrollback.
+ssh() {
+  command ssh "$@"
+  local _rc=$?
+  [ -t 1 ] && [ -t 0 ] && reset
+  return $_rc
+}
 
 # (quick) git aliases; more in gitconfig
 alias g='git'
@@ -83,14 +101,14 @@ alias glg='git log --graph --oneline --decorate'
 alias grh='git reset HEAD'
 alias gsta='git stash'
 alias gstp='git stash pop'
-alias goc='git diff --name-only main...HEAD | xargs $EDITOR'
+alias goc='git open-changed' # defined in .gitconfig
 
 # av (Aviator CLI) shortcuts for stacked PRs
 alias avs='av sync'
 alias avr='av restack'
 alias avsub='av pr --all'
 alias avt='av tree'
-alias gcm='git checkout main'
+alias gm='git checkout main' # (gcm is taken by 'git commit -m' above)
 
 # Combines fzf and git add into a handy workflow
 ga_fzf() {
@@ -241,9 +259,10 @@ gw_list_f() {
     echo ""
     for dir in "$code_dir"/*/; do
       if [ -d "$dir/.git" ]; then
-        local rname="$(basename "$dir")"
-        local bname="$(git -C "$dir" branch --show-current 2>/dev/null || echo "(detached)")"
-        local wtcount="$(git -C "$dir" worktree list 2>/dev/null | wc -l | tr -d ' ')"
+        local rname bname wtcount
+        rname="$(basename "$dir")"
+        bname="$(git -C "$dir" branch --show-current 2>/dev/null || echo "(detached)")"
+        wtcount="$(git -C "$dir" worktree list 2>/dev/null | wc -l | tr -d ' ')"
 
         if [ "$wtcount" -gt 1 ]; then
           printf "%-30s %-25s (%d worktrees)\n" "$rname" "$bname" "$wtcount"
@@ -339,16 +358,22 @@ alias tka='tmux kill-server'
 alias tn='tmux new-session -s'
 alias tq='tmux kill-session && exit'
 
-# Alert alias for long running commands
+# Alert alias for long running commands (Linux/notify-send only)
 # Usage: sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+if command -v notify-send >/dev/null 2>&1; then
+  alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+fi
 
 # OS-specific configurations
 case "$(uname -s)" in
 Darwin*)
-  # macOS-specific settings
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-  export ANDROID_HOME="$HOME/Library/Android/sdk"
+  # macOS-specific settings (Apple Silicon, then Intel)
+  if [ -x /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+  elif [ -x /usr/local/bin/brew ]; then
+    eval "$(/usr/local/bin/brew shellenv)"
+  fi
+  [ -d "$HOME/Library/Android/sdk" ] && export ANDROID_HOME="$HOME/Library/Android/sdk"
   ;;
 Linux*)
   # Linux-specific settings (Linuxbrew, if installed)
@@ -358,73 +383,49 @@ Linux*)
   ;;
 esac
 
-# WSL-specific utilities
-if grep -qi microsoft /proc/version 2>/dev/null; then
-    # wslview replacement (wslu was discontinued)
-    wslview() {
-        if [ -z "$1" ]; then
-            echo "Usage: wslview <file or url>"
-            return 1
-        fi
+# WSL-specific utilities (Linux guard skips the /proc read on macOS)
+if [ "$(uname -s)" = "Linux" ] && grep -qi microsoft /proc/version 2>/dev/null; then
+  # wslview replacement (wslu was discontinued)
+  wslview() {
+    if [ -z "$1" ]; then
+      echo "Usage: wslview <file or url>"
+      return 1
+    fi
 
-        if [ -e "$1" ]; then
-            # It's a file - convert to Windows path
-            cmd.exe /c start "" "$(wslpath -w "$1")" 2>/dev/null
-        else
-            # Assume it's a URL
-            cmd.exe /c start "" "$1" 2>/dev/null
-        fi
-    }
-fi
-
-# Languages
-# nvm (node version manager)
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"                   # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion" # This loads nvm bash_completion
-
-# Auto nvm use when entering directory with .nvmrc
-_nvm_auto_use() {
-  if [ -f ".nvmrc" ] && command -v nvm >/dev/null 2>&1; then
-    nvm use --silent
-  fi
-}
-
-# Use chpwd hook for zsh (works with zoxide's z command), cd wrapper for bash
-if [ -n "$ZSH_VERSION" ]; then
-  autoload -U add-zsh-hook
-  add-zsh-hook chpwd _nvm_auto_use
-else
-  cd() {
-    # Guarded: Claude Code's shell-snapshot replays this without capturing the
-    # function definition, which otherwise spams "_nvm_auto_use: command not found".
-    builtin cd "$@" && { declare -F _nvm_auto_use >/dev/null 2>&1 && _nvm_auto_use; }
+    if [ -e "$1" ]; then
+      # It's a file - convert to Windows path
+      cmd.exe /c start "" "$(wslpath -w "$1")" 2>/dev/null
+    else
+      # Assume it's a URL
+      cmd.exe /c start "" "$1" 2>/dev/null
+    fi
   }
 fi
 
-# Check on shell startup (guarded for the same snapshot-replay reason)
-command -v _nvm_auto_use >/dev/null 2>&1 && _nvm_auto_use
+# Languages
+# mise is the single version manager (node, erlang/elixir via ~/.tool-versions,
+# and notion-next's .nvmrc via idiomatic_version_file_enable_tools=["node"]).
+# It replaced nvm, pyenv, asdf, and rvm here -- together they cost ~0.5s per
+# shell and shimmed the same tools mise already provides.
+
+# nvm kept lazily for one-off version work; sourcing it eagerly costs ~400ms.
+export NVM_DIR="$HOME/.nvm"
+nvm() {
+  unset -f nvm
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  nvm "$@"
+}
 
 # uv
 export PATH="$HOME/.local/bin:$PATH"
-
-# pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
-
-# rvm (ruby version manager)
-export PATH="$PATH:$HOME/.rvm/bin"
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 
 # sdkman (java, kotlin, gradle)
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
 
-# go
-export PATH="/usr/local/go/bin:$HOME/go/bin:$PATH"
-
-# asdf (erlang, elixir)
-[ -f "$HOME/.asdf/asdf.sh" ] && source "$HOME/.asdf/asdf.sh"
+# go (manual install location, Linux only; Homebrew handles macOS)
+[ -d /usr/local/go/bin ] && export PATH="/usr/local/go/bin:$PATH"
+export PATH="$HOME/go/bin:$PATH"
 
 # oh-my-posh (if installed)
 if command -v oh-my-posh >/dev/null 2>&1; then
@@ -442,6 +443,13 @@ elif [ -n "$BASH_VERSION" ]; then
   _running_shell=bash
 else
   _running_shell=$(basename "$SHELL")
+fi
+
+# mise (version manager; see the Languages section above). Shims cover
+# non-interactive shells; activate takes over in interactive ones.
+[ -d "$HOME/.local/share/mise/shims" ] && export PATH="$HOME/.local/share/mise/shims:$PATH"
+if command -v mise >/dev/null 2>&1; then
+  eval "$(mise activate "$_running_shell")"
 fi
 
 # zoxide (smarter cd)
@@ -464,6 +472,7 @@ elif [ -d "/work/notion-next" ]; then
   _notion_next="/work/notion-next"
 fi
 
+# shellcheck disable=SC2139  # aliases intentionally bake in the path resolved at shell startup
 if [ -n "$_notion_next" ]; then
   export NOTION_ENV=dev
 
@@ -488,27 +497,38 @@ if [ -n "$_notion_next" ]; then
   fi
 
   # The push-hook checks, exposed as manual helpers:
-  alias ntc="notion typecheck"          # typecheck
-  alias ntb="notion test --branch"      # relevant tests for the current branch
+  alias ntc="notion typecheck"     # typecheck
+  alias ntb="notion test --branch" # relevant tests for the current branch
   # nhook: exactly what the pre-push hook runs -- lint-staged over the branch diff
   nhook() {
-    ( cd "$(git rev-parse --show-toplevel)" &&
+    (cd "$(git rev-parse --show-toplevel)" &&
       CI=true NOTION_LINT_STAGED=1 NOTION_LINT_STAGED_HOOK=pre-push \
-        ./ntx lint-staged --diff="origin/main...HEAD" --config .lintstagedrc.mjs )
+        ./ntx lint-staged --diff="origin/main...HEAD" --config .lintstagedrc.mjs)
   }
 
   # Notion Android paths
-  export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin"
+  if [ -n "${ANDROID_HOME:-}" ]; then
+    export PATH="$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools:$ANDROID_HOME/cmdline-tools/latest/bin"
+  fi
 
-  # Notion shell completion
+  # Notion shell completion -- cached, because `notion completion --install`
+  # costs ~600ms per shell. Regenerated when the notion CLI script changes.
   if command -v notion >/dev/null 2>&1; then
-    eval "$(notion completion --install)"
+    _notion_comp="$HOME/.cache/notion-completion-${ZSH_VERSION:+zsh}${BASH_VERSION:+bash}.sh"
+    _notion_bin="$(command -v notion)"
+    if [ ! -s "$_notion_comp" ] || [ "$_notion_bin" -nt "$_notion_comp" ]; then
+      mkdir -p "$HOME/.cache"
+      notion completion --install >"$_notion_comp" 2>/dev/null
+    fi
+    . "$_notion_comp"
+    unset _notion_comp _notion_bin
   fi
 
   # Run all modified test files on current branch vs main
   test-branch() {
     echo "Finding modified test files..."
-    local test_files=$(git diff --name-only main...HEAD | grep '\.test\.tsx\?$')
+    local test_files
+    test_files=$(git diff --name-only main...HEAD | grep '\.test\.tsx\?$')
 
     if [ -z "$test_files" ]; then
       echo "No modified test files found"
@@ -531,10 +551,12 @@ if [ -n "$_notion_next" ]; then
   }
 fi
 
-# Gemini
+# Gemini (service-account key lives outside the repo; keep it chmod 600)
 export GOOGLE_CLOUD_PROJECT=assistant-vertex
 export GOOGLE_CLOUD_LOCATION=global
-export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gemini.json"
+if [ -f "$HOME/gemini.json" ]; then
+  export GOOGLE_APPLICATION_CREDENTIALS="$HOME/gemini.json"
+fi
 
 # PR/CI status (requires gh CLI)
 if command -v gh >/dev/null 2>&1; then
@@ -546,10 +568,19 @@ fi
 # Boxy shortcuts
 if command -v notion >/dev/null 2>&1; then
   alias nb='notion boxy'
-  nbc() { notion boxy claude "$@"; reset; }
-  nbs() { notion boxy ssh "$@"; reset; }
+  nbc() {
+    notion boxy claude "$@"
+    reset
+  }
+  nbs() {
+    notion boxy ssh "$@"
+    reset
+  }
   alias nbl='notion boxy ls'
-  nbcr() { notion boxy create "$@"; reset; }
+  nbcr() {
+    notion boxy create "$@"
+    reset
+  }
   alias nbd='notion boxy destroy'
 
   # Copy local secrets/configs that can't be committed to a boxy
@@ -558,7 +589,7 @@ if command -v notion >/dev/null 2>&1; then
     local host="REDACTED-HOST:${name}"
     echo "Syncing secrets to $name..."
     if [ -f ~/.config/av/config.yaml ]; then
-      ssh "$host" 'mkdir -p ~/.config/av'
+      command ssh "$host" 'mkdir -p ~/.config/av'
       scp ~/.config/av/config.yaml "${host}:~/.config/av/config.yaml"
     fi
     echo "Done."

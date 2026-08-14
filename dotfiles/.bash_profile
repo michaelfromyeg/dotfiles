@@ -11,5 +11,5 @@ export LANG=C.UTF-8
 # Only load the full interactive config for interactive bash; keep the
 # mosh-server launcher's startup silent and side-effect-free.
 case $- in
-  *i*) [ -f ~/.bashrc ] && source ~/.bashrc ;;
+*i*) [ -f ~/.bashrc ] && source ~/.bashrc ;;
 esac

@@ -7,6 +7,6 @@
     "config": "plaintext",
     "scripts/*": "shellscript",
     ".ghstackrc": "plaintext",
-    "*.ctbbl": "json"
-  }
+    "*.ctbbl": "json",
+  },
 }

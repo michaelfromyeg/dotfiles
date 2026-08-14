@@ -2,15 +2,17 @@
 
 # Install a bunch of applications using Winget.
 
-if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
+if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator"))
+{
   Write-Warning "Please run as administrator"
   break
 }
 
-try {
-  $wingetVersion = winget --version
-}
-catch {
+try
+{
+  $null = winget --version
+} catch
+{
   Write-Error "Winget is not installed. Please install the App Installer from the Microsoft Store."
   exit 1
 }
@@ -94,7 +96,8 @@ $apps = @(
   # https://apps.microsoft.com/detail/9PCDBQX582BZ
 )
 
-foreach ($app in $apps) {
+foreach ($app in $apps)
+{
   Write-Host "Installing $app..." -ForegroundColor Green
   winget install --id $app --accept-source-agreements --accept-package-agreements -h
 }

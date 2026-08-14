@@ -1,0 +1,3 @@
+# Work identity — included by .gitconfig for Notion repos only
+[user]
+  email = mdemarco@makenotion.com

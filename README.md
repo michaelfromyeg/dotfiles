@@ -1,72 +1,85 @@
 # Dotfiles
 
-This repository includes the dotfiles I use for (cross-platform) Neovim, Visual Studio Code, Cursor, (Windows) WSL 2, Windows Terminal, PowerShell, (macOS) Ghostty.
+Cross-platform (macOS, Linux/WSL, Windows) development environment: shell
+configs, app configs, setup scripts, git hooks, and Claude Code configuration.
 
-> ⚠️ This is a work-in-progress!
+## Quick start
 
-There's one entry point for all of my setup `run.sh`. It can, in turn, run scripts in `scripts/`.
+On a fresh macOS or Linux machine:
 
-Some of the scripts I have today...
+```sh
+curl -fsSL https://raw.githubusercontent.com/michaelfromyeg/dotfiles/main/bootstrap.sh | bash
+```
 
-- `test`, for sanity
-- `neovim`, to build `neovim` from source
-- `env`, to set up my development environment
-  - On Linux,
-  - On macOS,
-  - or on Windows
+This installs git if needed, clones the repo to `~/code/dotfiles` (the path
+the configs assume), and syncs configs to your home directory. Then:
 
-Plus some config files under `dotfiles/` and `config/`.
+```sh
+dotfiles ui         # Homebrew CLI tools + apps (from Brewfile)
+dotfiles languages  # language toolchains
+exec $SHELL
+```
 
-- The `vscode.json` is a read-only copy, since Visual Studio Code natively handles settings sync
-
-## Prerequisites
-
-- On Windows
-  - Install WSL via the Microsoft Store
-  - Install Ubuntu (or another instance of choice) similarly
-  - (To install Windows GUI applications...)
-    - Go to PowerShell, run `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`, `cd ~`, `winget install --id=Git.Git -e`
-    - Clone this repository to `~/code` on the Windows filesystem, and run `.\dotfiles\scripts\ui.ps1`
-    - Let that run in the background while you do the rest
-  - Open Ubuntu, and switch to the Linux instructions below
-- On macOS
-  - Run `xcode-select --install`
-  - Clone this repository to `~/code`
-  - `chmod +x scripts/*.sh`
-  - Run `scripts/ui.sh`
-- On Linux
-  - `sudo apt install git`
-  - Clone this repository to `~/code`
-  - `chmod +x scripts/*.sh`
-  - Run `scripts/ui.sh`
+On Windows: install WSL + Ubuntu from the Microsoft Store, run the Linux steps
+inside WSL, and for native apps run `scripts/ui.ps1` in an elevated PowerShell
+(`Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` first).
 
 ## Usage
 
-Everything should be run through the `run.sh` harness. This universally takes care of argument parsing and provides some helpful guards.
+Everything runs through the `run.sh` harness (symlinked to `~/bin/dotfiles` by
+`env.sh`):
 
-Depending on your operating system, it'll call the appropriate script (`.sh` for POSIX systems, or `.ps1` for Windows).
-
-To access `run.sh`, call it like...
-
-```plaintext
-# on macOS or Linux
-bash ~/code/dotfiles/run.sh --dry
-bash ~/code/dotfiles/run.sh test --drier
-bash ~/code/dotfiles/run.sh
-
-# on Windows
-# NOTE: on Windows it's okay to run `ui.ps1` "directly" (i.e., via PowerShell)
-wsl bash -c "~/code/dotfiles/run.sh --dry"
-wsl bash -c "~/code/dotfiles/run.sh test --drier"
-wsl bash -c "~/code/dotfiles/run.sh"
+```sh
+dotfiles <script>            # run one script (exact name, e.g. `dotfiles env`)
+dotfiles                     # run everything
+dotfiles <script> --dry      # show what would run, run nothing
+dotfiles <script> --drier    # scripts run, but log instead of executing
+dotfiles <script> -- <args>  # pass args through to the script
 ```
 
-To get going initially, you'll want to run `run.sh env` to set up your environment.
+### Scripts
 
-Running the `env.sh` script will make the run script accessible everywhere, under `dotfiles`. For example, `dotfiles test` will output the test script!
+| Script | What it does |
+|---|---|
+| `env` | Sync configs to `$HOME` (backs up anything it overwrites to `~/.dotfiles-backup/`) |
+| `ui` | Install CLI tools and apps via `brew bundle` (see `Brewfile`) |
+| `languages` | Install language toolchains (rust, go, etc.) |
+| `update` | Update apt/brew packages |
+| `homebrew` | Install Homebrew itself |
+| `neovim` | Build Neovim from source |
+| `claude-plugins` | Install Claude Code plugins declared in `claude/settings.json` |
+| `test` | Sanity check |
+| `test-changed` | Run tests for files changed vs a base branch (notion-next) |
+| `tmux-dev` | Start a dev tmux session (claude + scratchpad + notion run) |
+| `stats` | Git contribution stats |
+| `cold-turkey` | Quit Cold Turkey Blocker (it breaks headless Chrome) |
+| `getignore` | Download a gitignore template |
+| `repo` | Show repo files as a tree |
+| `toggle-dock` | Restart the macOS Dock |
+| `font` | Install a Nerd Font via oh-my-posh |
+| `notion` | Run Notion's environment setup |
 
-## Window Managers
+## Layout
 
-- Fancy Zones on Windows
-  - TODO(michaelfromyeg): go through [this guide](https://learn.microsoft.com/en-us/windows/powertoys/fancyzones)
-- Rectangles on macOS
+```
+run.sh          # entry-point harness ($dry, $script_dir contract)
+bootstrap.sh    # fresh-machine setup, curl-able
+Brewfile        # Homebrew packages + casks (brew bundle)
+scripts/        # setup scripts; lib.sh holds shared log/run_cmd helpers
+dotfiles/       # home-directory configs (.shellrc, .zshrc, .gitconfig, ...)
+config/         # XDG configs (nvim, ghostty, lazygit, bat, ohmyposh)
+config/git/hooks/  # global git hooks (core.hooksPath)
+claude/         # Claude Code user config (settings, CLAUDE.md, statusline)
+boxy/           # Notion remote-dev (boxy) init script + profile
+```
+
+`env.sh` copies (not symlinks) configs into place and warns about repo files
+it doesn't know how to sync. Shell config layering: `.zshrc`/`.bashrc` source
+the shared `.shellrc`; mise manages language versions.
+
+## Notes
+
+- Window managers: Rectangle on macOS, FancyZones (PowerToys) on Windows.
+- VS Code settings sync natively; `.vscode/` here is for this repo only.
+- CI runs shellcheck, shfmt, JSON validation, and a harness smoke test on
+  macOS and Ubuntu.

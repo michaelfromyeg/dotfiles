@@ -14,24 +14,13 @@
 # Idempotent and cheap: skips marketplaces/plugins already present without
 # spawning the claude CLI, so it's safe to run on every `dotfiles env`.
 
+# shellcheck source=lib.sh
+source "$(dirname "$0")/lib.sh"
+
 settings="${script_dir:-$(cd "$(dirname "$0")/.." && pwd)}/claude/settings.json"
 plugins_dir="$HOME/.claude/plugins"
 known="$plugins_dir/known_marketplaces.json"
 installed="$plugins_dir/installed_plugins.json"
-
-log() {
-  if [[ $dry == "1" ]] || [[ $dry == "2" ]]; then
-    echo "[claude-plugins] [DRY_RUN] $*"
-  else
-    echo "[claude-plugins] $*"
-  fi
-}
-
-run_cmd() {
-  log "$*"
-  [[ $dry == "1" ]] || [[ $dry == "2" ]] && return 0
-  "$@"
-}
 
 for tool in claude jq; do
   if ! command -v "$tool" >/dev/null 2>&1; then

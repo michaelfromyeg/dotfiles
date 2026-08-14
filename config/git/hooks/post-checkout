@@ -2,8 +2,6 @@
 # post-checkout hook: Prevent base worktrees from leaving main/master
 
 # Args: previous_head new_head is_branch_checkout
-prev_head="$1"
-new_head="$2"
 is_branch_checkout="$3"
 
 # Skip on boxy
@@ -22,7 +20,7 @@ fi
 
 # Get current branch
 current_branch=$(git symbolic-ref --short HEAD 2>/dev/null)
-[ -z "$current_branch" ] && exit 0  # Detached HEAD, allow it
+[ -z "$current_branch" ] && exit 0 # Detached HEAD, allow it
 
 # If we're on main/master, nothing to enforce
 [[ "$current_branch" == "main" || "$current_branch" == "master" ]] && exit 0

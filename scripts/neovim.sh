@@ -2,7 +2,10 @@
 
 # Sets up Neovim from source.
 
-echo "[neovim] Installing..."
+# shellcheck source=lib.sh
+source "$(dirname "$0")/lib.sh"
+
+log "Installing..."
 
 if [[ $dry == "1" ]] || [[ $dry == "2" ]]; then
   exit
@@ -15,7 +18,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 elif [[ "$OSTYPE" == "linux"* ]]; then
   sudo apt install cmake gettext lua5.3 liblua5.3-dev
 else
-  echo "Unsupported operating system"
+  log "Unsupported operating system"
   exit 1
 fi
 

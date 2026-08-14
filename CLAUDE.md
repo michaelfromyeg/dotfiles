@@ -18,14 +18,19 @@ bash ~/code/dotfiles/run.sh <script-name> [--dry|--drier]
 dotfiles <script-name>
 
 # Examples
-dotfiles env           # Sync configs to home directory
+dotfiles env           # Sync configs to home directory (backs up overwrites to ~/.dotfiles-backup/)
 dotfiles update        # Update package managers (apt, brew)
 dotfiles test          # Sanity check
-dotfiles homebrew      # Install tools/apps via Homebrew
+dotfiles homebrew      # Install Homebrew itself
+dotfiles ui            # Install CLI tools + apps via `brew bundle` (Brewfile)
 dotfiles languages     # Install programming languages
 dotfiles neovim        # Build Neovim from source
 dotfiles claude-plugins # Install Claude Code plugins from claude/settings.json
 ```
+
+Fresh machines bootstrap with `bootstrap.sh` (curl-able; clones to `~/code/dotfiles` and runs `env`).
+
+The filter matches a script name exactly first (`dotfiles test` runs only test.sh), falling back to substring match.
 
 ### Dry-Run Modes
 
@@ -35,11 +40,15 @@ dotfiles claude-plugins # Install Claude Code plugins from claude/settings.json
 ### Testing Changed Files
 
 ```bash
-./scripts/test-changed.sh [options]
-# Options: -a (all tests), -i (integration only), -n (dry-run), -v (verbose)
-# Default: runs unit tests for files changed vs main branch
-# Discovers .test.{ts,tsx,js,jsx} and .spec.{ts,tsx,js,jsx} files
-# Uses "notion test" as default runner (-c to override)
+./scripts/test-changed.sh [options] [-- notion-test-args...]
+# -b, --base BRANCH   Compare against BRANCH (av stack parent); discovers tests
+#                     over BRANCH..HEAD. Unset: falls back to `notion test --branch`.
+# -o, --output FILE   Tee combined output to FILE ( -t appends a timestamp)
+# -u, --untracked     Also include untracked *.test.{ts,tsx,js,jsx} files
+# -a, --all           Include integration tests (excluded by default)
+# -i, --integration   Run ONLY integration tests
+# -c, --cap N         Cap discovered tests at N (random sample; default 40, 0 = off)
+# Everything after -- is forwarded to `notion test` (e.g. --coverage --bail)
 ```
 
 ## Architecture
@@ -56,24 +65,29 @@ boxy/                  # Remote dev profile init script (macOS only)
 ### Key Design Patterns
 
 **Shell Configuration Hierarchy:**
+
 ```
 .zshrc / .bashrc (shell-specific)
   └─ sources .shellrc (universal)
-      └─ language managers (nvm, pyenv, rvm, cargo)
+      └─ mise (single version manager: node, erlang/elixir; nvm is lazy-stubbed)
       └─ environment variables
       └─ aliases and functions
 ```
 
-**Script Pattern:** Scripts expect `$dry` and `$script_dir` exported from `run.sh`:
+**Script Pattern:** Scripts source shared helpers from `scripts/lib.sh` and expect `$dry` / `$script_dir` exported from `run.sh` (lib.sh defaults `dry` to "0" for direct invocation):
+
 ```bash
 #!/usr/bin/env bash
-echo "[script-name] Starting..."
-# $dry == "0" → normal, "1" → harness dry run, "2" → script-level dry run
-# $script_dir → absolute path to the repo root
-# Scripts typically define local log() and execute() wrappers that check $dry
+# shellcheck source=lib.sh
+source "$(dirname "$0")/lib.sh"
+log "Starting..."          # prefixed with [script-name], notes DRY_RUN
+run_cmd some command       # logs, then runs unless $dry is 1 or 2
+# $dry == "0" -> normal, "1" -> harness dry run, "2" -> script-level dry run
+# lib.sh is deliberately NOT executable: run.sh runs every executable *.sh in scripts/
 ```
 
 **Config Deployment:** `env.sh` copies (not symlinks) configs from this repo to:
+
 - `config/*` → `~/.config/`
 - `dotfiles/*` → `~/`
 - `dotfiles/.ssh/config.local` → `~/.ssh/` (auto-included via `~/.ssh/config`)
@@ -82,13 +96,14 @@ echo "[script-name] Starting..."
 
 ## Key Files
 
-| Purpose | File |
-|---------|------|
-| Universal shell config | `dotfiles/.shellrc` |
-| Git settings & aliases | `dotfiles/.gitconfig` |
+| Purpose                 | File                   |
+| ----------------------- | ---------------------- |
+| Universal shell config  | `dotfiles/.shellrc`    |
+| Git settings & aliases  | `dotfiles/.gitconfig`  |
 | Neovim config (LazyVim) | `config/nvim/init.lua` |
-| Homebrew apps list | `scripts/homebrew.sh` |
-| Language installers | `scripts/languages.sh` |
+| Homebrew packages/apps  | `Brewfile` (installed by `scripts/ui.sh`) |
+| Language installers     | `scripts/languages.sh` |
+| Shared script helpers   | `scripts/lib.sh`       |
 
 ## Workflow
 
@@ -102,11 +117,13 @@ I use both vanilla git and av (Aviator CLI, `av`) for branch/PR management. Dete
 Don't mix: e.g., don't `git rebase` an av-managed stack or `av pr` a vanilla branch.
 
 ### Modifying configs:
+
 1. Edit files in `dotfiles/` or `config/`
 2. Run `dotfiles env` to sync to home
 3. Reload shell: `exec zsh`
 
 **Adding new setup script:**
+
 1. Create `scripts/my-script.sh` following the pattern above
 2. `chmod +x scripts/my-script.sh`
 3. Run via `dotfiles my-script`

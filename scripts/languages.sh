@@ -5,23 +5,14 @@
 
 set -e
 
-log() {
-  if [[ $dry == "1" ]] || [[ $dry == "2" ]]; then
-    echo "[languages] [DRY_RUN] $*"
-  else
-    echo "[languages] $*"
-  fi
-}
+# shellcheck source=lib.sh
+source "$(dirname "$0")/lib.sh"
 
-check_cmd() {
-  if ! command -v "$1" &> /dev/null; then
-    log "$1 not found"
-    return 1
-  else
-    log "$1 $(command -v "$1")"
-    return 0
-  fi
-}
+# The installers below run unconditionally, so honor dry-run up front.
+if [[ $dry == "1" ]] || [[ $dry == "2" ]]; then
+  log "would install/update language toolchains (rust, go, node, etc.)"
+  exit 0
+fi
 
 export PATH="$HOME/.local/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
@@ -63,13 +54,13 @@ OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 ARCH=$(uname -m)
 case "$ARCH" in
   x86_64) ARCH="amd64" ;;
-  aarch64|arm64) ARCH="arm64" ;;
+  aarch64 | arm64) ARCH="arm64" ;;
 esac
 
 if [[ "$OS" == "darwin" ]]; then
   brew install go || brew upgrade go || true
 else
-  if ! command -v go &> /dev/null || [[ "$(go version 2>/dev/null)" != *"$GO_VERSION"* ]]; then
+  if ! command -v go &>/dev/null || [[ "$(go version 2>/dev/null)" != *"$GO_VERSION"* ]]; then
     wget -q "https://go.dev/dl/go${GO_VERSION}.${OS}-${ARCH}.tar.gz"
     sudo rm -rf /usr/local/go
     sudo tar -C /usr/local -xzf "go${GO_VERSION}.${OS}-${ARCH}.tar.gz"
@@ -104,7 +95,7 @@ check_cmd node
 
 # uv (Python)
 log "Installing uv for Python..."
-if ! command -v uv &> /dev/null; then
+if ! command -v uv &>/dev/null; then
   curl -LsSf https://astral.sh/uv/install.sh | sh
 else
   log "uv already installed, upgrading..."
@@ -165,18 +156,18 @@ if [[ "$(uname -s)" == "Linux" ]]; then
       unixodbc-dev \
       xsltproc fop libxml2-utils \
       2>/dev/null || {
-        # Fallback for older Ubuntu versions with wxWidgets 3.0
-        log "Trying fallback dependencies for older Ubuntu..."
-        sudo apt-get install -y \
-          build-essential autoconf m4 \
-          libncurses5-dev libncurses-dev \
-          libssl-dev \
-          libwxgtk3.0-gtk3-dev libwxgtk-webview3.0-gtk3-dev \
-          libgl1-mesa-dev libglu1-mesa-dev \
-          libpng-dev libssh-dev unixodbc-dev \
-          xsltproc fop libxml2-utils \
-          2>/dev/null || log "Some optional dependencies may not be available"
-      }
+      # Fallback for older Ubuntu versions with wxWidgets 3.0
+      log "Trying fallback dependencies for older Ubuntu..."
+      sudo apt-get install -y \
+        build-essential autoconf m4 \
+        libncurses5-dev libncurses-dev \
+        libssl-dev \
+        libwxgtk3.0-gtk3-dev libwxgtk-webview3.0-gtk3-dev \
+        libgl1-mesa-dev libglu1-mesa-dev \
+        libpng-dev libssh-dev unixodbc-dev \
+        xsltproc fop libxml2-utils \
+        2>/dev/null || log "Some optional dependencies may not be available"
+    }
   else
     log "Erlang build dependencies already installed"
   fi

@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: shellcheck
+        run: |
+          git ls-files '*.sh' | xargs shellcheck
+          shellcheck dotfiles/.shellrc dotfiles/.bashrc dotfiles/.bash_profile \
+            config/git/hooks/post-checkout config/git/hooks/pre-commit config/git/hooks/pre-push
+
+      - name: shfmt
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y shfmt
+          git ls-files '*.sh' | xargs shfmt -i 2 -ci -d
+
+      - name: validate JSON
+        # .vscode/ is JSONC (comments, trailing commas), so strict jq skips it
+        run: |
+          git ls-files '*.json' ':!:.vscode/*' | xargs -n1 jq empty
+
+      - name: python compiles
+        run: python3 -m py_compile scripts/sync-claude-desktop.py
+
+  smoke:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # --dry lists what would run; proves script discovery works on both
+      # GNU and BSD find (the latter regressed silently once)
+      - name: harness discovers scripts
+        run: |
+          bash run.sh --dry | tee /tmp/dry.log
+          grep -q 'env.sh' /tmp/dry.log
+
+      - name: harness runs a script
+        run: bash run.sh test --drier | grep -q 'Hello world'

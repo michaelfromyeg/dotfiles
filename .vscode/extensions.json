@@ -35,7 +35,7 @@
     "tamasfe.even-better-toml",
     "timonwong.shellcheck",
     "vscode-icons-team.vscode-icons",
-    "vscodevim.vim"
+    "vscodevim.vim",
   ],
-  "unwantedRecommendations": ["eamodio.gitlens"]
+  "unwantedRecommendations": ["eamodio.gitlens"],
 }

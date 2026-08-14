@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # Sets up a dev tmux session: claude + scratchpad + notion run
 
-echo "[tmux-dev] Starting..."
+# shellcheck source=lib.sh
+source "$(dirname "$0")/lib.sh"
+
+log "Starting..."
 
 SESSION="dev"
 
@@ -16,7 +19,7 @@ fi
 
 # If session exists, attach/switch to it
 if tmux has-session -t "=$SESSION" 2>/dev/null; then
-  echo "[tmux-dev] Session '$SESSION' exists, reattaching..."
+  log "Session '$SESSION' exists, reattaching..."
 
   if [[ "$dry" == "1" ]] || [[ "$dry" == "2" ]]; then
     exit 0
@@ -30,7 +33,7 @@ if tmux has-session -t "=$SESSION" 2>/dev/null; then
   exit 0
 fi
 
-echo "[tmux-dev] Creating session '$SESSION' in $WORK_DIR"
+log "Creating session '$SESSION' in $WORK_DIR"
 
 if [[ "$dry" == "1" ]] || [[ "$dry" == "2" ]]; then
   exit 0

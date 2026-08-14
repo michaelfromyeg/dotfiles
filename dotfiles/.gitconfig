@@ -5,7 +5,8 @@
   ui = auto
 [core]
   pager = delta
-  editor = nvim
+  # No editor set on purpose: git falls through to $VISUAL/$EDITOR, which
+  # .shellrc resolves per-machine (zed --wait locally, nvim on boxies).
   precomposeunicode = true
   untrackedCache = true
   ignorecase = true
@@ -20,14 +21,32 @@
   followTags = false
 [fetch]
   prune = true
+  # Keep the commit-graph current (incremental, cheap) so log/merge-base
+  # stay fast in big repos
+  writeCommitGraph = true
+# Compute changed-path Bloom filters on commit-graph writes -- makes
+# `git log -- <path>` ~10x faster in notion-next
+[commitGraph]
+  changedPaths = true
 [diff]
   renames = copies
   algorithm = histogram
 [merge]
   log = true
-  conflictstyle = diff3
+  conflictstyle = zdiff3
 [rebase]
   autoStash = true
+# Remember conflict resolutions and replay them -- pays for itself with
+# av restacks that hit the same conflicts repeatedly
+[rerere]
+  enabled = true
+[delta]
+  navigate = true
+  line-numbers = true
+  hyperlinks = true
+  hyperlinks-file-link-format = "zed://file/{path}:{line}"
+[interactive]
+  diffFilter = delta --color-only
 [alias]
   # Push and set upstream
   pushup = push -u origin HEAD
@@ -39,8 +58,8 @@
   undo = reset --soft HEAD^
   # List all aliases
   aliases = config --get-regexp alias
-  # Show what you've done since yesterday
-  standup = log --since yesterday --author $(git config user.email) --pretty=short
+  # Show what you've done since yesterday (needs the ! so $() actually expands)
+  standup = "!git log --since yesterday --author \"$(git config user.email)\" --pretty=short"
   # Show last tag
   lasttag = describe --tags --abbrev=0
   # Show modified files in last commit
@@ -57,3 +76,9 @@
   helper = "!f() { if command -v gh >/dev/null 2>&1; then gh auth git-credential \"$@\"; elif [ \"$1\" = get ] && [ -n \"$GH_TOKEN\" ]; then echo username=x-access-token; echo \"password=$GH_TOKEN\"; fi; }; f"
 [advice]
   skippedCherryPicks = false
+# Work identity for Notion repos (covers notion-next and its -N worktrees
+# locally, and /work/notion-next on boxies). Trailing / matches everything under.
+[includeIf "gitdir:~/code/notion-next*/"]
+  path = ~/.gitconfig-notion
+[includeIf "gitdir:/work/"]
+  path = ~/.gitconfig-notion

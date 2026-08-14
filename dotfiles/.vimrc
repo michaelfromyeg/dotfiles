@@ -19,21 +19,28 @@ set smartindent
 
 " Better editing experience
 set nowrap
-set clipboard=unnamed
+if has('unnamedplus')
+  set clipboard=unnamedplus
+else
+  set clipboard=unnamed
+endif
 set noswapfile
 
 " Set leader key to space
 let mapleader = " "
 
-" Plug plugin manager
-call plug#begin('~/.vim/plugged')
-Plug 'tpope/vim-sensible'
-Plug 'morhetz/gruvbox'
-call plug#end()
+" Plug plugin manager (guarded so a fresh machine without vim-plug still gets
+" a working vim; `dotfiles env` installs it)
+if !empty(glob('~/.vim/autoload/plug.vim'))
+  call plug#begin('~/.vim/plugged')
+  Plug 'tpope/vim-sensible'
+  Plug 'morhetz/gruvbox'
+  call plug#end()
+endif
 
-" Gruvbox theme settings
+" Gruvbox theme settings (silent! so a missing plugin doesn't error every launch)
 let g:gruvbox_transparent_bg=1
-autocmd vimenter * ++nested colorscheme gruvbox
+autocmd vimenter * ++nested silent! colorscheme gruvbox
 
 " Netrw file explorer settings
 let g:netrw_liststyle=3

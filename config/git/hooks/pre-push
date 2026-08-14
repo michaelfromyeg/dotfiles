@@ -83,8 +83,8 @@ echo ""
 #   TEST_CAP=100      git push   -> raise cap to 100
 extra_args=()
 [ -n "${RUN_INTEGRATION:-}" ] && extra_args+=(--integration)
-[ -n "${RUN_ALL_TESTS:-}" ]   && extra_args+=(--all)
-[ -n "${TEST_CAP:-}" ]        && extra_args+=(--cap "$TEST_CAP")
+[ -n "${RUN_ALL_TESTS:-}" ] && extra_args+=(--all)
+[ -n "${TEST_CAP:-}" ] && extra_args+=(--cap "$TEST_CAP")
 ~/code/dotfiles/scripts/test-changed.sh --base "$base_ref" "${extra_args[@]}"
 test_exit=$?
 

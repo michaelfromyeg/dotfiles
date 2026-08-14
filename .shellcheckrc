@@ -1,0 +1,9 @@
+# Don't try to follow sourced files (nvm, cargo, rvm, oh-my-zsh, ~/.shellrc, ...);
+# they live outside the repo or don't exist until the setup scripts install them.
+disable=SC1090,SC1091
+
+# Follow `# shellcheck source=...` directives (so scripts/*.sh resolve lib.sh
+# even when a single file is checked, e.g. by an editor), relative to the
+# script's own directory.
+external-sources=true
+source-path=SCRIPTDIR

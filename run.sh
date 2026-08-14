@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 
 # This is the generic harness for running each of my setup scripts.
-# Usage: ./run.sh [filter] [--dry]
+# Usage: ./run.sh [filter] [--dry|--drier] [-- script-args...]
+#   --dry:   harness dry run (list what would run, run nothing)
+#   --drier: script-level dry run (scripts run but log instead of executing)
+#   --:      everything after is passed through to the scripts
 
 # This ensures that if this is run via symlink, we still get the correct path
 if [[ -L "$0" ]]; then
-    script_path=$(readlink -f "$0")
+  script_path=$(readlink -f "$0")
 else
-    script_path="$0"
+  script_path="$0"
 fi
 
 # The directory of this script
@@ -91,7 +94,7 @@ cd "$script_dir"/scripts || exit
 # Detect if running on Windows
 is_windows() {
   case "$(uname -s)" in
-    CYGWIN*|MINGW*|MSYS*|Windows*)
+    CYGWIN* | MINGW* | MSYS* | Windows*)
       return 0
       ;;
     *)
@@ -100,24 +103,30 @@ is_windows() {
   esac
 }
 
-# Determine which find command to use
-if command -v gfind >/dev/null 2>&1; then
-  FIND="gfind"
+# Find appropriate scripts based on platform. -perm -u+x instead of GNU-only
+# -executable: BSD find (a fresh Mac, before findutils is installed) doesn't
+# support -executable and would silently discover nothing.
+if is_windows; then
+  scripts=$(find . -maxdepth 1 -mindepth 1 -name "*.ps1" -type f | sort)
 else
-  FIND="find"
+  scripts=$(find . -maxdepth 1 -mindepth 1 -name "*.sh" -type f -perm -u+x | sort)
 fi
 
-# Find appropriate scripts based on platform
-if is_windows; then
-  scripts=$($FIND . -maxdepth 1 -mindepth 1 -name "*.ps1" -type f)
-else
-  scripts=$($FIND . -maxdepth 1 -mindepth 1 -executable -name "*.sh" -type f)
+# A filter that exactly matches a script name (sans extension) runs only that
+# script, so `dotfiles test` doesn't also run test-changed.sh. Otherwise fall
+# back to substring matching.
+if [[ -n "$filter" ]]; then
+  for script in $scripts; do
+    name=$(basename "$script")
+    if [[ "${name%.*}" == "$filter" ]]; then
+      scripts="$script"
+      break
+    fi
+  done
 fi
 
 for script in $scripts; do
-  if echo "$script" | grep -qv "$filter"; then
-    # Only show skipped scripts when running all (no filter)
-    [[ -z "$filter" ]] && log "${DIM}Skipped $script${NC}"
+  if [[ -n "$filter" ]] && ! echo "$script" | grep -q -- "$filter"; then
     continue
   fi
 

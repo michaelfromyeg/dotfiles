@@ -1,7 +1,9 @@
 # General
 scripts/test-results.txt
 .env
+.DS_Store
+*.bak
+*.orig
 
 # Python
 scripts/__pycache__/
-

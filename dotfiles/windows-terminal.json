@@ -5,6 +5,62 @@
     {
       "command": { "action": "sendInput", "input": "\u001b[13;2u" },
       "id": "User.ShiftEnter"
+    },
+    {
+      "command": { "action": "splitPane", "split": "vertical" },
+      "id": "User.SplitPaneVertical"
+    },
+    {
+      "command": { "action": "splitPane", "split": "horizontal" },
+      "id": "User.SplitPaneHorizontal"
+    },
+    {
+      "command": { "action": "moveFocus", "direction": "previous" },
+      "id": "User.MoveFocusPrevious"
+    },
+    {
+      "command": { "action": "moveFocus", "direction": "nextInOrder" },
+      "id": "User.MoveFocusNextInOrder"
+    },
+    {
+      "command": { "action": "moveFocus", "direction": "up" },
+      "id": "User.MoveFocusUp"
+    },
+    {
+      "command": { "action": "moveFocus", "direction": "down" },
+      "id": "User.MoveFocusDown"
+    },
+    {
+      "command": { "action": "moveFocus", "direction": "left" },
+      "id": "User.MoveFocusLeft"
+    },
+    {
+      "command": { "action": "moveFocus", "direction": "right" },
+      "id": "User.MoveFocusRight"
+    },
+    {
+      "command": { "action": "resizePane", "direction": "up" },
+      "id": "User.ResizePaneUp"
+    },
+    {
+      "command": { "action": "resizePane", "direction": "down" },
+      "id": "User.ResizePaneDown"
+    },
+    {
+      "command": { "action": "resizePane", "direction": "left" },
+      "id": "User.ResizePaneLeft"
+    },
+    {
+      "command": { "action": "resizePane", "direction": "right" },
+      "id": "User.ResizePaneRight"
+    },
+    {
+      "command": { "action": "adjustFontSize", "delta": 1 },
+      "id": "User.IncreaseFontSize"
+    },
+    {
+      "command": { "action": "adjustFontSize", "delta": -1 },
+      "id": "User.DecreaseFontSize"
     }
   ],
   "copyFormatting": "none",
@@ -20,75 +76,75 @@
       "keys": "ctrl+shift+v"
     },
     {
-      "command": { "action": "splitPane", "split": "vertical" },
+      "id": "User.SplitPaneVertical",
       "keys": "alt+d"
     },
     {
-      "command": { "action": "splitPane", "split": "horizontal" },
+      "id": "User.SplitPaneHorizontal",
       "keys": "alt+shift+d"
     },
     {
-      "command": "closePane",
+      "id": "Terminal.ClosePane",
       "keys": "alt+w"
     },
     {
-      "command": { "action": "moveFocus", "direction": "previous" },
+      "id": "User.MoveFocusPrevious",
       "keys": "ctrl+["
     },
     {
-      "command": { "action": "moveFocus", "direction": "nextInOrder" },
+      "id": "User.MoveFocusNextInOrder",
       "keys": "ctrl+]"
     },
     {
-      "command": { "action": "moveFocus", "direction": "up" },
+      "id": "User.MoveFocusUp",
       "keys": "ctrl+alt+up"
     },
     {
-      "command": { "action": "moveFocus", "direction": "down" },
+      "id": "User.MoveFocusDown",
       "keys": "ctrl+alt+down"
     },
     {
-      "command": { "action": "moveFocus", "direction": "left" },
+      "id": "User.MoveFocusLeft",
       "keys": "ctrl+alt+left"
     },
     {
-      "command": { "action": "moveFocus", "direction": "right" },
+      "id": "User.MoveFocusRight",
       "keys": "ctrl+alt+right"
     },
     {
-      "command": { "action": "resizePane", "direction": "up" },
+      "id": "User.ResizePaneUp",
       "keys": "ctrl+shift+up"
     },
     {
-      "command": { "action": "resizePane", "direction": "down" },
+      "id": "User.ResizePaneDown",
       "keys": "ctrl+shift+down"
     },
     {
-      "command": { "action": "resizePane", "direction": "left" },
+      "id": "User.ResizePaneLeft",
       "keys": "ctrl+shift+left"
     },
     {
-      "command": { "action": "resizePane", "direction": "right" },
+      "id": "User.ResizePaneRight",
       "keys": "ctrl+shift+right"
     },
     {
-      "command": "togglePaneZoom",
+      "id": "Terminal.TogglePaneZoom",
       "keys": "ctrl+shift+enter"
     },
     {
-      "command": "toggleFullscreen",
+      "id": "Terminal.ToggleFullscreen",
       "keys": "ctrl+enter"
     },
     {
-      "command": { "action": "adjustFontSize", "delta": 1 },
+      "id": "User.IncreaseFontSize",
       "keys": "ctrl+="
     },
     {
-      "command": { "action": "adjustFontSize", "delta": -1 },
+      "id": "User.DecreaseFontSize",
       "keys": "ctrl+-"
     },
     {
-      "command": "resetFontSize",
+      "id": "Terminal.ResetFontSize",
       "keys": "ctrl+0"
     },
     {

@@ -2,29 +2,28 @@
 
 # Sets up my development environment.
 
-echo "[env] Setting up your environment..."
+# shellcheck source=lib.sh
+source "$(dirname "$0")/lib.sh"
 
-if [[ -z "$dry" ]] || [[ -z "$script_dir" ]]; then
-  echo "[env] Error: Required variables 'dry' or 'script_dir' are not set"
+log "Setting up your environment..."
+
+if [[ -z "$script_dir" ]]; then
+  log "Error: Required variable 'script_dir' is not set"
   exit 1
 fi
 
-log() {
-  if [[ $dry == "1" ]] || [[ $dry == "2" ]]; then
-    echo "[env] [DRY_RUN] $*"
-  else
-    echo "[env] $*"
+# Back up anything we're about to overwrite, preserving its path relative to
+# $HOME, so a bad sync (or a machine with hand-written configs) is recoverable.
+BACKUP_DIR="$HOME/.dotfiles-backup/$(date +%Y%m%d-%H%M%S)"
+
+backup() {
+  target=$1
+  [ -e "$target" ] || return 0
+  if [[ $dry != "1" ]] && [[ $dry != "2" ]]; then
+    dest="$BACKUP_DIR/${target#"$HOME"/}"
+    mkdir -p "$(dirname "$dest")"
+    cp -a "$target" "$dest"
   fi
-}
-
-execute() {
-  log "Executing... $*"
-
-  if [[ $dry == "1" ]] || [[ $dry == "2" ]]; then
-    return
-  fi
-
-  "$@"
 }
 
 copy_dirs() {
@@ -33,18 +32,19 @@ copy_dirs() {
 
   log "Copying directories in $from to $to"
 
-  pushd "$from" > /dev/null || exit
+  pushd "$from" >/dev/null || exit
 
   # the 'sed' removes the './' from the beginning of the path
   dirs=$(find . -mindepth 1 -maxdepth 1 -type d | sed 's|^\./||')
   for dir in $dirs; do
     log "Copying the directory $from/$dir to $to"
 
-    execute rm -rf "$to/$dir"
-    execute cp -r "$from/$dir" "$to"
+    backup "$to/$dir"
+    run_cmd rm -rf "$to/$dir"
+    run_cmd cp -r "$from/$dir" "$to"
   done
 
-  popd > /dev/null || exit
+  popd >/dev/null || exit
 }
 
 SYNCED_FILES=()
@@ -59,19 +59,20 @@ copy_file() {
 
   log "Copying the file $from to $to"
 
-  execute rm -f "$to/$name"
-  execute cp "$from" "$to"
+  backup "$to/$name"
+  run_cmd rm -f "$to/$name"
+  run_cmd cp "$from" "$to"
 
 }
 
 # Copy config directories (nvim, bat, lazygit, ohmyposh, etc.)
 config_home="${XDG_CONFIG_HOME:-$HOME/.config}"
-execute mkdir -p "$config_home"
+run_cmd mkdir -p "$config_home"
 copy_dirs "$script_dir"/config "$config_home"
 
 # Remove ghostty config on non-macOS (it's macOS-only)
 if [[ "$(uname -s)" != "Darwin" ]]; then
-  execute rm -rf "$config_home/ghostty"
+  run_cmd rm -rf "$config_home/ghostty"
 fi
 
 # the 'real' dotfiles
@@ -82,14 +83,17 @@ copy_file "$script_dir"/dotfiles/.bashrc "$HOME"
 copy_file "$script_dir"/dotfiles/.bash_profile "$HOME"
 copy_file "$script_dir/dotfiles/.vimrc" "$HOME"
 copy_file "$script_dir/dotfiles/.gitconfig" "$HOME"
+copy_file "$script_dir/dotfiles/.gitconfig-notion" "$HOME"
 copy_file "$script_dir/dotfiles/.tmux.conf" "$HOME"
 copy_file "$script_dir/dotfiles/.ripgreprc" "$HOME"
 copy_file "$script_dir/dotfiles/.gitignore_global" "$HOME"
 
 # SSH config (managed portion — included by ~/.ssh/config)
-execute mkdir -p "$HOME/.ssh"
-execute chmod 700 "$HOME/.ssh"
+run_cmd mkdir -p "$HOME/.ssh"
+run_cmd chmod 700 "$HOME/.ssh"
+run_cmd mkdir -p "$HOME/.ssh/sockets" # ControlPath dir (see config.local)
 copy_file "$script_dir/dotfiles/.ssh/config.local" "$HOME/.ssh"
+run_cmd chmod 600 "$HOME/.ssh/config.local"
 if [ -f "$HOME/.ssh/config" ]; then
   if ! grep -q "Include config.local" "$HOME/.ssh/config"; then
     log "Adding Include config.local to ~/.ssh/config"
@@ -101,38 +105,38 @@ if [ -f "$HOME/.ssh/config" ]; then
 else
   log "Creating ~/.ssh/config with Include"
   if [[ $dry != "1" ]] && [[ $dry != "2" ]]; then
-    echo "Include config.local" > "$HOME/.ssh/config"
+    echo "Include config.local" >"$HOME/.ssh/config"
     chmod 600 "$HOME/.ssh/config"
   fi
 fi
 
 # setup vim and neovim
-execute mkdir -p "$HOME/.vim"
-execute mkdir -p "$HOME/.vim/undodir"
-execute mkdir -p "$HOME/.config/nvim"
-execute mkdir -p "$HOME/.local/share/nvim/site/autoload"
+run_cmd mkdir -p "$HOME/.vim"
+run_cmd mkdir -p "$HOME/.vim/undodir"
+run_cmd mkdir -p "$HOME/.config/nvim"
+run_cmd mkdir -p "$HOME/.local/share/nvim/site/autoload"
 
-execute mkdir -p "$HOME/.vim/backup"
-execute mkdir -p "$HOME/.vim/swap"
-execute mkdir -p "$HOME/.local/share/nvim/backup"
-execute mkdir -p "$HOME/.local/share/nvim/swap"
+run_cmd mkdir -p "$HOME/.vim/backup"
+run_cmd mkdir -p "$HOME/.vim/swap"
+run_cmd mkdir -p "$HOME/.local/share/nvim/backup"
+run_cmd mkdir -p "$HOME/.local/share/nvim/swap"
 
-execute chmod 700 "$HOME/.vim" "$HOME/.config/nvim"
-execute chmod 700 "$HOME/.vim/backup" "$HOME/.vim/swap" "$HOME/.vim/undodir"
-execute chmod 700 "$HOME/.local/share/nvim/backup" "$HOME/.local/share/nvim/swap"
+run_cmd chmod 700 "$HOME/.vim" "$HOME/.config/nvim"
+run_cmd chmod 700 "$HOME/.vim/backup" "$HOME/.vim/swap" "$HOME/.vim/undodir"
+run_cmd chmod 700 "$HOME/.local/share/nvim/backup" "$HOME/.local/share/nvim/swap"
 
 if [[ ! -f "$HOME/.vim/autoload/plug.vim" ]]; then
   log "Installing vim-plug for Vim"
-  execute curl -fLo "$HOME/.vim/autoload/plug.vim" --create-dirs \
+  run_cmd curl -fLo "$HOME/.vim/autoload/plug.vim" --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 fi
 
 log "Installing Vim plugins"
-execute vim +PlugInstall +qall
+run_cmd vim +PlugInstall +qall
 
 # Claude Code user-level config (~/.claude/ is not XDG, so handled separately)
-execute mkdir -p "$HOME/.claude"
-execute mkdir -p "$HOME/.claude/skills"
+run_cmd mkdir -p "$HOME/.claude"
+run_cmd mkdir -p "$HOME/.claude/skills"
 copy_file "$script_dir/claude/settings.json" "$HOME/.claude"
 copy_file "$script_dir/claude/statusline-command.sh" "$HOME/.claude"
 copy_file "$script_dir/claude/CLAUDE.md" "$HOME/.claude"
@@ -142,7 +146,7 @@ fi
 
 # Install the Claude Code plugins declared in settings.json (no-op if the
 # claude CLI isn't present yet, e.g. early in a fresh Boxy provision).
-execute bash "$script_dir/scripts/claude-plugins.sh"
+run_cmd bash "$script_dir/scripts/claude-plugins.sh"
 
 # Windows Terminal settings (WSL only — push config to Windows filesystem)
 if grep -qi microsoft /proc/version 2>/dev/null; then
@@ -152,7 +156,7 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
     log "Syncing Windows Terminal settings..."
     copy_file "$script_dir/dotfiles/windows-terminal.json" "$(dirname "$wt_settings")"
     # Windows Terminal expects settings.json, not windows-terminal.json
-    execute mv "$(dirname "$wt_settings")/windows-terminal.json" "$wt_settings"
+    run_cmd mv "$(dirname "$wt_settings")/windows-terminal.json" "$wt_settings"
   else
     log "Windows Terminal settings directory not found, skipping"
   fi
@@ -160,8 +164,8 @@ if grep -qi microsoft /proc/version 2>/dev/null; then
 fi
 
 # make `run.sh` runnable from anywhere
-execute mkdir -p "$HOME/bin"
-execute ln -sf "$script_dir/run.sh" "$HOME/bin/dotfiles"
+run_cmd mkdir -p "$HOME/bin"
+run_cmd ln -sf "$script_dir/run.sh" "$HOME/bin/dotfiles"
 
 # Claude Desktop MCP servers (WSL and macOS)
 SYNCED_FILES+=("claude/desktop-mcp-servers.json")
@@ -171,6 +175,12 @@ python3 "$script_dir/scripts/sync-claude-desktop.py"
 # deep-merges it into /work/notion-next/.claude/settings.local.json on boxies.
 SYNCED_FILES+=("claude/notion-next.settings.local.json")
 
+# Windows Terminal settings only deploy on WSL; don't warn about them elsewhere.
+SYNCED_FILES+=("dotfiles/windows-terminal.json")
+
+# Cold Turkey block lists are imported manually via the app's UI, not deployed.
+SYNCED_FILES+=("dotfiles/cold-turkey-block-lists.ctbbl")
+
 # Boxy remote dev profile (macOS only — synced to boxy containers from laptop)
 if [[ "$(uname -s)" == "Darwin" ]]; then
   log "Setting up boxy profile..."
@@ -178,8 +188,8 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
   boxy_dotfiles="$HOME/.boxy/profile/dotfiles"
   boxy_config="$boxy_dotfiles/.config"
 
-  execute mkdir -p "$boxy_dotfiles"
-  execute mkdir -p "$boxy_config"
+  run_cmd mkdir -p "$boxy_dotfiles"
+  run_cmd mkdir -p "$boxy_config"
 
   # Shell configs
   copy_file "$script_dir/dotfiles/.shellrc" "$boxy_dotfiles"
@@ -189,32 +199,33 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
   copy_file "$script_dir/dotfiles/.bash_profile" "$boxy_dotfiles"
   copy_file "$script_dir/dotfiles/.vimrc" "$boxy_dotfiles"
   copy_file "$script_dir/dotfiles/.gitconfig" "$boxy_dotfiles"
+  copy_file "$script_dir/dotfiles/.gitconfig-notion" "$boxy_dotfiles"
   copy_file "$script_dir/dotfiles/.ripgreprc" "$boxy_dotfiles"
   copy_file "$script_dir/dotfiles/.gitignore_global" "$boxy_dotfiles"
 
   # tmux.conf — append zsh as default shell for boxy sessions
   copy_file "$script_dir/dotfiles/.tmux.conf" "$boxy_dotfiles"
   if [[ $dry != "1" ]] && [[ $dry != "2" ]]; then
-    printf '\n# Boxy: use zsh as default shell\nset-option -g default-shell /usr/bin/zsh\n' >> "$boxy_dotfiles/.tmux.conf"
+    printf '\n# Boxy: use zsh as default shell\nset-option -g default-shell /usr/bin/zsh\n' >>"$boxy_dotfiles/.tmux.conf"
   fi
 
   # App configs (skip ghostty — macOS-only terminal)
   for dir in bat git lazygit nvim ohmyposh; do
     if [ -d "$script_dir/config/$dir" ]; then
-      execute rm -rf "$boxy_config/$dir"
-      execute cp -r "$script_dir/config/$dir" "$boxy_config"
+      run_cmd rm -rf "$boxy_config/$dir"
+      run_cmd cp -r "$script_dir/config/$dir" "$boxy_config"
     fi
   done
 
   # Claude Code config
   boxy_claude="$boxy_dotfiles/.claude"
-  execute mkdir -p "$boxy_claude"
+  run_cmd mkdir -p "$boxy_claude"
   copy_file "$script_dir/claude/CLAUDE.md" "$boxy_claude"
   copy_file "$script_dir/claude/settings.json" "$boxy_claude"
 
   # Boxy init script
-  execute cp "$script_dir/boxy/init.sh" "$HOME/.boxy/profile/init.sh"
-  execute chmod +x "$HOME/.boxy/profile/init.sh"
+  run_cmd cp "$script_dir/boxy/init.sh" "$HOME/.boxy/profile/init.sh"
+  run_cmd chmod +x "$HOME/.boxy/profile/init.sh"
 fi
 
 # === Sync check: warn about files not handled by this script ===
@@ -244,4 +255,8 @@ done
 
 if [[ $unsynced -gt 0 ]]; then
   echo -e "${WARN_YELLOW}[env] Add a copy_file call to env.sh for each, or remove them.${WARN_NC}"
+fi
+
+if [ -d "$BACKUP_DIR" ]; then
+  log "Overwritten files backed up to $BACKUP_DIR"
 fi

@@ -18,7 +18,7 @@ BASE=""
 OUTPUT_FILE=""
 ADD_TIMESTAMP=false
 INCLUDE_UNTRACKED=false
-INTEGRATION_MODE="exclude"  # exclude | include | only
+INTEGRATION_MODE="exclude" # exclude | include | only
 CAP=40
 PASSTHROUGH=()
 
@@ -54,16 +54,47 @@ EOF
 
 while [[ $# -gt 0 ]]; do
   case $1 in
-    -b|--base)      BASE="$2"; shift 2 ;;
-    -o|--output)    OUTPUT_FILE="$2"; shift 2 ;;
-    -t|--timestamp) ADD_TIMESTAMP=true; shift ;;
-    -u|--untracked) INCLUDE_UNTRACKED=true; shift ;;
-    -a|--all)         INTEGRATION_MODE="include"; shift ;;
-    -i|--integration) INTEGRATION_MODE="only"; shift ;;
-    -c|--cap)       CAP="$2"; shift 2 ;;
-    -h|--help)      show_help; exit 0 ;;
-    --)             shift; PASSTHROUGH+=("$@"); break ;;
-    *)              PASSTHROUGH+=("$1"); shift ;;
+    -b | --base)
+      BASE="$2"
+      shift 2
+      ;;
+    -o | --output)
+      OUTPUT_FILE="$2"
+      shift 2
+      ;;
+    -t | --timestamp)
+      ADD_TIMESTAMP=true
+      shift
+      ;;
+    -u | --untracked)
+      INCLUDE_UNTRACKED=true
+      shift
+      ;;
+    -a | --all)
+      INTEGRATION_MODE="include"
+      shift
+      ;;
+    -i | --integration)
+      INTEGRATION_MODE="only"
+      shift
+      ;;
+    -c | --cap)
+      CAP="$2"
+      shift 2
+      ;;
+    -h | --help)
+      show_help
+      exit 0
+      ;;
+    --)
+      shift
+      PASSTHROUGH+=("$@")
+      break
+      ;;
+    *)
+      PASSTHROUGH+=("$1")
+      shift
+      ;;
   esac
 done
 
@@ -112,7 +143,7 @@ discover_tests() {
 filter_integration() {
   case "$INTEGRATION_MODE" in
     exclude) grep -vE '\.integration\.(test|spec)\.' || true ;;
-    only)    grep -E  '\.integration\.(test|spec)\.' || true ;;
+    only) grep -E '\.integration\.(test|spec)\.' || true ;;
     include) cat ;;
   esac
 }
@@ -147,7 +178,7 @@ run() {
       echo "  Command:   ${CMD[*]}"
       echo "=============================================="
       echo ""
-    } > "$OUTPUT_FILE"
+    } >"$OUTPUT_FILE"
     "${CMD[@]}" 2>&1 | tee -a "$OUTPUT_FILE"
     return "${PIPESTATUS[0]}"
   else

@@ -10,27 +10,27 @@
 # lines modified) for a repo
 
 # Process command line arguments
-git_log_opts=( "$@" )
+git_log_opts=("$@")
 
 # Print header
 printf "%-30s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\n" \
-       "Email" "Commits" "Files" "Insertions" "Deletions" "Total Lines"
+  "Email" "Commits" "Files" "Insertions" "Deletions" "Total Lines"
 printf "%-30s\t%-10s\t%-10s\t%-10s\t%-10s\t%-10s\n" \
-       "-----" "-------" "-----" "----------" "---------" "-----------"
+  "-----" "-------" "-----" "----------" "---------" "-----------"
 
 # Check if current directory is a git repository
-if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-    echo "Error: Not a git repository"
-    exit 1
+if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  echo "Error: Not a git repository"
+  exit 1
 fi
 
 # Use git log to get data, and process with simple awk script
 # The command will run in the current directory
-git log "${git_log_opts[@]}" --format='author: %ae' --numstat \
-    | tr '[A-Z]' '[a-z]' \
-    | grep -v '^$' \
-    | grep -v '^-' \
-    | awk '
+git log "${git_log_opts[@]}" --format='author: %ae' --numstat |
+  tr '[:upper:]' '[:lower:]' |
+  grep -v '^$' |
+  grep -v '^-' |
+  awk '
         {
             if ($1 == "author:") {
                 author = $2;
@@ -56,4 +56,4 @@ git log "${git_log_opts[@]}" --format='author: %ae' --numstat \
                        insertions[email], deletions[email], total[email]);
             }
         }
-    ' | sort -k6,6nr  # Sort by total lines column in descending order
+    ' | sort -k6,6nr # Sort by total lines column in descending order
