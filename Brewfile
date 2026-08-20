@@ -5,11 +5,13 @@
 
 tap "aviator-co/tap"
 tap "jandedobbeleer/oh-my-posh"
+tap "michaelfromorg/tiled"
 
 # Core command line tools
 brew "gcc"
 brew "git"
 brew "gh"
+brew "michaelfromorg/tiled/til"
 brew "vim"
 brew "make"
 # NOTE: neovim is built from source (`dotfiles neovim`), not installed here

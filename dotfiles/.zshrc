@@ -48,6 +48,18 @@ else
   compinit
 fi
 
+# TILed completion -- cached and regenerated when the installed binary changes.
+if command -v til >/dev/null 2>&1; then
+  _til_completion="$HOME/.cache/til-completion.zsh"
+  _til_binary="$(command -v til)"
+  if [[ ! -s "$_til_completion" || "$_til_binary" -nt "$_til_completion" ]]; then
+    mkdir -p "$HOME/.cache"
+    til completion zsh >| "$_til_completion"
+  fi
+  source "$_til_completion"
+  unset _til_completion _til_binary
+fi
+
 # Better completion styles
 zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' # Case insensitive

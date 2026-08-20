@@ -14,6 +14,10 @@ export PATH="$HOME/bin:$PATH"
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 export RIPGREP_CONFIG_PATH="$HOME/.ripgreprc"
 
+# TILed location metadata. The Notion API token stays in the OS keychain.
+export TIL_DATA_DIR="$HOME/til-data"
+export TIL_NOTION_DATABASE_ID="1b8c4188-fa0e-8096-a37b-c5c21681c47e"
+
 # Ghostty and every terminal we connect from is truecolor, but `notion boxy mosh`
 # (forces TERM=xterm-256color) and `notion boxy sshv2` (kubectl exec) both drop
 # COLORTERM, so 24-bit apps downgrade to 256 colors. Re-assert it on the remote.
@@ -74,6 +78,7 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias c='clear'
+alias tild='cd "$TIL_DATA_DIR"'
 
 # Reset terminal after SSH to clear any terminfo weirdness. Only for
 # interactive sessions -- `reset` on a non-tty emits escape junk, and scripted
