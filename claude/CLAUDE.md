@@ -16,8 +16,8 @@
 
 ## My Quirks
 
-- I force the "original" working tree to be at main. You cannot create a branch in the original clone of a repository. You must do it in a worktree.
-- Creating worktrees is generally expensive for `notion-next` (i.e., the Notion app), but otherwise fine.
+- I force the "original" working tree to be at main. You cannot create a branch in the original clone of a repository; use my second checkout instead.
+- Do not create new worktrees for `notion-next` (i.e., the Notion app) -- each is a full ~19 GiB checkout. One line of work per checkout: finish the current PR before switching branches. For other repos, worktrees are fine.
 - I have some custom git global git hooks I like to run; if they're blocking you, disable them temporarily, but preferably you use them. (For example, on push, I'll re-run lint-staged and run tests. I prefer earlier signal, versus finding out in CI.)
 
 ## Code Style

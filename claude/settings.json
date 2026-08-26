@@ -21,16 +21,10 @@
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true,
-    "rust-analyzer-lsp@claude-plugins-official": true,
-    "pyright-lsp@claude-plugins-official": true,
-    "ruby-lsp@claude-plugins-official": true,
-    "github@claude-plugins-official": true,
-    "claude-md-management@claude-plugins-official": true,
     "av-cli@aviator-plugins": true,
     "notion-iac@makenotion-plugins": true,
     "notion-observability@makenotion-plugins": true,
-    "notion-infrasec@makenotion-plugins": true
+    "notion-statsig@makenotion-plugins": true
   },
   "extraKnownMarketplaces": {
     "aviator-plugins": {
@@ -45,6 +39,6 @@
   "fastMode": true,
   "skipDangerousModePermissionPrompt": true,
   "permissions": {
-    "defaultMode": "plan"
+    "defaultMode": "auto"
   }
 }
