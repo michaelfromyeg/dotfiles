@@ -570,9 +570,8 @@ if command -v gh >/dev/null 2>&1; then
   alias prv='gh pr view --web'
 fi
 
-# Notion-specific config (boxy helpers, Opal access requests). Lives in the
-# private makenotion/michaelfromyeg-dotfiles so this repo stays free of internal
-# hostnames and resource ids; absent on personal machines, which is fine.
+# Work-specific config (see README). Lives in a private repo so this one stays
+# free of internal hostnames and resource ids; absent on personal machines.
 if [ -f "$HOME/.shellrc.notion" ]; then
   . "$HOME/.shellrc.notion"
 fi

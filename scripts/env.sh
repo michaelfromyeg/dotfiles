@@ -219,8 +219,8 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
   copy_file "$script_dir/claude/CLAUDE.md" "$boxy_claude"
   copy_file "$script_dir/claude/settings.json" "$boxy_claude"
 
-  # The boxy init script itself lives in the private makenotion dotfiles repo,
-  # whose install.sh deploys it to ~/.boxy/profile/init.sh.
+  # The boxy init script itself lives in the private layer, whose installer
+  # deploys it to ~/.boxy/profile/init.sh.
 fi
 
 # Optional private layer: work-specific config that has no business in a public
