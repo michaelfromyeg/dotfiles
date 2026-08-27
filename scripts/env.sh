@@ -223,6 +223,15 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
   # whose install.sh deploys it to ~/.boxy/profile/init.sh.
 fi
 
+# Optional private layer: work-specific config that has no business in a public
+# repo. It registers itself here by symlink, and deploys on top of everything
+# above, so it has to run last. Absent on personal machines.
+private_install="$HOME/.config/dotfiles/private-install.sh"
+if [ -x "$private_install" ]; then
+  log "Running the private dotfiles layer"
+  run_cmd bash "$private_install"
+fi
+
 # === Sync check: warn about files not handled by this script ===
 
 WARN_YELLOW='\033[0;33m'

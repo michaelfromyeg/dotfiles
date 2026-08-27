@@ -76,6 +76,8 @@ Work-specific config (boxy helpers, Opal access requests, internal hostnames)
 lives in a separate private repo and layers on top of this one: `.shellrc`
 sources `~/.shellrc.notion` when it exists, and `~/.claude/CLAUDE.md` imports
 `~/.claude/CLAUDE.notion.md`. Neither is required — this repo stands alone.
+That repo symlinks its installer to `~/.config/dotfiles/private-install.sh`;
+`env.sh` runs it last when it's there, so one `dotfiles env` covers both.
 
 `env.sh` copies (not symlinks) configs into place and warns about repo files
 it doesn't know how to sync. Shell config layering: `.zshrc`/`.bashrc` source
