@@ -171,10 +171,6 @@ run_cmd ln -sf "$script_dir/run.sh" "$HOME/bin/dotfiles"
 SYNCED_FILES+=("claude/desktop-mcp-servers.json")
 python3 "$script_dir/scripts/sync-claude-desktop.py"
 
-# notion-next plan-mode override fragment: not deployed to $HOME — boxy/init.sh
-# deep-merges it into /work/notion-next/.claude/settings.local.json on boxies.
-SYNCED_FILES+=("claude/notion-next.settings.local.json")
-
 # Windows Terminal settings only deploy on WSL; don't warn about them elsewhere.
 SYNCED_FILES+=("dotfiles/windows-terminal.json")
 
@@ -223,9 +219,8 @@ if [[ "$(uname -s)" == "Darwin" ]]; then
   copy_file "$script_dir/claude/CLAUDE.md" "$boxy_claude"
   copy_file "$script_dir/claude/settings.json" "$boxy_claude"
 
-  # Boxy init script
-  run_cmd cp "$script_dir/boxy/init.sh" "$HOME/.boxy/profile/init.sh"
-  run_cmd chmod +x "$HOME/.boxy/profile/init.sh"
+  # The boxy init script itself lives in the private makenotion dotfiles repo,
+  # whose install.sh deploys it to ~/.boxy/profile/init.sh.
 fi
 
 # === Sync check: warn about files not handled by this script ===

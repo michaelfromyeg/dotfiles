@@ -59,7 +59,6 @@ scripts/               # Modular setup scripts (.sh for POSIX, .ps1 for Windows)
 config/                # XDG-compliant app configs (nvim, ghostty, lazygit, bat, ohmyposh)
 dotfiles/              # Shell configs (.shellrc, .zshrc, .bashrc, .gitconfig, .tmux.conf)
 claude/                # Claude Code user-level config (settings.json, CLAUDE.md, skills/)
-boxy/                  # Remote dev profile init script (macOS only)
 ```
 
 ### Key Design Patterns
@@ -92,7 +91,8 @@ run_cmd some command       # logs, then runs unless $dry is 1 or 2
 - `dotfiles/*` → `~/`
 - `dotfiles/.ssh/config.local` → `~/.ssh/` (auto-included via `~/.ssh/config`)
 - `claude/*` → `~/.claude/`
-- On macOS: also syncs a boxy remote dev profile to `~/.boxy/profile/`
+- On macOS: also syncs a boxy remote dev profile to `~/.boxy/profile/` (its
+  init script comes from the private makenotion dotfiles repo)
 
 ## Key Files
 

@@ -12,7 +12,7 @@
 - Be concise. Skip preamble.
 - Use plain text unless Markdown formatting genuinely helps. (Agents tend to over-use Markdown features like bold, and abuse em-dashes, etc., which makes it harder to read.)
 - Feel free to push back on what I suggest. If I ask you a question, I'm genuinely asking, I'm not secretly suggesting you did something wrong. You have the ability to make sure you're always operating from the truth, so do it. If I say "do X," and "X" is clearly a bad idea, say that.
-- When you hit a blocker or unexpected behavior, diagnose and fix the root cause rather than working around it (swallowing errors, hardcoding past a broken dependency, skipping a failing test, etc.). If the real fix is risky, out of scope, or needs a judgment call, consult me with what you found, and make sure it's tracked. The best way to do this is filing a Notion task with a clear description of the problem, what you tried, and what you think the next step is. My [Michael's tasks](https://app.dev.notion.com/p/notion/REDACTED-ID?v=REDACTED-ID&source=copy_link) database is a good way to do this in Notion's Dev environment.
+- When you hit a blocker or unexpected behavior, diagnose and fix the root cause rather than working around it (swallowing errors, hardcoding past a broken dependency, skipping a failing test, etc.). If the real fix is risky, out of scope, or needs a judgment call, consult me with what you found, and make sure it's tracked. The best way to do this is filing a Notion task with a clear description of the problem, what you tried, and what you think the next step is. My tasks database in Notion's Dev environment is a good way to do this.
 
 ## My Quirks
 
@@ -86,3 +86,10 @@ pay for itself in regression safety, refactoring confidence, or documentation va
 - Hard-to-test code is a design smell -> refactor toward smaller, independent components instead of piling on mocks.
 - Keep tests in Arrange-Act-Assert order, assert last, prefer one assertion per test, and assert what should happen rather than what shouldn't.
 - Tests are living documentation: optimize for the human reader, and think twice before deleting a "redundant" test that captures intent.
+
+# Work
+
+Notion-specific instructions live outside this repo; the import is a no-op on a
+personal machine, where the file is absent.
+
+@~/.claude/CLAUDE.notion.md
