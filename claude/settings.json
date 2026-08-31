@@ -24,13 +24,21 @@
     "av-cli@aviator-plugins": true,
     "notion-iac@makenotion-plugins": true,
     "notion-observability@makenotion-plugins": true,
-    "notion-statsig@makenotion-plugins": true
+    "notion-statsig@makenotion-plugins": true,
+    "trace-claude-code@braintrust-claude-plugin": true,
+    "braintrust@braintrust-claude-plugin": true
   },
   "extraKnownMarketplaces": {
     "aviator-plugins": {
       "source": {
         "source": "github",
         "repo": "aviator-co/agent-plugins"
+      }
+    },
+    "braintrust-claude-plugin": {
+      "source": {
+        "source": "github",
+        "repo": "braintrustdata/braintrust-claude-plugin"
       }
     }
   },
