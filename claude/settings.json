@@ -25,7 +25,7 @@
     "notion-iac@makenotion-plugins": true,
     "notion-observability@makenotion-plugins": true,
     "notion-statsig@makenotion-plugins": true,
-    "trace-claude-code@braintrust-claude-plugin": true,
+    "trace-claude-code@braintrust-claude-plugin": false,
     "braintrust@braintrust-claude-plugin": true
   },
   "extraKnownMarketplaces": {
