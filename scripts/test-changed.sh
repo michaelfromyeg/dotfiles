@@ -137,26 +137,7 @@ discover_tests() {
         [[ -f "$candidate" ]] && echo "$candidate"
       done
     fi
-  done | sort -u | filter_integration | filter_runnable
-}
-
-# `notion test` refuses any path that belongs to no module, so a file that only
-# looks like a test aborts the whole run. notion-next has some on purpose: the
-# agent-context eval fixtures under .agents/evals/ imitate product code down to
-# its test files. Keep only what the runner can actually run.
-filter_runnable() {
-  local f dir
-  while IFS= read -r f; do
-    dir=$(dirname "$f")
-    while true; do
-      if [[ -f "$dir/module.jsonc" ]]; then
-        printf '%s\n' "$f"
-        break
-      fi
-      [[ "$dir" == "." || "$dir" == "/" ]] && break
-      dir=$(dirname "$dir")
-    done
-  done
+  done | sort -u | filter_integration
 }
 
 filter_integration() {
