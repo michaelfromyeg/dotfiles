@@ -9,7 +9,7 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: shellcheck
         run: |
@@ -36,7 +36,7 @@ jobs:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # --dry lists what would run; proves script discovery works on both
       # GNU and BSD find (the latter regressed silently once)
