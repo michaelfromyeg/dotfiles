@@ -148,6 +148,9 @@ fi
 # claude CLI isn't present yet, e.g. early in a fresh Boxy provision).
 run_cmd bash "$script_dir/scripts/claude-plugins.sh"
 
+# Narrow fetches and schedule git maintenance for the repos git-repos.sh lists.
+run_cmd bash "$script_dir/scripts/git-repos.sh"
+
 # Windows Terminal settings (WSL only — push config to Windows filesystem)
 if grep -qi microsoft /proc/version 2>/dev/null; then
   win_user=$(cmd.exe /C "echo %USERNAME%" 2>/dev/null | tr -d '\r')

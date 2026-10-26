@@ -82,3 +82,7 @@
   path = ~/.gitconfig-notion
 [includeIf "gitdir:/work/"]
   path = ~/.gitconfig-notion
+# Machine-local state that env.sh must not clobber, e.g. the maintenance.repo
+# list scripts/git-repos.sh registers. Git skips the include if it's absent.
+[include]
+  path = ~/.gitconfig.local
