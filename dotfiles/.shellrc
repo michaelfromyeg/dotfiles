@@ -362,6 +362,8 @@ alias tks='tmux kill-session -t'
 alias tka='tmux kill-server'
 alias tn='tmux new-session -s'
 alias tq='tmux kill-session && exit'
+# Create or reattach the `dev` session (claude + scratchpad + notion run)
+alias tdev='~/code/dotfiles/scripts/tmux-dev.sh'
 
 # Alert alias for long running commands (Linux/notify-send only)
 # Usage: sleep 10; alert

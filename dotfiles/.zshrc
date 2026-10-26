@@ -83,16 +83,6 @@ command -v fzf >/dev/null 2>&1 && eval "$(fzf --zsh)"
 
 export NOTION_BOXY_TYPECHECK_SLOTS=3
 
-# Auto-start tmux-dev on boxy remote sessions. Don't gate on $SSH_CONNECTION:
-# `notion boxy sshv2` connects via `kubectl exec` and `notion boxy mosh` runs
-# under mosh-server, neither of which sets it. $NOTION_BOXY_NAME (on a boxy),
-# -z $TMUX (not already in tmux), and -t 0 (interactive tty) are enough.
-# The -x test matters: this file is synced from my laptop, so it can land on a
-# box whose dotfiles checkout hasn't been made yet.
-if [[ -n "$NOTION_BOXY_NAME" && -z "$TMUX" && -t 0 && -x ~/code/dotfiles/scripts/tmux-dev.sh ]]; then
-  ~/code/dotfiles/scripts/tmux-dev.sh && reset
-fi
-
 # pnpm (macOS install location)
 if [[ -d "$HOME/Library/pnpm" ]]; then
   export PNPM_HOME="$HOME/Library/pnpm"

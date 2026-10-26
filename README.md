@@ -50,7 +50,7 @@ dotfiles <script> -- <args>  # pass args through to the script
 | `claude-plugins` | Install Claude Code plugins declared in `claude/settings.json` |
 | `test` | Sanity check |
 | `test-changed` | Run tests for files changed vs a base branch (notion-next) |
-| `tmux-dev` | Start a dev tmux session (claude + scratchpad + notion run) |
+| `tmux-dev` | Start a dev tmux session (claude + scratchpad + notion run); `tdev` alias |
 | `stats` | Git contribution stats |
 | `cold-turkey` | Quit Cold Turkey Blocker (it breaks headless Chrome) |
 | `getignore` | Download a gitignore template |
