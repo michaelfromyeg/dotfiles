@@ -21,9 +21,13 @@ fi
 # command that prints the parent, so read it from av's metadata db (kept in
 # the git common dir so worktrees share one). Fall back to origin's default
 # branch when the branch isn't part of an av stack.
+#
+# A trunk parent resolves to its origin ref: nothing keeps the local trunk
+# branch current, and a stale one widens the range to every commit it's
+# missing (lint-staged then runs on thousands of unrelated files).
 cur_branch=$(git symbolic-ref --short HEAD 2>/dev/null)
 av_db="$(git rev-parse --git-common-dir 2>/dev/null)/av/av.db"
-base_ref=$(jq -r --arg b "$cur_branch" '.branches[$b].parent.name // empty' "$av_db" 2>/dev/null)
+base_ref=$(jq -r --arg b "$cur_branch" '.branches[$b].parent // empty | if .trunk then "origin/\(.name)" else .name end' "$av_db" 2>/dev/null)
 if [ -z "$base_ref" ]; then
   base_ref=$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/@@')
   base_ref=${base_ref:-origin/main}
