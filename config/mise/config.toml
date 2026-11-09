@@ -1,0 +1,9 @@
+# mise is the single version manager (see the Languages section of .shellrc).
+# Synced to ~/.config/mise/config.toml by `dotfiles env`.
+
+[tools]
+node = "lts"
+
+[settings]
+# Honor per-repo .nvmrc / .node-version files (notion-next, rowspace, ...)
+idiomatic_version_file_enable_tools = ["node"]

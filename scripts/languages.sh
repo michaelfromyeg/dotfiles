@@ -74,21 +74,22 @@ go install golang.org/x/tools/gopls@latest
 check_cmd go
 check_cmd gopls
 
-# nvm (Node.js)
-log "Installing Node.js via nvm..."
-export NVM_DIR="$HOME/.nvm"
-if [ ! -d "$NVM_DIR" ]; then
-  mkdir -p "$NVM_DIR"
-  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
+# mise (Node.js). The global default and .nvmrc support live in
+# config/mise/config.toml, synced by `dotfiles env`.
+log "Installing Node.js via mise..."
+if ! command -v mise &>/dev/null; then
+  if command -v brew &>/dev/null; then
+    brew install mise
+  else
+    # Installs to ~/.local/bin, which is on PATH above
+    curl -fsSL https://mise.run | sh
+  fi
 else
-  log "nvm already installed"
+  log "mise already installed"
 fi
 
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-
-nvm install --lts
-nvm use --lts
+mise install node@lts
+export PATH="$HOME/.local/share/mise/shims:$PATH"
 
 check_cmd npm
 check_cmd node

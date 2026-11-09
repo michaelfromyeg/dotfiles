@@ -36,6 +36,8 @@ brew "tldr"
 brew "zoxide"
 brew "hyperfine"
 brew "direnv"
+# version manager (node, ...); config in config/mise, activated in .shellrc
+brew "mise"
 brew "shellcheck"
 brew "shfmt"
 brew "git-branchless"
