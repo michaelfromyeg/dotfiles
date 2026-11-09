@@ -23,9 +23,9 @@ jobs:
           git ls-files '*.sh' | xargs shfmt -i 2 -ci -d
 
       - name: validate JSON
-        # .vscode/ is JSONC (comments, trailing commas), so strict jq skips it
+        # .vscode/ and zed/ are JSONC (comments, trailing commas), so strict jq skips them
         run: |
-          git ls-files '*.json' ':!:.vscode/*' | xargs -n1 jq empty
+          git ls-files '*.json' ':!:.vscode/*' ':!:zed/*' | xargs -n1 jq empty
 
       - name: python compiles
         run: python3 -m py_compile scripts/sync-claude-desktop.py
