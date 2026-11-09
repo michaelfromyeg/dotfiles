@@ -144,6 +144,12 @@ if [ -d "$script_dir/claude/skills" ] && [ "$(ls -A "$script_dir/claude/skills" 
   copy_dirs "$script_dir/claude/skills" "$HOME/.claude/skills"
 fi
 
+# Zed: copy individual files, not the directory, since ~/.config/zed also holds
+# Zed's own state (prompt library, installed extensions).
+run_cmd mkdir -p "$config_home/zed"
+copy_file "$script_dir/zed/settings.json" "$config_home/zed"
+copy_file "$script_dir/zed/keymap.json" "$config_home/zed"
+
 # Install the Claude Code plugins declared in settings.json (no-op if the
 # claude CLI isn't present yet, e.g. early in a fresh Boxy provision).
 run_cmd bash "$script_dir/scripts/claude-plugins.sh"
@@ -241,7 +247,7 @@ WARN_YELLOW='\033[0;33m'
 WARN_NC='\033[0m'
 unsynced=0
 
-for dir in dotfiles claude; do
+for dir in dotfiles claude zed; do
   [[ ! -d "$script_dir/$dir" ]] && continue
   while IFS= read -r file; do
     rel="$dir/$file"

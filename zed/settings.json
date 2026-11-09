@@ -1,0 +1,62 @@
+// Synced to ~/.config/zed by `dotfiles env`. Edits made in Zed's settings UI
+// land in ~/.config/zed and get overwritten on the next sync; copy them back here.
+{
+  "vim_mode": true,
+  "session": {
+    "trust_all_worktrees": true
+  },
+
+  "theme": {
+    "mode": "dark",
+    "light": "Gruvbox Light",
+    "dark": "Gruvbox Dark"
+  },
+  // Same font as Ghostty
+  "buffer_font_family": "Cascadia Code NF",
+  "buffer_font_size": 15,
+  "ui_font_size": 16,
+  "terminal": {
+    "font_family": "Cascadia Code NF"
+  },
+
+  "disable_ai": false,
+  "edit_predictions": {
+    "provider": "ollama",
+    "zed": {
+      "prediction_debounce": 0
+    },
+    "allow_data_collection": "no"
+  },
+  "agent_servers": {
+    "claude-acp": { "type": "registry" },
+    "codex-acp": { "type": "registry" }
+  },
+
+  // rowspace: Python (ruff + ty), TS/React (oxlint/oxfmt), Justfile, Docker,
+  // SQL migrations, OpenFGA model (authz.fga)
+  "auto_install_extensions": {
+    "oxc": true,
+    "toml": true,
+    "dockerfile": true,
+    "docker-compose": true,
+    "just": true,
+    "sql": true,
+    "openfga": true,
+    "csv": true,
+    "env": true,
+    "git-firefly": true
+  },
+
+  "languages": {
+    "Python": {
+      // ty replaces basedpyright (rowspace type-checks with ty); ruff stays on via "..."
+      "language_servers": ["ty", "!basedpyright", "..."],
+      "format_on_save": "on",
+      "formatter": [
+        { "code_action": "source.organizeImports.ruff" },
+        { "code_action": "source.fixAll.ruff" },
+        { "language_server": { "name": "ruff" } }
+      ]
+    }
+  }
+}

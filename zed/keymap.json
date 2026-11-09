@@ -1,0 +1,21 @@
+// Synced to ~/.config/zed by `dotfiles env`.
+[
+  {
+    // Karabiner swaps Cmd/Ctrl everywhere but standalone terminals, so in Zed's
+    // terminal physical Ctrl+<key> arrives as Cmd+<key>. Send the real control
+    // keys the shell expects; copy moves to Ctrl+Shift+C like Windows Terminal.
+    "context": "Terminal",
+    "bindings": {
+      "cmd-c": ["terminal::SendKeystroke", "ctrl-c"],
+      "cmd-shift-c": "terminal::Copy",
+      "cmd-d": ["terminal::SendKeystroke", "ctrl-d"],
+      "cmd-r": ["terminal::SendKeystroke", "ctrl-r"],
+      "cmd-l": ["terminal::SendKeystroke", "ctrl-l"],
+      "cmd-a": ["terminal::SendKeystroke", "ctrl-a"],
+      "cmd-e": ["terminal::SendKeystroke", "ctrl-e"],
+      "cmd-u": ["terminal::SendKeystroke", "ctrl-u"],
+      "cmd-w": ["terminal::SendKeystroke", "ctrl-w"],
+      "cmd-z": ["terminal::SendKeystroke", "ctrl-z"]
+    }
+  }
+]

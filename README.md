@@ -70,6 +70,7 @@ dotfiles/       # home-directory configs (.shellrc, .zshrc, .gitconfig, ...)
 config/         # XDG configs (nvim, ghostty, karabiner, lazygit, bat, mise, ohmyposh)
 config/git/hooks/  # global git hooks (core.hooksPath)
 claude/         # Claude Code user config (settings, CLAUDE.md, statusline)
+zed/            # Zed settings + keymap (synced file by file; ~/.config/zed holds Zed state)
 ```
 
 Work-specific config (boxy helpers, Opal access requests, internal hostnames)
