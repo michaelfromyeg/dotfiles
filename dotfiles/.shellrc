@@ -79,6 +79,7 @@ alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 alias c='clear'
 alias tild='cd "$TIL_DATA_DIR"'
+alias rs='cd "$HOME/code/rowspace"'
 
 # Reset terminal after SSH to clear any terminfo weirdness. Only for
 # interactive sessions -- `reset` on a non-tty emits escape junk, and scripted
