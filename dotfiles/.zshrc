@@ -90,4 +90,8 @@ if [[ -d "$HOME/Library/pnpm" ]]; then
 fi
 
 # rv (ruby version manager)
-command -v rv >/dev/null 2>&1 && eval "$(rv shell init zsh)"
+# if-block, not `&&`: as the last line, a failed test would leave $? = 1 at
+# the first prompt.
+if command -v rv >/dev/null 2>&1; then
+  eval "$(rv shell init zsh)"
+fi
