@@ -440,21 +440,9 @@ export SDKMAN_DIR="$HOME/.sdkman"
 [ -d /usr/local/go/bin ] && export PATH="/usr/local/go/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
 
-# Prompt. oh-my-posh's theme uses Nerd Font icons; Claude desktop's terminal panel
-# can't render them (no font setting), so it gets a plain prompt instead.
-if [ "$TERM_PROGRAM" = "claude-desktop" ]; then
-  if [ -n "$ZSH_VERSION" ]; then
-    autoload -Uz vcs_info
-    precmd_functions+=(vcs_info)
-    zstyle ':vcs_info:git:*' formats ' (%b)'
-    setopt PROMPT_SUBST
-    # zsh reads PROMPT; single quotes defer ${vcs_info_msg_0_} to prompt time
-    # shellcheck disable=SC2034,SC2016
-    PROMPT='%F{yellow}%~%f%F{green}${vcs_info_msg_0_}%f %(?..%F{red}[%?]%f )$ '
-  else
-    PS1='\[\e[33m\]\w\[\e[0m\] \$ '
-  fi
-elif command -v oh-my-posh >/dev/null 2>&1; then
+# oh-my-posh (if installed). Its theme uses Nerd Font icons: in Claude desktop,
+# set Settings -> Code font to "Cascadia Code NF" (installed by the Brewfile).
+if command -v oh-my-posh >/dev/null 2>&1; then
   eval "$(oh-my-posh init "${ZSH_VERSION:+zsh}${BASH_VERSION:+bash}" --config ~/.config/ohmyposh/gruvbox2.omp.json)"
 fi
 
