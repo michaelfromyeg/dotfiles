@@ -8,3 +8,8 @@ keybind=ctrl+v=paste_from_clipboard
 keybind=ctrl+shift+v=paste_from_clipboard
 keybind=performable:ctrl+c=copy_to_clipboard
 keybind=ctrl+shift+c=copy_to_clipboard
+# Windows Terminal-style splits. Ctrl+D normally sends end-of-input (exit a
+# shell/REPL), so that moves to Alt+D.
+keybind=ctrl+d=new_split:right
+keybind=ctrl+shift+d=new_split:down
+keybind=alt+d=text:\x04
