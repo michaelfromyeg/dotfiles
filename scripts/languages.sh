@@ -26,8 +26,10 @@ log "Starting installation of programming languages and tools"
 
 # PowerShell (macOS only)
 if [[ $(uname) == "Darwin" ]]; then
-  brew install --cask powershell || true
-  check_cmd pwsh
+  # The stable powershell cask was removed from Homebrew; fall back to preview.
+  brew install --cask powershell || brew install --cask powershell@preview || true
+  # powershell@preview installs its binary as pwsh-preview
+  check_cmd pwsh || check_cmd pwsh-preview || true
 fi
 
 # Rust
@@ -44,8 +46,8 @@ rustup default stable
 rustup component add rust-src rust-analyzer
 cargo install cargo-edit cargo-watch || true
 
-check_cmd rustc
-check_cmd cargo
+check_cmd rustc || true
+check_cmd cargo || true
 
 # Golang (cross-platform)
 log "Installing Golang..."
@@ -71,12 +73,13 @@ else
 fi
 go install golang.org/x/tools/gopls@latest
 
-check_cmd go
-check_cmd gopls
+check_cmd go || true
+check_cmd gopls || true
 
-# mise (Node.js). The global default and .nvmrc support live in
-# config/mise/config.toml, synced by `dotfiles env`.
-log "Installing Node.js via mise..."
+# mise: Node, Erlang, Elixir and Ruby. Versions live in config/mise/config.toml
+# (synced to ~/.config/mise by `dotfiles env`); point mise at the repo copy so
+# this works even before env has run.
+log "Installing Node, Erlang, Elixir and Ruby via mise..."
 if ! command -v mise &>/dev/null; then
   if command -v brew &>/dev/null; then
     brew install mise
@@ -88,11 +91,27 @@ else
   log "mise already installed"
 fi
 
-mise install node@lts
+# Erlang compiles from source where no prebuilt exists (Linux); install its build deps.
+if [[ "$(uname -s)" == "Linux" ]] && ! dpkg -s libncurses-dev &>/dev/null; then
+  log "Installing Erlang build dependencies..."
+  sudo apt-get update -qq
+  sudo apt-get install -y build-essential autoconf m4 libncurses-dev libssl-dev \
+    libwxgtk3.2-dev libwxgtk-webview3.2-dev libgl1-mesa-dev libglu1-mesa-dev \
+    libpng-dev libssh-dev unixodbc-dev xsltproc fop libxml2-utils libyaml-dev \
+    2>/dev/null || log "Some optional Erlang build dependencies may not be available"
+fi
+
+repo_root="${script_dir:-$(cd "$(dirname "$0")/.." && pwd)}"
+MISE_GLOBAL_CONFIG_FILE="$repo_root/config/mise/config.toml" mise install
 export PATH="$HOME/.local/share/mise/shims:$PATH"
 
-check_cmd npm
-check_cmd node
+check_cmd node || true
+check_cmd npm || true
+check_cmd erl || true
+check_cmd elixir || true
+check_cmd mix || true
+check_cmd ruby || true
+check_cmd gem || true
 
 # uv (Python)
 log "Installing uv for Python..."
@@ -103,8 +122,8 @@ else
   uv self update || true
 fi
 
-check_cmd python3
-check_cmd uv
+check_cmd python3 || true
+check_cmd uv || true
 
 # SDKMAN (Java, Kotlin, Gradle)
 # Note: requires release-assets.githubusercontent.com to be accessible
@@ -126,118 +145,11 @@ if [ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]; then
   sdk install gradle || true
   sdk install kotlin || true
 
-  check_cmd java
-  check_cmd gradle
-  check_cmd kotlin
+  check_cmd java || true
+  check_cmd gradle || true
+  check_cmd kotlin || true
 else
   log "SDKMAN installation failed - skipping Java/Gradle/Kotlin"
-fi
-
-# asdf + Erlang/Elixir
-log "Installing Erlang and Elixir via asdf..."
-
-# Install build dependencies for Erlang (required for compiling from source)
-# Only install if not already present (check for key dependency: libncurses-dev)
-if [[ "$(uname -s)" == "Linux" ]]; then
-  if ! dpkg -s libncurses-dev &>/dev/null; then
-    log "Installing Erlang build dependencies..."
-    # Core build tools and libraries required by asdf-erlang
-    # See: https://github.com/asdf-vm/asdf-erlang#ubuntu-2404-lts
-    sudo apt-get update -qq
-    sudo apt-get install -y \
-      build-essential \
-      autoconf \
-      m4 \
-      libncurses-dev \
-      libssl-dev \
-      libwxgtk3.2-dev libwxgtk-webview3.2-dev \
-      libgl1-mesa-dev libglu1-mesa-dev \
-      libpng-dev \
-      libssh-dev \
-      unixodbc-dev \
-      xsltproc fop libxml2-utils \
-      2>/dev/null || {
-      # Fallback for older Ubuntu versions with wxWidgets 3.0
-      log "Trying fallback dependencies for older Ubuntu..."
-      sudo apt-get install -y \
-        build-essential autoconf m4 \
-        libncurses5-dev libncurses-dev \
-        libssl-dev \
-        libwxgtk3.0-gtk3-dev libwxgtk-webview3.0-gtk3-dev \
-        libgl1-mesa-dev libglu1-mesa-dev \
-        libpng-dev libssh-dev unixodbc-dev \
-        xsltproc fop libxml2-utils \
-        2>/dev/null || log "Some optional dependencies may not be available"
-    }
-  else
-    log "Erlang build dependencies already installed"
-  fi
-fi
-
-if [ ! -d "$HOME/.asdf" ]; then
-  git clone https://github.com/asdf-vm/asdf.git "$HOME/.asdf" --branch v0.14.1
-fi
-source "$HOME/.asdf/asdf.sh"
-
-asdf plugin add erlang || true
-asdf plugin add elixir || true
-
-# Install Erlang (skip if already installed - compilation takes 15+ minutes)
-ERLANG_VERSION=$(asdf latest erlang)
-INSTALLED_ERLANG=$(asdf current erlang 2>/dev/null | awk '{print $2}')
-if [ "$INSTALLED_ERLANG" != "$ERLANG_VERSION" ]; then
-  log "Installing Erlang $ERLANG_VERSION (this takes 15+ minutes)..."
-  asdf install erlang "$ERLANG_VERSION" || true
-  asdf global erlang "$ERLANG_VERSION" || true
-else
-  log "Erlang $ERLANG_VERSION already installed"
-fi
-
-# Get installed Erlang OTP version for Elixir compatibility
-OTP_VERSION=$(asdf current erlang 2>/dev/null | awk '{print $2}' | cut -d. -f1)
-if [ -n "$OTP_VERSION" ]; then
-  # Find latest Elixir compatible with installed OTP version
-  ELIXIR_VERSION=$(asdf list all elixir | grep -E "^[0-9]+\.[0-9]+\.[0-9]+-otp-${OTP_VERSION}$" | tail -1)
-  INSTALLED_ELIXIR=$(asdf current elixir 2>/dev/null | awk '{print $2}')
-  if [ "$INSTALLED_ELIXIR" = "$ELIXIR_VERSION" ]; then
-    log "Elixir $ELIXIR_VERSION already installed"
-  elif [ -n "$ELIXIR_VERSION" ]; then
-    log "Installing Elixir $ELIXIR_VERSION (compatible with OTP $OTP_VERSION)..."
-    asdf install elixir "$ELIXIR_VERSION" || true
-    asdf global elixir "$ELIXIR_VERSION" || true
-  else
-    log "No Elixir version found for OTP $OTP_VERSION, trying latest..."
-    asdf install elixir latest || true
-    asdf global elixir latest || true
-  fi
-else
-  log "Erlang not installed, skipping Elixir..."
-fi
-
-check_cmd erl
-check_cmd elixir
-check_cmd mix
-
-# rvm (Ruby)
-log "Installing Ruby via rvm..."
-if [ ! -d "$HOME/.rvm" ]; then
-  gpg --keyserver keyserver.ubuntu.com --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB || log "GPG key import failed, but continuing"
-  curl -sSL https://get.rvm.io | bash -s stable
-fi
-
-if [ -s "$HOME/.rvm/scripts/rvm" ]; then
-  source "$HOME/.rvm/scripts/rvm"
-
-  # Check if ruby is installed, install if not
-  if ! rvm list | grep -q ruby; then
-    rvm install ruby --latest
-  fi
-  rvm use ruby --latest --default || true
-
-  check_cmd ruby
-  check_cmd gem
-else
-  log "rvm installation failed - skipping Ruby"
 fi
 
 # Lua (for neovim plugins)
@@ -253,8 +165,8 @@ else
   fi
 fi
 
-check_cmd lua
-check_cmd luarocks
+check_cmd lua || true
+check_cmd luarocks || true
 
 # Language dependencies for neovim
 log "Installing language-specific packages..."

@@ -32,8 +32,11 @@ brew "jq"
 brew "bat"
 brew "eza"
 brew "htop"
-brew "tldr"
+# tldr formula was removed from Homebrew; tlrc is the official client (`tldr` command)
+brew "tlrc"
 brew "zoxide"
+# zsh plugin manager (a formula, not a cask)
+brew "antidote"
 brew "hyperfine"
 brew "direnv"
 # version manager (node, ...); config in config/mise, activated in .shellrc
@@ -50,21 +53,32 @@ brew "tectonic"
 brew "jandedobbeleer/oh-my-posh/oh-my-posh"
 
 if OS.mac?
+  # Leave apps alone when something other than Homebrew installed them (e.g. IT
+  # pushing Zoom via MDM on a work laptop): brew can't upgrade over those.
+  def installed_outside_brew?(token, app)
+    File.exist?("/Applications/#{app}") && !File.exist?("#{HOMEBREW_PREFIX}/Caskroom/#{token}")
+  end
+
   # Core Utilities
   cask "ghostty"
+  # Ghostty's font (config/ghostty/config)
+  cask "font-cascadia-code-nf"
   cask "rectangle"
+  # Windows-style keys; config in config/karabiner
+  cask "karabiner-elements"
   cask "alt-tab"
 
   # Development
   cask "visual-studio-code"
-  cask "docker"
-  cask "antidote"
+  cask "zed"
+  cask "zed-delta"
+  cask "docker-desktop" unless installed_outside_brew?("docker-desktop", "Docker.app")
 
   # Browsers and Communication
   cask "firefox"
   cask "google-chrome"
-  cask "slack"
-  cask "zoom"
+  cask "slack" unless installed_outside_brew?("slack", "Slack.app")
+  cask "zoom" unless installed_outside_brew?("zoom", "zoom.us.app")
   cask "thunderbird"
 
   # Media and File Management
@@ -78,6 +92,7 @@ if OS.mac?
   # Office and Productivity
   cask "libreoffice"
   cask "notion"
+  cask "notion-calendar"
   cask "figma"
   cask "beeper"
   cask "cold-turkey-blocker"
@@ -92,9 +107,8 @@ if OS.mac?
   cask "calibre"
   cask "the-unarchiver"
   cask "cursor"
-  cask "dupeguru"
+  # dupeguru and qbittorrent casks were disabled by Homebrew (fail Gatekeeper); install manually if needed
   cask "private-internet-access"
-  cask "qbittorrent"
 
   # Additional Mac-specific tools
   cask "alfred"

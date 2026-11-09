@@ -56,7 +56,7 @@ The filter matches a script name exactly first (`dotfiles test` runs only test.s
 ```
 run.sh                 # Main entry point harness
 scripts/               # Modular setup scripts (.sh for POSIX, .ps1 for Windows)
-config/                # XDG-compliant app configs (nvim, ghostty, lazygit, bat, ohmyposh)
+config/                # XDG-compliant app configs (nvim, ghostty, karabiner, lazygit, bat, mise, ohmyposh)
 dotfiles/              # Shell configs (.shellrc, .zshrc, .bashrc, .gitconfig, .tmux.conf)
 claude/                # Claude Code user-level config (settings.json, CLAUDE.md, skills/)
 ```

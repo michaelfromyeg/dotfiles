@@ -21,6 +21,15 @@ fi
 log "Updating Homebrew..."
 HOMEBREW_NO_AUTO_UPDATE=1 brew update
 
+# Newer Homebrew refuses to load formulae from third-party taps until they are
+# trusted, so trust every tap the Brewfile declares.
+if brew trust --help &>/dev/null; then
+  log "Trusting taps from Brewfile..."
+  grep -E '^tap "' "$repo_root/Brewfile" | cut -d'"' -f2 | while read -r t; do
+    brew trust "$t"
+  done
+fi
+
 log "Installing from Brewfile..."
 brew bundle --file="$repo_root/Brewfile"
 

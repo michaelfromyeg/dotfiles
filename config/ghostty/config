@@ -1,4 +1,10 @@
-theme=GruvboxDark
+theme=Gruvbox Dark
 font-family=Cascadia Code NF
 keybind=shift+enter=text:\x1b\r
 shell-integration-features=no-cursor,ssh-terminfo
+# Windows Terminal-style clipboard (Karabiner leaves Ctrl unswapped in terminals).
+# performable: Ctrl+C copies only when there's a selection, otherwise it still sends SIGINT.
+keybind=ctrl+v=paste_from_clipboard
+keybind=ctrl+shift+v=paste_from_clipboard
+keybind=performable:ctrl+c=copy_to_clipboard
+keybind=ctrl+shift+c=copy_to_clipboard

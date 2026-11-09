@@ -3,6 +3,9 @@
 
 [tools]
 node = "lts"
+erlang = "latest"
+elixir = "latest"
+ruby = "latest"
 
 [settings]
 # Honor per-repo .nvmrc / .node-version files (notion-next, rowspace, ...)
