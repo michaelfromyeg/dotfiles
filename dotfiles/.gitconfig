@@ -73,6 +73,9 @@
 # Use gh's credential helper locally; fall back to $GH_TOKEN where gh isn't
 # installed (e.g. boxies, which inject GH_TOKEN but have no gh on PATH).
 [credential "https://github.com"]
+  # Empty helper clears inherited ones (Homebrew git sets osxkeychain system-wide,
+  # which would hand out a stale cached token before gh is asked).
+  helper =
   helper = "!f() { if command -v gh >/dev/null 2>&1; then gh auth git-credential \"$@\"; elif [ \"$1\" = get ] && [ -n \"$GH_TOKEN\" ]; then echo username=x-access-token; echo \"password=$GH_TOKEN\"; fi; }; f"
 [advice]
   skippedCherryPicks = false
