@@ -80,6 +80,11 @@ alias egrep='egrep --color=auto'
 alias c='clear'
 alias tild='cd "$TIL_DATA_DIR"'
 alias rs='cd "$HOME/code/rowspace"'
+alias rs1='cd "$HOME/code/rowspace-1"'
+alias rs2='cd "$HOME/code/rowspace-2"'
+alias rs3='cd "$HOME/code/rowspace-3"'
+alias rs4='cd "$HOME/code/rowspace-4"'
+alias rs5='cd "$HOME/code/rowspace-5"'
 
 # Reset terminal after SSH to clear any terminfo weirdness. Only for
 # interactive sessions -- `reset` on a non-tty emits escape junk, and scripted
@@ -435,9 +440,21 @@ export SDKMAN_DIR="$HOME/.sdkman"
 [ -d /usr/local/go/bin ] && export PATH="/usr/local/go/bin:$PATH"
 export PATH="$HOME/go/bin:$PATH"
 
-# oh-my-posh (if installed)
-if command -v oh-my-posh >/dev/null 2>&1; then
-  # eval "$(oh-my-posh init "$(basename "$SHELL")" --config "$(brew --prefix oh-my-posh)"/themes/gruvbox.omp.json)"
+# Prompt. oh-my-posh's theme uses Nerd Font icons; Claude desktop's terminal panel
+# can't render them (no font setting), so it gets a plain prompt instead.
+if [ "$TERM_PROGRAM" = "claude-desktop" ]; then
+  if [ -n "$ZSH_VERSION" ]; then
+    autoload -Uz vcs_info
+    precmd_functions+=(vcs_info)
+    zstyle ':vcs_info:git:*' formats ' (%b)'
+    setopt PROMPT_SUBST
+    # zsh reads PROMPT; single quotes defer ${vcs_info_msg_0_} to prompt time
+    # shellcheck disable=SC2034,SC2016
+    PROMPT='%F{yellow}%~%f%F{green}${vcs_info_msg_0_}%f %(?..%F{red}[%?]%f )$ '
+  else
+    PS1='\[\e[33m\]\w\[\e[0m\] \$ '
+  fi
+elif command -v oh-my-posh >/dev/null 2>&1; then
   eval "$(oh-my-posh init "${ZSH_VERSION:+zsh}${BASH_VERSION:+bash}" --config ~/.config/ohmyposh/gruvbox2.omp.json)"
 fi
 
