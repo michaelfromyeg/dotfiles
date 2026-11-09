@@ -72,6 +72,9 @@ if OS.mac?
   cask "visual-studio-code"
   cask "zed"
   cask "zed-delta"
+  # Coding agent CLIs
+  cask "claude-code"
+  cask "codex"
   cask "docker-desktop" unless installed_outside_brew?("docker-desktop", "Docker.app")
 
   # Browsers and Communication
