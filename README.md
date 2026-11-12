@@ -59,6 +59,16 @@ dotfiles <script> -- <args>  # pass args through to the script
 | `font` | Install a Nerd Font via oh-my-posh |
 | `notion` | Run Notion's environment setup |
 
+Windows-native scripts (`scripts/*.ps1`) run directly in PowerShell, not via
+the harness:
+
+| Script | What it does |
+|---|---|
+| `ui.ps1` | Install apps via winget (admin) |
+| `update.ps1` | Windows Update + `winget upgrade --all` (admin) |
+| `font.ps1` | Install a Nerd Font via oh-my-posh |
+| `display.ps1` | Force an external monitor's resolution when its EDID doesn't come through (`-W 2560 -H 1440`; `-Edid` writes a Dell P2720D override, admin) |
+
 ## Layout
 
 ```
