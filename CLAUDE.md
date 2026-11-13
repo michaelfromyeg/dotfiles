@@ -58,7 +58,8 @@ run.sh                 # Main entry point harness
 scripts/               # Modular setup scripts (.sh for POSIX, .ps1 for Windows)
 config/                # XDG-compliant app configs (nvim, ghostty, karabiner, lazygit, bat, mise, ohmyposh)
 dotfiles/              # Shell configs (.shellrc, .zshrc, .bashrc, .gitconfig, .tmux.conf)
-claude/                # Claude Code user-level config (settings.json, CLAUDE.md, skills/)
+claude/                # Claude Code user-level config (settings.json, CLAUDE.md)
+skills/                # Agent skills -> ~/.claude/skills (Claude Code) and ~/.agents/skills (Codex)
 zed/                   # Zed settings.json + keymap.json -> ~/.config/zed (files, not the dir)
 ```
 

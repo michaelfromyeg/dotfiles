@@ -136,13 +136,19 @@ run_cmd vim +PlugInstall +qall
 
 # Claude Code user-level config (~/.claude/ is not XDG, so handled separately)
 run_cmd mkdir -p "$HOME/.claude"
-run_cmd mkdir -p "$HOME/.claude/skills"
 copy_file "$script_dir/claude/settings.json" "$HOME/.claude"
 copy_file "$script_dir/claude/statusline-command.sh" "$HOME/.claude"
 copy_file "$script_dir/claude/CLAUDE.md" "$HOME/.claude"
-if [ -d "$script_dir/claude/skills" ] && [ "$(ls -A "$script_dir/claude/skills" 2>/dev/null)" ]; then
-  copy_dirs "$script_dir/claude/skills" "$HOME/.claude/skills"
-fi
+
+# Agent skills: Claude Code reads ~/.claude/skills, Codex reads ~/.agents/skills.
+# copy_dirs replaces only the skill folders in skills/, so tool-managed folders
+# (e.g. ~/.claude/skills/synced) are left alone.
+for skills_dir in "$HOME/.claude/skills" "$HOME/.agents/skills"; do
+  run_cmd mkdir -p "$skills_dir"
+  if [ -d "$script_dir/skills" ] && [ "$(ls -A "$script_dir/skills" 2>/dev/null)" ]; then
+    copy_dirs "$script_dir/skills" "$skills_dir"
+  fi
+done
 
 # Zed: copy individual files, not the directory, since ~/.config/zed also holds
 # Zed's own state (prompt library, installed extensions).
