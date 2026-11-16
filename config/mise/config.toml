@@ -3,6 +3,8 @@
 
 [tools]
 node = "lts"
+# Keep pnpm available when a repository switches the active Node version.
+pnpm = "10.34.5"
 erlang = "latest"
 elixir = "latest"
 ruby = "latest"

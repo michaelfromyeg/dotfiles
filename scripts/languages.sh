@@ -76,10 +76,10 @@ go install golang.org/x/tools/gopls@latest
 check_cmd go || true
 check_cmd gopls || true
 
-# mise: Node, Erlang, Elixir and Ruby. Versions live in config/mise/config.toml
+# mise: Node, pnpm, Erlang, Elixir and Ruby. Versions live in config/mise/config.toml
 # (synced to ~/.config/mise by `dotfiles env`); point mise at the repo copy so
 # this works even before env has run.
-log "Installing Node, Erlang, Elixir and Ruby via mise..."
+log "Installing Node, pnpm, Erlang, Elixir and Ruby via mise..."
 if ! command -v mise &>/dev/null; then
   if command -v brew &>/dev/null; then
     brew install mise
@@ -107,6 +107,7 @@ export PATH="$HOME/.local/share/mise/shims:$PATH"
 
 check_cmd node || true
 check_cmd npm || true
+check_cmd pnpm || true
 check_cmd erl || true
 check_cmd elixir || true
 check_cmd mix || true
