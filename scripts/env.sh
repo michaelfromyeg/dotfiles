@@ -160,6 +160,10 @@ copy_file "$script_dir/zed/keymap.json" "$config_home/zed"
 # claude CLI isn't present yet, e.g. early in a fresh Boxy provision).
 run_cmd bash "$script_dir/scripts/claude-plugins.sh"
 
+# Register the user-scoped MCP servers declared in claude/mcp-servers.json.
+SYNCED_FILES+=("claude/mcp-servers.json")
+run_cmd bash "$script_dir/scripts/claude-mcp.sh"
+
 # Narrow fetches and schedule git maintenance for the repos git-repos.sh lists.
 run_cmd bash "$script_dir/scripts/git-repos.sh"
 

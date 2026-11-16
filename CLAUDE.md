@@ -26,6 +26,7 @@ dotfiles ui            # Install CLI tools + apps via `brew bundle` (Brewfile)
 dotfiles languages     # Install programming languages
 dotfiles neovim        # Build Neovim from source
 dotfiles claude-plugins # Install Claude Code plugins from claude/settings.json
+dotfiles claude-mcp     # Register user-scoped MCP servers from claude/mcp-servers.json
 ```
 
 Fresh machines bootstrap with `bootstrap.sh` (curl-able; clones to `~/code/dotfiles` and runs `env`).

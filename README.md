@@ -48,6 +48,7 @@ dotfiles <script> -- <args>  # pass args through to the script
 | `homebrew` | Install Homebrew itself |
 | `neovim` | Build Neovim from source |
 | `claude-plugins` | Install Claude Code plugins declared in `claude/settings.json` |
+| `claude-mcp` | Register user-scoped Claude Code MCP servers declared in `claude/mcp-servers.json` |
 | `test` | Sanity check |
 | `test-changed` | Run tests for files changed vs a base branch (notion-next) |
 | `tmux-dev` | Start a dev tmux session (claude + scratchpad + notion run); `tdev` alias |
