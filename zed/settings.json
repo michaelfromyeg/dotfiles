@@ -1,6 +1,7 @@
 // Synced to ~/.config/zed by `dotfiles env`. Edits made in Zed's settings UI
 // land in ~/.config/zed and get overwritten on the next sync; copy them back here.
 {
+  "diff_view_style": "unified",
   "vim_mode": true,
   "session": {
     "trust_all_worktrees": true
@@ -47,10 +48,24 @@
     "git-firefly": true
   },
 
+  "lsp": {
+    "yaml-language-server": {
+      "settings": {
+        "yaml": {
+          // MkDocs configs reference Python callables with these tags (rowspace scripts/docs/mkdocs.yml)
+          "customTags": [
+            "tag:yaml.org,2002:python/name:pymdownx.superfences.fence_code_format",
+            "tag:yaml.org,2002:python/object/apply:pymdownx.slugs.slugify mapping"
+          ]
+        }
+      }
+    }
+  },
+
   "languages": {
     "Python": {
-      // ty replaces basedpyright (rowspace type-checks with ty); ruff stays on via "..."
-      "language_servers": ["ty", "!basedpyright", "..."],
+      // ty replaces basedpyright and pyrefly (rowspace type-checks with ty); ruff stays on via "..."
+      "language_servers": ["ty", "!basedpyright", "!pyrefly", "..."],
       "format_on_save": "on",
       "formatter": [
         { "code_action": "source.organizeImports.ruff" },
