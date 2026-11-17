@@ -27,7 +27,7 @@ This skill is the canonical home for Andy's design and code-level preferences. W
 
 Short functions, DRY, self-documenting code, more abstraction, and low complexity scores are proxies, not definitions of readability. When a proxy conflicts with the questions below, follow the questions.
 
-Before handing off code, run `cccc` (in `~/.local/bin`) on the changed source files, excluding tests and generated code: `cccc --table --max-cyclomatic 40 <files>`. It lists every function's cognitive and cyclomatic complexity and exits non-zero when any function exceeds cyclomatic 40; split a function over that limit before handing off. Below the limit, treat a new or grown function near the top as a prompt to reapply these principles, and report the hotspots you left in place. The score is a signal, not a target.
+Before handing off code, run `cccc` (installed by `dotfiles languages`) on the changed source files, excluding tests and generated code: `cccc --table --max-cyclomatic 40 <files>`. It lists every function's cognitive and cyclomatic complexity and exits non-zero when any function exceeds cyclomatic 40; split a function over that limit before handing off. Below the limit, treat a new or grown function near the top as a prompt to reapply these principles, and report the hotspots you left in place. The score is a signal, not a target.
 
 | Property | Question |
 | --- | --- |

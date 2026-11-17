@@ -44,7 +44,7 @@ else
 fi
 rustup default stable
 rustup component add rust-src rust-analyzer
-cargo install cargo-edit cargo-watch || true
+cargo install --locked cargo-edit cargo-watch cccc-cli || true
 
 check_cmd rustc || true
 check_cmd cargo || true
