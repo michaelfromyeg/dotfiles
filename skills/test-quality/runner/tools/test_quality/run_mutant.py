@@ -57,6 +57,9 @@ INTERRUPTING_SIGNALS = (signal.SIGTERM, signal.SIGHUP, signal.SIGQUIT)
 # Time a run keeps the source mutated after its test command's --timeout:
 # stopping the process group and restoring the file.
 CLEANUP_MARGIN_SECONDS = 30
+# Upper bound on a run's work before its test command starts: the dev-stack
+# query (30 s timeout), git show for --from-ref, and writing the backup.
+PRE_TEST_SECONDS = 120
 
 
 def emit(payload: dict) -> None:
@@ -424,7 +427,13 @@ def compute_mutant(args: argparse.Namespace, target: Path, original: bytes) -> b
     return replace_snippet(original.decode(), args.old, args.new).encode()
 
 
-def hold_checkout_lock(*, run_seconds: float | None = None) -> None:
+def write_run_deadline(lock_fd: int, run_seconds: float) -> None:
+    """Record, in the held lock file, when this process will have restored its file."""
+    os.ftruncate(lock_fd, 0)
+    os.pwrite(lock_fd, encode_run_deadline(time.time(), run_seconds, CLEANUP_MARGIN_SECONDS), 0)
+
+
+def hold_checkout_lock(*, run_seconds: float | None = None) -> int:
     """Allow one mutation run or recovery per checkout.
 
     A mutant in one file changes what every test in the checkout sees, so a
@@ -455,17 +464,9 @@ def hold_checkout_lock(*, run_seconds: float | None = None) -> None:
         time.sleep(0.5)
     # Always replace the previous holder's deadline: a recovery writes a short
     # one, so a waiter never reads a finished run's stale value.
-    os.ftruncate(fd, 0)
-    os.pwrite(
-        fd,
-        encode_run_deadline(
-            time.time(),
-            run_seconds if run_seconds is not None else 0,
-            CLEANUP_MARGIN_SECONDS,
-        ),
-        0,
-    )
+    write_run_deadline(fd, run_seconds if run_seconds is not None else 0)
     # Deliberately never closed: closing would release the lock.
+    return fd
 
 
 def bytecode_dir_prefix(root: Path) -> str:
@@ -598,7 +599,9 @@ def main() -> None:
     working_dir = Path(args.working_dir).resolve()
     if not (working_dir.is_dir() and is_inside(working_dir, root)):
         fail(f"--working-dir {working_dir} must be a directory inside the repository")
-    hold_checkout_lock(run_seconds=args.timeout)
+    # Budget for the work before the test command starts (the dev-stack and
+    # git queries); the deadline is rewritten when the command starts.
+    lock_fd = hold_checkout_lock(run_seconds=args.timeout + PRE_TEST_SECONDS)
     # With the checkout lock held no other run is live, so any record is a
     # crashed run's mutant still in the tree, which would skew this run.
     pending = sorted(path.name for path in backup_dir().glob("*.json"))
@@ -654,6 +657,7 @@ def main() -> None:
         remove_cached_bytecode(target)
         bytecode_dir = tempfile.mkdtemp(prefix=bytecode_dir_prefix(root))
         with os.fdopen(log_fd, "wb") as log:
+            write_run_deadline(lock_fd, args.timeout)
             process = subprocess.Popen(
                 cmd,
                 stdout=log,
