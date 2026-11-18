@@ -265,11 +265,15 @@ def stop_orphaned_test_group(directory: Path) -> dict | None:
         # an unrelated group, so only report it. The record stays, and keeps
         # new runs from starting, until no process in the group is left.
         return {"pgid": pgid, "action": "not-verified-left-running"}
-    path.unlink(missing_ok=True)
+    # Stop the group first: the record keeps new runs out until it is gone.
     try:
         os.killpg(pgid, signal.SIGKILL)
     except ProcessLookupError:
+        path.unlink(missing_ok=True)
         return None
+    except PermissionError:
+        return {"pgid": pgid, "action": "not-verified-left-running"}
+    path.unlink(missing_ok=True)
     return {"pgid": pgid, "action": "stopped"}
 
 
@@ -282,6 +286,10 @@ def restore_leftovers() -> None:
     # A hard-killed run's tests may still be running against the mutant; stop
     # them before restoring, or they would keep scoring against a changing tree.
     orphaned_tests = stop_orphaned_test_group(directory)
+    # Caches of runs that were killed before their own cleanup; with the
+    # checkout lock held, none of this checkout's caches is in use.
+    for cache in Path(tempfile.gettempdir()).glob(f"{bytecode_dir_prefix(root)}*"):
+        shutil.rmtree(cache, ignore_errors=True)
     results = []
     for record_path in sorted(directory.glob("*.json")):
         try:
@@ -460,21 +468,41 @@ def hold_checkout_lock(*, run_seconds: float | None = None) -> None:
     # Deliberately never closed: closing would release the lock.
 
 
+def bytecode_dir_prefix(root: Path) -> str:
+    """Prefix of this checkout's per-run bytecode caches, so recovery can find them."""
+    return f"test-quality-pycache-{sha256(str(root).encode())[:12]}-"
+
+
 def dev_stack_running(root: Path) -> bool | None:
     """Whether this worktree's Docker Compose dev stack is up; None if it cannot be told.
 
     Its app services bind-mount the checkout and reload changed source, so
     they would load the mutant. Only repositories with the stack helper (this
     one) have such a stack; elsewhere this is False. Docker is queried here
-    rather than through the helper, which reads a failed query as "no stack":
-    containers keep running when the Docker socket is unreachable.
+    rather than through the helper's exists check, which reads a failed query
+    as "no stack": containers keep running when the Docker socket is
+    unreachable.
     """
     if not (root / "scripts" / "worktree" / "compose_stack.py").is_file():
+        return False
+    # The stack is started from this env file and its project name is
+    # resolved with it, so a worktree without one cannot have a stack.
+    if not (root / ".cache" / "env").is_file():
         return False
     try:
         listed = subprocess.run(
             ["docker", "compose", "ls", "-q"], cwd=root, capture_output=True, text=True, timeout=30
         )
+    except FileNotFoundError:
+        return False  # No Docker CLI: no stack can be running.
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if listed.returncode != 0:
+        return None
+    projects = listed.stdout.split()
+    if not projects:
+        return False
+    try:
         name = subprocess.run(
             ["uv", "run", "python", "-m", "scripts.worktree.compose_stack", "name"],
             cwd=root,
@@ -482,14 +510,11 @@ def dev_stack_running(root: Path) -> bool | None:
             text=True,
             timeout=60,
         )
-    except FileNotFoundError:
-        # No Docker CLI (or uv) on this machine: no stack can be running.
-        return False
     except (OSError, subprocess.TimeoutExpired):
         return None
-    if listed.returncode != 0 or name.returncode != 0:
+    if name.returncode != 0:
         return None
-    return name.stdout.strip() in listed.stdout.split()
+    return name.stdout.strip() in projects
 
 
 def open_log(log: str | None) -> int:
@@ -637,7 +662,7 @@ def main() -> None:
             write_error = error
             raise
         remove_cached_bytecode(target)
-        bytecode_dir = tempfile.mkdtemp(prefix="test-quality-pycache-")
+        bytecode_dir = tempfile.mkdtemp(prefix=bytecode_dir_prefix(root))
         with os.fdopen(log_fd, "wb") as log:
             process = subprocess.Popen(
                 cmd,
