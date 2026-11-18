@@ -15,6 +15,7 @@ import argparse
 import fcntl
 import json
 import os
+import shutil
 import signal
 import subprocess
 import sys
@@ -162,20 +163,18 @@ def replace_contents(target: Path, data: bytes, *, expected: bytes) -> None:
             print(f"warning: could not remove {temporary}: {error}", file=sys.stderr)
 
 
-def remove_cached_bytecode(target: Path) -> bool:
+def remove_cached_bytecode(target: Path) -> None:
     # CPython validates a .pyc by source mtime (whole seconds) and size, so a
     # same-size mutant written within the same second as an earlier one could
-    # run stale bytecode. Removing the cache forces a recompile from source.
-    # Returns whether the cache is gone. Before a test run a stale cache could
-    # make the tests run the original code, so the caller must not trust that
-    # run; after a restore it is only a warning.
+    # run stale bytecode. Test commands on this host never read this cache
+    # (they get their own PYTHONPYCACHEPREFIX); this protects test processes
+    # elsewhere that share the checkout, such as a dev container, so a failure
+    # (a root-owned __pycache__) is only a warning.
     try:
         for cached in (target.parent / "__pycache__").glob(f"{target.stem}.*.pyc"):
             cached.unlink(missing_ok=True)
     except OSError as error:
         print(f"warning: could not clear cached bytecode for {target}: {error}", file=sys.stderr)
-        return False
-    return True
 
 
 def stop_process_group(process: subprocess.Popen) -> None:
@@ -188,10 +187,6 @@ def stop_process_group(process: subprocess.Popen) -> None:
         process.wait(timeout=10)
     except (OSError, subprocess.TimeoutExpired) as error:
         print(f"warning: could not stop the test process group: {error}", file=sys.stderr)
-
-
-class StaleBytecodeError(Exception):
-    pass
 
 
 def raise_keyboard_interrupt(_signum, _frame):
@@ -465,6 +460,38 @@ def hold_checkout_lock(*, run_seconds: float | None = None) -> None:
     # Deliberately never closed: closing would release the lock.
 
 
+def dev_stack_running(root: Path) -> bool | None:
+    """Whether this worktree's Docker Compose dev stack is up; None if it cannot be told.
+
+    Its app services bind-mount the checkout and reload changed source, so
+    they would load the mutant. Only repositories with the stack helper (this
+    one) have such a stack; elsewhere this is False. Docker is queried here
+    rather than through the helper, which reads a failed query as "no stack":
+    containers keep running when the Docker socket is unreachable.
+    """
+    if not (root / "scripts" / "worktree" / "compose_stack.py").is_file():
+        return False
+    try:
+        listed = subprocess.run(
+            ["docker", "compose", "ls", "-q"], cwd=root, capture_output=True, text=True, timeout=30
+        )
+        name = subprocess.run(
+            ["uv", "run", "python", "-m", "scripts.worktree.compose_stack", "name"],
+            cwd=root,
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+    except FileNotFoundError:
+        # No Docker CLI (or uv) on this machine: no stack can be running.
+        return False
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    if listed.returncode != 0 or name.returncode != 0:
+        return None
+    return name.stdout.strip() in listed.stdout.split()
+
+
 def open_log(log: str | None) -> int:
     """Open the test log for writing. Opening truncates, so it is limited to temporary directories outside the repository."""
     if log is None:
@@ -514,6 +541,11 @@ def main() -> None:
         default=".",
         help="Directory to run the test command in, inside the repository (e.g. frontend)",
     )
+    parser.add_argument(
+        "--allow-running-stack",
+        action="store_true",
+        help="Run even though this worktree's dev stack is up (integration tests need it)",
+    )
     parser.add_argument("--restore-leftovers", action="store_true")
     parser.add_argument("cmd", nargs=argparse.REMAINDER, help="-- <test command>")
     args = parser.parse_args()
@@ -561,6 +593,17 @@ def main() -> None:
     # score this run's mutants too.
     if (backup_dir() / TEST_GROUP_FILE).exists():
         fail("a crashed run's tests may still be running; run --restore-leftovers first")
+    stack = dev_stack_running(root) if not args.allow_running_stack else False
+    if stack is None:
+        fail(
+            "could not tell whether this worktree's dev stack is running (Docker did not "
+            "answer); check Docker or pass --allow-running-stack"
+        )
+    if stack:
+        fail(
+            "this worktree's dev stack is running, and its services reload source files, "
+            "so they would run the mutant; stop the stack or pass --allow-running-stack"
+        )
     log_fd = open_log(args.log)
     record_path = record_path_for(target)
     started = time.monotonic()
@@ -570,6 +613,7 @@ def main() -> None:
     write_error: OSError | None = None
     run_error: str | None = None
     recorded_test_group = False
+    bytecode_dir: str | None = None
     for interrupting in INTERRUPTING_SIGNALS:
         signal.signal(interrupting, raise_keyboard_interrupt)
     try:
@@ -592,15 +636,21 @@ def main() -> None:
         except OSError as error:
             write_error = error
             raise
-        if not remove_cached_bytecode(target):
-            raise StaleBytecodeError(f"could not clear cached bytecode for {target}")
+        remove_cached_bytecode(target)
+        bytecode_dir = tempfile.mkdtemp(prefix="test-quality-pycache-")
         with os.fdopen(log_fd, "wb") as log:
             process = subprocess.Popen(
                 cmd,
                 stdout=log,
                 stderr=subprocess.STDOUT,
                 cwd=working_dir,
-                env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
+                env={
+                    **os.environ,
+                    "PYTHONDONTWRITEBYTECODE": "1",
+                    # A cache of its own, so no bytecode in the checkout (stale
+                    # or unremovable) can stand in for the mutant.
+                    "PYTHONPYCACHEPREFIX": bytecode_dir,
+                },
                 start_new_session=True,
             )
             # Record the group at once (no start time yet: recovery reports such
@@ -631,10 +681,6 @@ def main() -> None:
         # The command could not start (missing, not executable).
         outcome = Outcome.ERROR
         run_error = f"the test command could not start: {error}"
-    except StaleBytecodeError as error:
-        # The tests could run the original code, so the result would mean nothing.
-        outcome = Outcome.ERROR
-        run_error = str(error)
     except KeyboardInterrupt:
         outcome = Outcome.INTERRUPTED
     finally:
@@ -660,6 +706,8 @@ def main() -> None:
             fail(f"{target}: {reason}")
         if recorded_test_group:
             (backup_dir() / TEST_GROUP_FILE).unlink(missing_ok=True)
+        if bytecode_dir is not None:
+            shutil.rmtree(bytecode_dir, ignore_errors=True)
         if cleanup == RunCleanup.SET_ASIDE:
             # The run held the lock, so the record is dead but holds the only
             # copy of the original; set it aside so later runs are not blocked.
