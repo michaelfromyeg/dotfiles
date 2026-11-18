@@ -474,24 +474,24 @@ def bytecode_dir_prefix(root: Path) -> str:
 
 
 def dev_stack_running(root: Path) -> bool | None:
-    """Whether this worktree's Docker Compose dev stack is up; None if it cannot be told.
+    """Whether a Docker Compose stack is running from this checkout; None if it cannot be told.
 
     Its app services bind-mount the checkout and reload changed source, so
-    they would load the mutant. Only repositories with the stack helper (this
-    one) have such a stack; elsewhere this is False. Docker is queried here
-    rather than through the helper's exists check, which reads a failed query
-    as "no stack": containers keep running when the Docker socket is
-    unreachable.
+    they would load the mutant. Compose labels every container with its
+    project's working directory, so a running container whose working
+    directory is inside this checkout means this checkout's stack is up. Project
+    names are not used: worktrees can resolve another checkout's name.
+    Only repositories with the stack helper (this one) run such stacks;
+    elsewhere this is False.
     """
     if not (root / "scripts" / "worktree" / "compose_stack.py").is_file():
         return False
-    # The stack is started from this env file and its project name is
-    # resolved with it, so a worktree without one cannot have a stack.
-    if not (root / ".cache" / "env").is_file():
-        return False
     try:
         listed = subprocess.run(
-            ["docker", "compose", "ls", "-q"], cwd=root, capture_output=True, text=True, timeout=30
+            ["docker", "ps", "--format", '{{.Label "com.docker.compose.project.working_dir"}}'],
+            capture_output=True,
+            text=True,
+            timeout=30,
         )
     except FileNotFoundError:
         return False  # No Docker CLI: no stack can be running.
@@ -499,22 +499,9 @@ def dev_stack_running(root: Path) -> bool | None:
         return None
     if listed.returncode != 0:
         return None
-    projects = listed.stdout.split()
-    if not projects:
-        return False
-    try:
-        name = subprocess.run(
-            ["uv", "run", "python", "-m", "scripts.worktree.compose_stack", "name"],
-            cwd=root,
-            capture_output=True,
-            text=True,
-            timeout=60,
-        )
-    except (OSError, subprocess.TimeoutExpired):
-        return None
-    if name.returncode != 0:
-        return None
-    return name.stdout.strip() in projects
+    return any(
+        is_inside(Path(line).resolve(), root) for line in listed.stdout.splitlines() if line.strip()
+    )
 
 
 def open_log(log: str | None) -> int:
@@ -621,12 +608,12 @@ def main() -> None:
     stack = dev_stack_running(root) if not args.allow_running_stack else False
     if stack is None:
         fail(
-            "could not tell whether this worktree's dev stack is running (Docker did not "
-            "answer); check Docker or pass --allow-running-stack"
+            "could not tell whether a dev stack is running from this checkout (Docker did "
+            "not answer); check Docker or pass --allow-running-stack"
         )
     if stack:
         fail(
-            "this worktree's dev stack is running, and its services reload source files, "
+            "a dev stack is running from this checkout, and its services reload source files, "
             "so they would run the mutant; stop the stack or pass --allow-running-stack"
         )
     log_fd = open_log(args.log)
