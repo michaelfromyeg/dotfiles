@@ -80,7 +80,9 @@ scripts/        # setup scripts; lib.sh holds shared log/run_cmd helpers
 dotfiles/       # home-directory configs (.shellrc, .zshrc, .gitconfig, ...)
 config/         # XDG configs (nvim, ghostty, karabiner, lazygit, bat, mise, ohmyposh)
 config/git/hooks/  # global git hooks (core.hooksPath)
-claude/         # Claude Code user config (settings, CLAUDE.md, statusline)
+claude/         # Claude Code user config (settings, CLAUDE.md, statusline, agents/)
+codex/          # Codex user config (agents/)
+skills/         # agent skills, synced to ~/.claude/skills and ~/.agents/skills
 zed/            # Zed settings + keymap (synced file by file; ~/.config/zed holds Zed state)
 ```
 

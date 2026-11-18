@@ -150,6 +150,15 @@ for skills_dir in "$HOME/.claude/skills" "$HOME/.agents/skills"; do
   fi
 done
 
+# Custom agents: Claude Code reads ~/.claude/agents, Codex reads ~/.codex/agents.
+run_cmd mkdir -p "$HOME/.claude/agents" "$HOME/.codex/agents"
+for agent in "$script_dir"/claude/agents/*; do
+  [ -f "$agent" ] && copy_file "$agent" "$HOME/.claude/agents"
+done
+for agent in "$script_dir"/codex/agents/*; do
+  [ -f "$agent" ] && copy_file "$agent" "$HOME/.codex/agents"
+done
+
 # Zed: copy individual files, not the directory, since ~/.config/zed also holds
 # Zed's own state (prompt library, installed extensions).
 run_cmd mkdir -p "$config_home/zed"
@@ -257,7 +266,7 @@ WARN_YELLOW='\033[0;33m'
 WARN_NC='\033[0m'
 unsynced=0
 
-for dir in dotfiles claude zed; do
+for dir in dotfiles claude codex zed; do
   [[ ! -d "$script_dir/$dir" ]] && continue
   while IFS= read -r file; do
     rel="$dir/$file"
