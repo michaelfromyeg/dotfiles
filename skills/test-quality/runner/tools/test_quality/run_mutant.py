@@ -474,17 +474,18 @@ def bytecode_dir_prefix(root: Path) -> str:
 
 
 def dev_stack_running(root: Path) -> bool | None:
-    """Whether a Docker Compose stack is running from this checkout; None if it cannot be told.
+    """Whether this checkout's app dev stack is running; None if it cannot be told.
 
-    Its app services bind-mount the checkout and reload changed source, so
-    they would load the mutant. Compose labels every container with its
-    project's working directory, so a running container whose working
-    directory is inside this checkout means this checkout's stack is up. Project
-    names are not used: worktrees can resolve another checkout's name.
-    Only repositories with the stack helper (this one) run such stacks;
-    elsewhere this is False.
+    The app stack (docker/local) bind-mounts the checkout and reloads changed
+    source, so it would load the mutant. Compose labels every container with
+    its project's working directory, so a running container whose working
+    directory is this checkout's docker/local means that stack is up. Project
+    names are not used, because worktrees can resolve another checkout's name.
+    Other Compose stacks (such as Temporal for ingestion) do not reload app
+    source and are ignored. Repositories without that stack get False.
     """
-    if not (root / "scripts" / "worktree" / "compose_stack.py").is_file():
+    app_stack = root / "docker" / "local"
+    if not (app_stack / "docker-compose.yml").is_file():
         return False
     try:
         listed = subprocess.run(
@@ -500,7 +501,9 @@ def dev_stack_running(root: Path) -> bool | None:
     if listed.returncode != 0:
         return None
     return any(
-        is_inside(Path(line).resolve(), root) for line in listed.stdout.splitlines() if line.strip()
+        Path(line).resolve() == app_stack.resolve()
+        for line in listed.stdout.splitlines()
+        if line.strip()
     )
 
 
