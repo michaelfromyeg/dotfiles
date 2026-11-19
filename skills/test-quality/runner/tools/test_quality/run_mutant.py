@@ -12,6 +12,7 @@ recorded mutant, so edits made after a crash survive.
 """
 
 import argparse
+import contextlib
 import fcntl
 import json
 import os
@@ -474,7 +475,7 @@ def bytecode_dir_prefix(root: Path) -> str:
     return f"test-quality-pycache-{sha256(str(root).encode())[:12]}-"
 
 
-def dev_stack_running(root: Path) -> bool | None:
+def compose_app_stack_running(root: Path) -> bool | None:
     """Whether this checkout's app dev stack is running; None if it cannot be told.
 
     The app stack (docker/local) bind-mounts the checkout and reloads changed
@@ -506,6 +507,70 @@ def dev_stack_running(root: Path) -> bool | None:
         for line in listed.stdout.splitlines()
         if line.strip()
     )
+
+
+def host_dev_server_running(root: Path) -> bool | None:
+    """Whether a backend dev server from this checkout is listening (`just run`).
+
+    It reloads changed source like the Compose stack does. The port is the
+    worktree's BACKEND_PORT (default 8000); the listener only counts when its
+    working directory is inside this checkout, so another worktree's server on
+    that port does not block runs here.
+    """
+    port = os.environ.get("BACKEND_PORT") or env_file_value(root, "BACKEND_PORT") or "8000"
+    try:
+        listeners = subprocess.run(
+            ["lsof", "-nP", f"-iTCP:{port}", "-sTCP:LISTEN", "-t"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except FileNotFoundError:
+        return None  # Cannot look, so cannot say.
+    except (OSError, subprocess.TimeoutExpired):
+        return None
+    for pid in listeners.stdout.split():
+        try:
+            cwd = subprocess.run(
+                ["lsof", "-a", "-p", pid, "-d", "cwd", "-Fn"],
+                capture_output=True,
+                text=True,
+                timeout=30,
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            return None
+        directories = [line[1:] for line in cwd.stdout.splitlines() if line.startswith("n")]
+        if any(is_inside(Path(directory).resolve(), root) for directory in directories):
+            return True
+    return False
+
+
+def env_file_value(root: Path, name: str) -> str | None:
+    try:
+        lines = (root / ".cache" / "env").read_text().splitlines()
+    except OSError:
+        return None
+    for line in lines:
+        if line.startswith(f"{name}="):
+            return line.split("=", 1)[1].strip().strip('"')
+    return None
+
+
+def dev_stack_running(root: Path) -> bool | None:
+    """Whether a dev stack from this checkout, which reloads changed source, is up.
+
+    True if either the Compose app stack or a host dev server is running from
+    this checkout, None if either cannot be told. Repositories without the app
+    stack definition have neither, so get False.
+    """
+    if not (root / "docker" / "local" / "docker-compose.yml").is_file():
+        return False
+    answers = [compose_app_stack_running(root), host_dev_server_running(root)]
+    if True in answers:
+        return True
+    if None in answers:
+        return None
+    return False
 
 
 def open_log(log: str | None) -> int:
@@ -619,8 +684,8 @@ def main() -> None:
         )
     if stack:
         fail(
-            "a dev stack is running from this checkout, and its services reload source files, "
-            "so they would run the mutant; stop the stack or pass --allow-running-stack"
+            "a dev stack or dev server is running from this checkout, and it reloads source "
+            "files, so it would run the mutant; stop it or pass --allow-running-stack"
         )
     log_fd = open_log(args.log)
     record_path = record_path_for(target)
@@ -631,6 +696,7 @@ def main() -> None:
     write_error: OSError | None = None
     run_error: str | None = None
     recorded_test_group = False
+    starting_test_command = False
     bytecode_dir: str | None = None
     for interrupting in INTERRUPTING_SIGNALS:
         signal.signal(interrupting, raise_keyboard_interrupt)
@@ -658,6 +724,7 @@ def main() -> None:
         bytecode_dir = tempfile.mkdtemp(prefix=bytecode_dir_prefix(root))
         with os.fdopen(log_fd, "wb") as log:
             write_run_deadline(lock_fd, args.timeout)
+            starting_test_command = True
             process = subprocess.Popen(
                 cmd,
                 stdout=log,
@@ -697,9 +764,12 @@ def main() -> None:
     except subprocess.TimeoutExpired:
         outcome = Outcome.TIMEOUT
     except (OSError, subprocess.SubprocessError) as error:
-        # The command could not start (missing, not executable).
         outcome = Outcome.ERROR
-        run_error = f"the test command could not start: {error}"
+        if starting_test_command:
+            # The command itself could not start (missing, not executable).
+            run_error = f"the test command could not start: {error}"
+        else:
+            run_error = f"could not prepare the test run (the source is restored): {error}"
     except KeyboardInterrupt:
         outcome = Outcome.INTERRUPTED
     finally:
@@ -720,11 +790,17 @@ def main() -> None:
             test_started=process is not None,
         )
         if cleanup == RunCleanup.DISCARD_RECORD:
-            record_path.unlink(missing_ok=True)
+            with contextlib.suppress(OSError):
+                record_path.unlink(missing_ok=True)
             reason = f"could not write the mutant: {write_error}" if write_error else "interrupted"
             fail(f"{target}: {reason}")
+        # Nothing between here and the restore may exit or raise: the
+        # mutant is still in the file.
         if recorded_test_group:
-            (backup_dir() / TEST_GROUP_FILE).unlink(missing_ok=True)
+            try:
+                (record_path.parent / TEST_GROUP_FILE).unlink(missing_ok=True)
+            except OSError as error:
+                print(f"warning: could not remove the test-group record: {error}", file=sys.stderr)
         if bytecode_dir is not None:
             shutil.rmtree(bytecode_dir, ignore_errors=True)
         if cleanup == RunCleanup.SET_ASIDE:

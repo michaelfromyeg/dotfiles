@@ -1,6 +1,6 @@
 ---
 name: test-quality
-description: Measures whether new or changed tests would catch real regressions, using diff-scoped mutation testing, changed-line coverage, a revert check, a flakiness rerun, and a review against the repository's testing rules. Use only when the user asks for a test-quality review or asks "are these tests any good?"; it temporarily rewrites source files, so do not start it on your own. Pass the base ref or changed files, the behavior under test (and the bug, for a fix), and the test files.
+description: Runs the test-quality skill (~/.claude/skills/test-quality/SKILL.md, which holds the full description and rules), measuring whether new or changed tests would catch regressions. Use only when the user asks for a test-quality review, since it temporarily rewrites source files.
 tools: Read, Grep, Glob, Bash
 skills:
   - test-quality
