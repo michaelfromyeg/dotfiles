@@ -259,12 +259,9 @@ def stop_orphaned_test_group(directory: Path) -> dict | None:
         pgid, start = int(group["pgid"]), group["start"]
     except FileNotFoundError:
         return None
-    except (ValueError, KeyError, TypeError):
-        path.unlink(missing_ok=True)
-        return None
-    except OSError:
-        # The record exists but cannot be read: its group may still be running,
-        # so keep the record, which keeps new runs out.
+    except (OSError, ValueError, KeyError, TypeError):
+        # The record exists but cannot be read or parsed: its group may still be
+        # running, so keep the record, which keeps new runs out.
         return {"pgid": None, "action": "not-verified-left-running", "record": str(path)}
     if not process_group_exists(pgid):
         # Nothing left running in that group: the record has done its job.
@@ -571,10 +568,15 @@ def dev_stack_refusal(root: Path) -> str | None:
         return None
     compose = compose_app_stack_running(root)
     host = host_dev_server_running(root)
-    if compose or host:
+    running = []
+    if compose:
+        running.append("this checkout's Docker Compose stack is running")
+    if host:
+        running.append("a host dev server or file watcher is running from this checkout")
+    if running:
         return (
-            "a dev stack or dev server is running from this checkout, and it reloads source "
-            "files, so it would run the mutant; stop it or pass --allow-running-stack"
+            f"{' and '.join(running)}, and it reloads source files, so it would run the "
+            "mutant; stop it or pass --allow-running-stack"
         )
     unanswered = []
     if compose is None:
