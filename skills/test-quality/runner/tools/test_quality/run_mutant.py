@@ -291,7 +291,10 @@ def restore_leftovers() -> None:
     root = repo_root()
     directory = backup_dir()
     # A hard-killed run's tests may still be running against the mutant; stop
-    # them before restoring, or they would keep scoring against a changing tree.
+    # them first when that is safe. Files are restored even when the group
+    # could not be verified: nothing scores those tests any more, the original
+    # source is what the checkout must end with, and the kept group record
+    # keeps new runs out until the caller has dealt with the group.
     orphaned_tests = stop_orphaned_test_group(directory)
     # Caches of runs that were killed before their own cleanup; with the
     # checkout lock held, none of this checkout's caches is in use.
