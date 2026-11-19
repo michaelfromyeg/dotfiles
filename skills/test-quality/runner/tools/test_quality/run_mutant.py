@@ -510,67 +510,64 @@ def compose_app_stack_running(root: Path) -> bool | None:
 
 
 def host_dev_server_running(root: Path) -> bool | None:
-    """Whether a backend dev server from this checkout is listening (`just run`).
+    """Whether a host dev server from this checkout is listening; None if it cannot be told.
 
-    It reloads changed source like the Compose stack does. The port is the
-    worktree's BACKEND_PORT (default 8000); the listener only counts when its
-    working directory is inside this checkout, so another worktree's server on
-    that port does not block runs here.
+    Host dev servers (`just run`, `just be-dev`) reload changed source like the
+    Compose stack does. They accept any port (`just be-dev --port 8002`), so
+    every TCP listener counts when its working directory is inside this
+    checkout. A server from another worktree does not block runs here.
     """
-    port = os.environ.get("BACKEND_PORT") or env_file_value(root, "BACKEND_PORT") or "8000"
     try:
         listeners = subprocess.run(
-            ["lsof", "-nP", f"-iTCP:{port}", "-sTCP:LISTEN", "-t"],
+            ["lsof", "-nP", "-iTCP", "-sTCP:LISTEN", "-t"],
             capture_output=True,
             text=True,
             timeout=30,
         )
-    except FileNotFoundError:
-        return None  # Cannot look, so cannot say.
+        pids = sorted(set(listeners.stdout.split()))
+        if not pids:
+            return False
+        cwds = subprocess.run(
+            ["lsof", "-a", "-p", ",".join(pids), "-d", "cwd", "-Fn"],
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
     except (OSError, subprocess.TimeoutExpired):
         return None
-    for pid in listeners.stdout.split():
-        try:
-            cwd = subprocess.run(
-                ["lsof", "-a", "-p", pid, "-d", "cwd", "-Fn"],
-                capture_output=True,
-                text=True,
-                timeout=30,
-            )
-        except (OSError, subprocess.TimeoutExpired):
-            return None
-        directories = [line[1:] for line in cwd.stdout.splitlines() if line.startswith("n")]
-        if any(is_inside(Path(directory).resolve(), root) for directory in directories):
-            return True
-    return False
+    directories = [line[1:] for line in cwds.stdout.splitlines() if line.startswith("n")]
+    return any(is_inside(Path(directory).resolve(), root) for directory in directories)
 
 
-def env_file_value(root: Path, name: str) -> str | None:
-    try:
-        lines = (root / ".cache" / "env").read_text().splitlines()
-    except OSError:
-        return None
-    for line in lines:
-        if line.startswith(f"{name}="):
-            return line.split("=", 1)[1].strip().strip('"')
-    return None
+def dev_stack_refusal(root: Path) -> str | None:
+    """Why a run must not start while this checkout's dev stack could reload the mutant.
 
-
-def dev_stack_running(root: Path) -> bool | None:
-    """Whether a dev stack from this checkout, which reloads changed source, is up.
-
-    True if either the Compose app stack or a host dev server is running from
-    this checkout, None if either cannot be told. Repositories without the app
-    stack definition have neither, so get False.
+    The Compose app stack and host dev servers both reload changed source and
+    would run the mutant against the local database. Each probe that cannot
+    answer is named, so the caller fixes that probe instead of guessing.
+    Repositories without the app stack definition have neither, so get None.
     """
     if not (root / "docker" / "local" / "docker-compose.yml").is_file():
-        return False
-    answers = [compose_app_stack_running(root), host_dev_server_running(root)]
-    if True in answers:
-        return True
-    if None in answers:
         return None
-    return False
+    compose = compose_app_stack_running(root)
+    host = host_dev_server_running(root)
+    if compose or host:
+        return (
+            "a dev stack or dev server is running from this checkout, and it reloads source "
+            "files, so it would run the mutant; stop it or pass --allow-running-stack"
+        )
+    unanswered = []
+    if compose is None:
+        unanswered.append("whether the Docker Compose stack is running (docker ps failed)")
+    if host is None:
+        unanswered.append("whether a host dev server is listening (lsof failed or is missing)")
+    if unanswered:
+        return (
+            f"could not tell {' or '.join(unanswered)}; fix that check, or pass "
+            "--allow-running-stack after confirming no dev stack or dev server runs from "
+            "this checkout"
+        )
+    return None
 
 
 def open_log(log: str | None) -> int:
@@ -676,17 +673,9 @@ def main() -> None:
     # score this run's mutants too.
     if (backup_dir() / TEST_GROUP_FILE).exists():
         fail("a crashed run's tests may still be running; run --restore-leftovers first")
-    stack = dev_stack_running(root) if not args.allow_running_stack else False
-    if stack is None:
-        fail(
-            "could not tell whether a dev stack is running from this checkout (Docker did "
-            "not answer); check Docker or pass --allow-running-stack"
-        )
-    if stack:
-        fail(
-            "a dev stack or dev server is running from this checkout, and it reloads source "
-            "files, so it would run the mutant; stop it or pass --allow-running-stack"
-        )
+    refusal = None if args.allow_running_stack else dev_stack_refusal(root)
+    if refusal:
+        fail(refusal)
     log_fd = open_log(args.log)
     record_path = record_path_for(target)
     started = time.monotonic()
