@@ -508,25 +508,33 @@ def compose_app_stack_running(root: Path) -> bool | None:
 
 
 def host_dev_server_running(root: Path) -> bool | None:
-    """Whether a host dev server from this checkout is listening; None if it cannot be told.
+    """Whether a host dev process from this checkout reloads source; None if it cannot be told.
 
     Host dev servers (`just run`, `just be-dev`) reload changed source like the
-    Compose stack does. They accept any port (`just be-dev --port 8002`), so
-    every TCP listener counts when its working directory is inside this
-    checkout. A server from another worktree does not block runs here.
+    Compose stack does, on any port (`just be-dev --port 8002`), so every TCP
+    listener counts. The job runners and authz relay listen on nothing; they
+    rerun under `entr` on every source change, so every `entr` process counts
+    too. Either only counts when its working directory is inside this
+    checkout, so another worktree's processes do not block runs here.
     """
     try:
+        # lsof and pgrep exit 1 when nothing matches; lsof -w silences
+        # warnings, so anything on stderr means a tool could not look.
         listeners = subprocess.run(
             ["lsof", "-w", "-nP", "-iTCP", "-sTCP:LISTEN", "-t"],
             capture_output=True,
             text=True,
             timeout=30,
         )
-        # lsof exits 1 both when nothing listens and when it fails; -w silences
-        # warnings, so anything on stderr means it could not look.
-        if listeners.returncode not in (0, 1) or listeners.stderr.strip():
+        watchers = subprocess.run(
+            ["pgrep", "-x", "entr"], capture_output=True, text=True, timeout=30
+        )
+        if any(
+            found.returncode not in (0, 1) or found.stderr.strip()
+            for found in (listeners, watchers)
+        ):
             return None
-        pids = sorted(set(listeners.stdout.split()))
+        pids = sorted(set(listeners.stdout.split()) | set(watchers.stdout.split()))
         if not pids:
             return False
         cwds = subprocess.run(
@@ -537,9 +545,10 @@ def host_dev_server_running(root: Path) -> bool | None:
         )
     except (OSError, subprocess.TimeoutExpired):
         return None
-    directories = [line[1:] for line in cwds.stdout.splitlines() if line.startswith("n")]
-    if cwds.returncode != 0 and not directories:
+    # Exit 1 here can mean a process exited since it was listed.
+    if cwds.returncode not in (0, 1) or cwds.stderr.strip():
         return None
+    directories = [line[1:] for line in cwds.stdout.splitlines() if line.startswith("n")]
     return any(is_inside(Path(directory).resolve(), root) for directory in directories)
 
 
@@ -564,7 +573,9 @@ def dev_stack_refusal(root: Path) -> str | None:
     if compose is None:
         unanswered.append("whether the Docker Compose stack is running (docker ps failed)")
     if host is None:
-        unanswered.append("whether a host dev server is listening (lsof failed or is missing)")
+        unanswered.append(
+            "whether a host dev server or file watcher is running (lsof or pgrep failed or is missing)"
+        )
     if unanswered:
         return (
             f"could not tell {' or '.join(unanswered)}; fix that check, or pass "
@@ -771,7 +782,14 @@ def main() -> None:
             signal.signal(interrupting, signal.SIG_IGN)
         if process and exit_code is None:
             stop_process_group(process)
-        current = read_if_present(target)
+        try:
+            current = read_if_present(target)
+        except OSError as error:
+            # Keep the record: it may hold the only copy of the original bytes.
+            stop_with_record_kept(
+                KeptState.RESTORE_FAILED,
+                f"cannot read {target} after the run ({error}); its original is in {record_path}",
+            )
         if process is not None and trusted_outcome(outcome, current, mutant) != outcome:
             outcome = Outcome.ERROR
             run_error = "the test command changed the file, so the tests may not have run against the mutant"
