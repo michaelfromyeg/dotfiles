@@ -268,7 +268,7 @@ def stop_orphaned_test_group(directory: Path) -> dict | None:
         # The leader has exited or the pid was reused: killing by pgid could hit
         # an unrelated group, so only report it. The record stays, and keeps
         # new runs from starting, until no process in the group is left.
-        return {"pgid": pgid, "action": "not-verified-left-running"}
+        return {"pgid": pgid, "action": "not-verified-left-running", "record": str(path)}
     # Stop the group first: the record keeps new runs out until it is gone.
     try:
         os.killpg(pgid, signal.SIGKILL)
@@ -276,7 +276,7 @@ def stop_orphaned_test_group(directory: Path) -> dict | None:
         path.unlink(missing_ok=True)
         return None
     except PermissionError:
-        return {"pgid": pgid, "action": "not-verified-left-running"}
+        return {"pgid": pgid, "action": "not-verified-left-running", "record": str(path)}
     path.unlink(missing_ok=True)
     return {"pgid": pgid, "action": "stopped"}
 
@@ -484,11 +484,9 @@ def compose_app_stack_running(root: Path) -> bool | None:
     directory is this checkout's docker/local means that stack is up. Project
     names are not used, because worktrees can resolve another checkout's name.
     Other Compose stacks (such as Temporal for ingestion) do not reload app
-    source and are ignored. Repositories without that stack get False.
+    source and are ignored. The caller checks that the stack definition exists.
     """
     app_stack = root / "docker" / "local"
-    if not (app_stack / "docker-compose.yml").is_file():
-        return False
     try:
         listed = subprocess.run(
             ["docker", "ps", "--format", '{{.Label "com.docker.compose.project.working_dir"}}'],
@@ -519,16 +517,20 @@ def host_dev_server_running(root: Path) -> bool | None:
     """
     try:
         listeners = subprocess.run(
-            ["lsof", "-nP", "-iTCP", "-sTCP:LISTEN", "-t"],
+            ["lsof", "-w", "-nP", "-iTCP", "-sTCP:LISTEN", "-t"],
             capture_output=True,
             text=True,
             timeout=30,
         )
+        # lsof exits 1 both when nothing listens and when it fails; -w silences
+        # warnings, so anything on stderr means it could not look.
+        if listeners.returncode not in (0, 1) or listeners.stderr.strip():
+            return None
         pids = sorted(set(listeners.stdout.split()))
         if not pids:
             return False
         cwds = subprocess.run(
-            ["lsof", "-a", "-p", ",".join(pids), "-d", "cwd", "-Fn"],
+            ["lsof", "-w", "-a", "-p", ",".join(pids), "-d", "cwd", "-Fn"],
             capture_output=True,
             text=True,
             timeout=30,
@@ -536,6 +538,8 @@ def host_dev_server_running(root: Path) -> bool | None:
     except (OSError, subprocess.TimeoutExpired):
         return None
     directories = [line[1:] for line in cwds.stdout.splitlines() if line.startswith("n")]
+    if cwds.returncode != 0 and not directories:
+        return None
     return any(is_inside(Path(directory).resolve(), root) for directory in directories)
 
 
