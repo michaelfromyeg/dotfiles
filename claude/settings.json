@@ -25,7 +25,8 @@
     "notion-iac@makenotion-plugins": true,
     "notion-observability@makenotion-plugins": true,
     "notion-statsig@makenotion-plugins": true,
-    "trace-claude-code@braintrust-claude-plugin": false
+    "trace-claude-code@braintrust-claude-plugin": false,
+    "local-times@michaelfromyeg": true
   },
   "extraKnownMarketplaces": {
     "aviator-plugins": {
@@ -38,6 +39,12 @@
       "source": {
         "source": "github",
         "repo": "braintrustdata/braintrust-claude-plugin"
+      }
+    },
+    "michaelfromyeg": {
+      "source": {
+        "source": "github",
+        "repo": "michaelfromyeg/dotfiles"
       }
     }
   },

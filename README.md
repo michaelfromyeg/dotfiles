@@ -83,6 +83,7 @@ config/git/hooks/  # global git hooks (core.hooksPath)
 claude/         # Claude Code user config (settings, CLAUDE.md, statusline, agents/)
 codex/          # Codex user config (agents/)
 skills/         # agent skills, synced to ~/.claude/skills and ~/.agents/skills
+mods/           # Claude Code mods, installed from this repo's marketplace (.claude-plugin/)
 zed/            # Zed settings + keymap (synced file by file; ~/.config/zed holds Zed state)
 ```
 

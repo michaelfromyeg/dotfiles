@@ -1,0 +1,11 @@
+{
+  "name": "michaelfromyeg",
+  "owner": { "name": "michaelfromyeg" },
+  "plugins": [
+    {
+      "name": "local-times",
+      "source": "./mods/local-times",
+      "description": "Annotates UTC times in Claude's replies with your local time."
+    }
+  ]
+}

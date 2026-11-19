@@ -1,0 +1,13 @@
+{
+  "name": "local-times",
+  "version": "0.1.0",
+  "description": "Annotates UTC times in Claude's replies with your local time, e.g. 18:04 UTC (10:04 AM PST).",
+  "userConfig": {
+    "timeZone": {
+      "type": "string",
+      "title": "Time zone",
+      "description": "IANA zone such as America/Vancouver. Leave empty to use this computer's zone.",
+      "default": ""
+    }
+  }
+}
