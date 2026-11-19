@@ -257,9 +257,15 @@ def stop_orphaned_test_group(directory: Path) -> dict | None:
     try:
         group = json.loads(path.read_text())
         pgid, start = int(group["pgid"]), group["start"]
-    except (OSError, ValueError, KeyError, TypeError):
+    except FileNotFoundError:
+        return None
+    except (ValueError, KeyError, TypeError):
         path.unlink(missing_ok=True)
         return None
+    except OSError:
+        # The record exists but cannot be read: its group may still be running,
+        # so keep the record, which keeps new runs out.
+        return {"pgid": None, "action": "not-verified-left-running", "record": str(path)}
     if not process_group_exists(pgid):
         # Nothing left running in that group: the record has done its job.
         path.unlink(missing_ok=True)
@@ -499,7 +505,8 @@ def compose_app_stack_running(root: Path) -> bool | None:
     except (OSError, subprocess.TimeoutExpired):
         return None
     if listed.returncode != 0:
-        return None
+        # With the daemon down no container runs, so no stack can be up.
+        return False if "Cannot connect to the Docker daemon" in listed.stderr else None
     return any(
         Path(line).resolve() == app_stack.resolve()
         for line in listed.stdout.splitlines()
