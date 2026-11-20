@@ -78,7 +78,7 @@ bootstrap.sh    # fresh-machine setup, curl-able
 Brewfile        # Homebrew packages + casks (brew bundle)
 scripts/        # setup scripts; lib.sh holds shared log/run_cmd helpers
 dotfiles/       # home-directory configs (.shellrc, .zshrc, .gitconfig, ...)
-config/         # XDG configs (nvim, ghostty, karabiner, lazygit, bat, mise, ohmyposh)
+config/         # XDG configs (nvim, ghostty, rex, karabiner, lazygit, bat, mise, ohmyposh)
 config/git/hooks/  # global git hooks (core.hooksPath)
 claude/         # Claude Code user config (settings, CLAUDE.md, statusline, agents/)
 codex/          # Codex user config (agents/)
@@ -102,7 +102,7 @@ the shared `.shellrc`; mise manages language versions.
 
 - Window managers: Rectangle on macOS, FancyZones (PowerToys) on Windows.
 - Windows-style keys on macOS: Karabiner-Elements swaps Cmd and Ctrl (except in
-  terminals, where Ghostty binds Ctrl+C/V itself), adds Ctrl+arrow word
+  terminals, where Ghostty and Rex bind Ctrl+C/V themselves), adds Ctrl+arrow word
   navigation, Home/End, and Win+arrows for Rectangle snapping. AltTab handles
   Alt+Tab. Rectangle needs its "Recommended" (Ctrl+Option) shortcuts.
 - VS Code settings sync natively; `.vscode/` here is for this repo only.
