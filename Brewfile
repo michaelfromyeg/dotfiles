@@ -17,6 +17,8 @@ brew "vim"
 brew "make"
 # NOTE: neovim is built from source (`dotfiles neovim`), not installed here
 brew "sqlite"
+# Matches rowspace (RDS 16.x). Keg-only, so force-link psql/pg_dump onto PATH
+brew "postgresql@16", link: true
 brew "qpdf"
 brew "wget"
 # GNU find; macOS's BSD find is limited
