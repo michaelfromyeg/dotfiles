@@ -64,13 +64,13 @@ if OS.mac?
 
   # Core Utilities
   cask "ghostty"
-  # Rex (terminal multiplexer) has no cask; install it by hand from superlogical.com. Config in config/rex
   # Ghostty's font (config/ghostty/config)
   cask "font-cascadia-code-nf"
   cask "rectangle"
   # Windows-style keys; config in config/karabiner
   cask "karabiner-elements"
   cask "alt-tab"
+  # Rex (terminal multiplexer) has no cask; install it by hand from superlogical.com. Config in config/rex
 
   # Development
   cask "visual-studio-code"
